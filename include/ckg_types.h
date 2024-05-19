@@ -43,4 +43,6 @@ typedef u8 Boolean;
  * 
  */
 #define ArrayCount(array) (sizeof(array) / sizeof(array[0]))
+
+#define CRASH *((int *)0) = 0
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
