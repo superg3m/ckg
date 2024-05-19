@@ -18,8 +18,8 @@ extern "C" {
 
 	u8* memory_advance_new_ptr(const void* data, u32 size_in_bytes);
 	u8* memory_retreat_new_ptr(const void* data, u32 size_in_bytes);
-	void* ckg_memory_byte_advance(const void* data, u32 size_in_bytes);
-	void* ckg_memory_byte_retreat(const void* data, u32 size_in_bytes);
+	void* MACRO_memory_byte_advance(const void* data, u32 size_in_bytes);
+	void* MACRO_memory_byte_retreat(const void* data, u32 size_in_bytes);
 
 #ifdef __cplusplus
 }
@@ -33,6 +33,7 @@ extern "C" {
 	}                                                  	\
 }
 
-
+#define memory_byte_advance(data, size_in_bytes) data = MACRO_memory_byte_advance(data, size_in_bytes)
+#define memory_byte_retreat(data, size_in_bytes) data = MACRO_memory_byte_retreat(data, size_in_bytes)
 
 	

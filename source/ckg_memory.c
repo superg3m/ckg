@@ -53,13 +53,13 @@ u8* memory_retreat_new_ptr(const void* data, u32 size_in_bytes) {
     return base_address;
 }
 
-void* ckg_memory_byte_advance(const void* data, u32 size_in_bytes) {
+void* MACRO_memory_byte_advance(const void* data, u32 size_in_bytes) {
 	u8* base_address = (u8*)data;
   	base_address += size_in_bytes;
   	return base_address;
 }
 
-void* ckg_memory_byte_retreat(const void* data, u32 size_in_bytes) {
+void* MACRO_memory_byte_retreat(const void* data, u32 size_in_bytes) {
 	u8* base_address = (u8*)data;
   	base_address -= size_in_bytes;
   	return base_address;
