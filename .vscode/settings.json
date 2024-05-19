@@ -1,5 +1,11 @@
 {
 	"files.associations": {
-		"ckg_memory.h": "c"
+		"ckg_memory.h": "c",
+		"ckg_types.h": "c",
+		"ckg_platform_services.h": "c",
+		"ckg_string.h": "c",
+		"ckg_assert.h": "c",
+		"ckg_logger.h": "c",
+		"stdarg.h": "c"
 	}
 }

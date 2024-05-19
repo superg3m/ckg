@@ -4,8 +4,8 @@
  * Date: May 18, 2024
  * Creator: Jovanni Djonaj
 ===========================================================*/
-#include "core_logger.h"
-#include "core_memory.h"
+#include "ckg_logger.h"
+#include "ckg_memory.h"
 
 //========================== Begin Types ==========================
 #define ASSERT_ENABLED TRUE

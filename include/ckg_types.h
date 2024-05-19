@@ -5,6 +5,8 @@
  * Creator: Jovanni Djonaj
 ===========================================================*/
 #include <stdint.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 //========================== Begin Types ==========================
 typedef int8_t  s8;

@@ -42,20 +42,6 @@ extern "C" {
 	 * @param string_buffer_size 
 	 */
 	void ckg_string_copy(char* string_buffer, u32 string_buffer_size, const char* source);
-
-	/**
-	 * @brief 
-	 * 
-	 * Notes:
-	 * 	Requires formated_buffer to be allocated
-	 * 	formated_buffer allocation should include the null terminator
-	 * @param formated_buffer 
-	 * @param buffer_size 
-	 * @param format 
-	 * @param ... 
-	 * @return char* 
-	 */
-	char* ckg_formated_string(char* formated_buffer, const int buffer_size, const char* format, ...);
 	
 #ifdef __cplusplus
 }

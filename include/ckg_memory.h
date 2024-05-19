@@ -14,6 +14,7 @@ extern "C" {
     Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size);
     void memory_copy(const void* source, void* destination, u32 source_size, u32 destination_size);
     void memory_zero(void* data, u32 data_size_in_bytes);
+    void memory_set(u8* data, u32 data_size_in_bytes, u8 element);
 
     u8* memory_advance_new_ptr(const void* data, u32 size_in_bytes);
     u8* memory_retreat_new_ptr(const void* data, u32 size_in_bytes);
