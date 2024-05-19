@@ -48,112 +48,6 @@
 	//++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 #pragma endregion
 
-#pragma region ASSERT
-	//========================== Begin Types ==========================
-	#define ASSERT_ENABLED TRUE
-
-	#define CRASH *((int *)0) = 0
-	//=========================== End Types ===========================
-
-	//************************* Begin Functions *************************
-	#ifdef __cplusplus
-	extern "C" {
-	#endif
-
-	#ifdef __cplusplus
-	}
-	#endif
-	//************************** End Functions **************************
-
-	//+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
-	#if ASSERT_ENABLED == TRUE	
-		#define assert_in_macro(expression, message) 																	\
-			do { 																										\
-				if (!(expression))                                                       		                       	\
-				{                                                                        		                       	\
-					char message_buffer[PLATFORM_CHARACTER_LIMIT];                                                     	\
-					memory_zero(message_buffer, PLATFORM_CHARACTER_LIMIT);                                             	\
-					sprintf(message_buffer, "%s | file: %s:%d | Function: %s", message, __FILE__, __LINE__, __func__); 	\
-					LOG_FATAL("%s\n", message_buffer);                                                                 	\
-					CRASH;                                                                                             	\
-				}																									 	\
-			} while (FALSE)
-
-
-		#define assert_in_function(expression, message, ...) 	\
-			do { 												\
-				if (!(expression))                              \
-				{                                               \
-					LOG_FATAL(message, ##__VA_ARGS__);          \
-					CRASH;                                      \
-				}												\
-			} while (FALSE)
-
-
-	#else
-			#define assert_in_function(expression, message)
-			#define assert_in_macro(expression, message) 
-	#endif
-	//++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
-#pragma endregion
-
-#pragma region PLATFORM_SERVICES
-	//========================== Begin Types ==========================
-	#define TEXT_CLEAR     0x0000 // text color default clear
-	#define TEXT_BLUE      0x0001 // text color contains blue.
-	#define TEXT_GREEN     0x0002 // text color contains green.
-	#define TEXT_RED       0x0004 // text color contains red.
-	#define TEXT_CYAN      TEXT_BLUE|TEXT_GREEN // text color contains cyan.
-	#define TEXT_PURPLE    TEXT_RED|TEXT_BLUE // text color contains purple.
-	#define TEXT_WHITE     TEXT_RED|TEXT_GREEN|TEXT_BLUE // text color contains white.
-
-	#define BACK_BLUE      0x0010 // background color contains blue.
-	#define BACK_GREEN     0x0020 // background color contains green.
-	#define BACK_RED       0x0040 // background color contains red.
-
-	// Supported Platforms
-	#if (_WIN32)
-	#define PLATFORM_WINDOWS
-	#include <windows.h>
-	#elif (__linux__)
-	#define PLATFORM_LINUX
-	#elif (__APPLE__)
-	#define PLATFORM_MACOS
-	#endif
-	//=========================== End Types ===========================
-
-
-
-
-
-	//************************* Begin Functions *************************
-	// Supported Platform Operations
-
-	#ifdef __cplusplus
-	extern "C" {
-	#endif
-	void* platform_allocate(unsigned long long number_of_bytes);
-	void* MACRO_platform_free(void* data);
-	void platform_console_write(const char* message, unsigned char color);
-	void platform_console_init();
-	void platform_console_shutdown();
-	// void _platform_open_window();
-	// void _platform_open_file();
-	// void _platform_close_file();
-	// void _platform_sleep();
-	#ifdef __cplusplus
-	}
-	#endif
-
-	//************************** End Functions **************************
-
-	//+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
-	#define platform_free(data) data = MACRO_platform_free(data);
-	//++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
-
-	#define PLATFORM_CHARACTER_LIMIT 200
-#pragma endregion
-
 #pragma region MEMORY
 	//************************* Begin Functions *************************
 	#ifdef __cplusplus
@@ -192,6 +86,39 @@
 	 */
 	#define memory_byte_advance(data, size_in_bytes) data = MACRO_memory_byte_advance(data, size_in_bytes)
 	#define memory_byte_retreat(data, size_in_bytes) data = MACRO_memory_byte_retreat(data, size_in_bytes)
+#pragma endregion
+
+#pragma region ASSERT
+	//========================== Begin Types ==========================
+	#define ASSERT_ENABLED TRUE
+
+	#define CRASH *((int *)0) = 0
+	//=========================== End Types ===========================
+
+	//************************* Begin Functions *************************
+	#ifdef __cplusplus
+	extern "C" {
+	#endif
+
+	#ifdef __cplusplus
+	}
+	#endif
+	//************************** End Functions **************************
+
+	//+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
+	#if ASSERT_ENABLED == TRUE	
+		#define ckg_assert(expression, message, ...)		\
+			do { 											\
+				if (!(expression))                          \
+				{                                           \
+					fprintf(stderr,message, ##__VA_ARGS__); \
+					CRASH;                                  \
+				}											\
+			} while (FALSE)
+	#else
+			#define ckg_assert(expression, message)
+	#endif
+//++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 #pragma endregion
 
 #pragma region STRING

@@ -7,7 +7,9 @@
 		"ckg_assert.h": "c",
 		"ckg_logger.h": "c",
 		"stdarg.h": "c",
-		"ckg_global_context": "c"
+		"ckg_global_context": "c",
+		"stdint.h": "c",
+		"stdlib.h": "c"
 	},
 	"editor.insertSpaces": false
 }

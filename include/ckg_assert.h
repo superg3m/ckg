@@ -24,32 +24,16 @@ extern "C" {
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
 #if ASSERT_ENABLED == TRUE	
-	#define assert_in_macro(expression, message) 																	\
-		do { 																										\
-		 	if (!(expression))                                                       		                       	\
-			{                                                                        		                       	\
-				char message_buffer[PLATFORM_CHARACTER_LIMIT];                                                     	\
-				memory_zero(message_buffer, PLATFORM_CHARACTER_LIMIT);                                             	\
-				sprintf(message_buffer, "%s | file: %s:%d | Function: %s", message, __FILE__, __LINE__, __func__); 	\
-				fprintf(stderr, "%s\n", message_buffer);                                                                 	\
-				CRASH;                                                                                             	\
-			}																									 	\
+	#define ckg_assert(expression, message, ...)		\
+		do { 											\
+			if (!(expression))                          \
+			{                                           \
+				fprintf(stderr,message, ##__VA_ARGS__); \
+				CRASH;                                  \
+			}											\
 		} while (FALSE)
-
-
-	#define assert_in_function(expression, message, ...) 	\
-		do { 												\
-			if (!(expression))                              \
-			{                                               \
-				fprintf(stderr,message, ##__VA_ARGS__);          \
-				CRASH;                                      \
-			}												\
-		} while (FALSE)
-
-
 #else
-		#define assert_in_function(expression, message)
-		#define assert_in_macro(expression, message) 
+		#define ckg_assert(expression, message)
 #endif
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 
