@@ -37,4 +37,10 @@ typedef u8 Boolean;
 
 #define local_persist static
 #define internal static
+
+/**
+ * @brief This only works on static arrays not buffers
+ * 
+ */
+#define ArrayCount(array) (sizeof(array) / sizeof(array[0]))
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++

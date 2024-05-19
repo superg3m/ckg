@@ -16,6 +16,9 @@ extern "C" {
 	void memory_zero(void* data, u32 data_size_in_bytes);
 	void memory_set(u8* data, u32 data_size_in_bytes, u8 element);
 
+	void memory_buffer_delete_index(const void* data, u32 size_in_bytes, u32 buffer_count, u32 index);
+
+
 	u8* memory_advance_new_ptr(const void* data, u32 size_in_bytes);
 	u8* memory_retreat_new_ptr(const void* data, u32 size_in_bytes);
 	void* MACRO_memory_byte_advance(const void* data, u32 size_in_bytes);
