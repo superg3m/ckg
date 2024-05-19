@@ -7,10 +7,8 @@
 		return ret;
 	}
 
-	void* ckg_memory_default_free(void* data) {
+	void ckg_memory_default_free(void* data) {
 		free(data);
-		data = NULLPTR;
-		return data;
 	}
 
 	void* MACRO_ckg_memory_allocate(ckg_MemoryAllocator_func func_allocator, u32 allocation_size) {
@@ -23,10 +21,12 @@
 
 	void* MACRO_ckg_memory_free(void* data, ckg_MemoryFree_func func_free) {
 		if (!func_free) {
-			data = ckg_memory_default_free(data);
+			ckg_memory_default_free(data);
+			data = NULLPTR;
 			return data;
 		} else {
-			return func_free(data);
+			func_free(data);
+			return data;
 		}
 	}
 
