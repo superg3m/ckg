@@ -85,16 +85,22 @@ void ckg_string_append_char(char* string_buffer, u32 string_buffer_size, const c
 }
 
 void ckg_string_clear(char* string_buffer, u32 string_buffer_size) {
+	ckg_assert_in_function(string_buffer, "ckg_string_clear string_buffer is not valid | null\n");
+
 	memory_zero(string_buffer, string_buffer_size);
 }
 
 void ckg_string_copy(char* string_buffer, u32 string_buffer_size, const char* source) {
+	ckg_assert_in_function(string_buffer, "string_copy string_buffer is not valid | null\n");
+	ckg_assert_in_function(source, "string_copy source is not valid | null\n");
 	u32 source_length = ckg_cstring_length(source);
+	ckg_string_clear(string_buffer, string_buffer_size);
 
 	// Date: May 18, 2024
-	// NOTE(Jovanni): We want to use source_length + 1 because we need inclukde the null terminator
+	// NOTE(Jovanni): We want to use source_length + 1 because we want to include the null terminator
 	memory_copy(source, string_buffer, source_length + 1, string_buffer_size);
 }
+
 //************************** End Functions **************************
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++

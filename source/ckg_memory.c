@@ -1,5 +1,37 @@
 #include "../include/ckg_memory.h"
 #include "../include/ckg_assert.h"
+#include <memory.h>
+#include <stdlib.h>
+
+
+void* ckg_memory_default_allocator(u32 allocation_size) {
+	void* ret = malloc(allocation_size);
+	memory_zero(ret, sizeof(allocation_size));
+	return ret;
+}
+
+void* ckg_memory_default_free(void* data) {
+	free(data);
+	data = NULLPTR;
+	return data;
+}
+
+void* MACRO_ckg_memory_allocate(ckg_MemoryAllocator_func func_allocator, u32 allocation_size) {
+	if (!func_allocator) {
+		return ckg_memory_default_allocator(allocation_size);
+	} else {
+		return func_allocator(allocation_size);
+	}
+}
+
+void* MACRO_ckg_memory_free(void* data, ckg_MemoryFree_func func_free) {
+	if (!func_free) {
+		data = ckg_memory_default_free(data);
+		return data;
+	} else {
+		return func_free(data);
+	}
+}
 
 Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size) {
   	ckg_assert_in_function(buffer_one, "memory_byte_compare buffer_one IS NULL\n");

@@ -10,7 +10,8 @@
 		"ckg_global_context": "c",
 		"stdint.h": "c",
 		"stdlib.h": "c",
-		"ckg_assert.h": "c"
+		"ckg_assert.h": "c",
+		"memory.h": "c"
 	},
 	"editor.insertSpaces": false
 }
