@@ -24,6 +24,7 @@ void memory_copy(const void* source, void* destination, u32 source_size, u32 des
   	assert_in_function(source, "MEMORY COPY SOURCE IS NULL\n");
   	assert_in_function(destination, "MEMORY COPY SOURCE IS NULL\n");
   	assert_in_function((source_size <= destination_size), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
+	
   	for (int i = 0; i < source_size; i++) {
   	    ((u8*)destination)[i] = ((u8*)source)[i];
   	}

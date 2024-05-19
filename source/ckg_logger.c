@@ -4,9 +4,6 @@
 #include "../include/ckg_assert.h"
 #include "../include/ckg_string.h"
 
-#include<stdarg.h>
-#include <stdio.h>
-
 static Boolean logging_is_initialized = FALSE;
 Boolean logger_init() {
     if (!LOGGING_ENABLED) {

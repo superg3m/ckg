@@ -1,13 +1,13 @@
-#include "../include/ckg_platform_services.h"
-#include "../include/ckg_types.h"
-#include "../include/ckg_string.h"
-#include "../include/ckg_assert.h"
-
 /*===========================================================
  * File: platform_services.cpp
  * Date: May 11, 2024
  * Creator: Jovanni Djonaj
 ===========================================================*/
+
+#include "../include/ckg_platform_services.h"
+#include "../include/ckg_types.h"
+#include "../include/ckg_string.h"
+#include "../include/ckg_assert.h"
 
 //========================== Begin Types ==========================
 //=========================== End Types ===========================

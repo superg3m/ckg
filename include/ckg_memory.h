@@ -33,6 +33,11 @@ extern "C" {
 	}                                                  	\
 }
 
+/**
+ * @brief Modifies the data pointer, if you just want a new pointer consider using 
+ * memory_advance_new_ptr()
+ * 
+ */
 #define memory_byte_advance(data, size_in_bytes) data = MACRO_memory_byte_advance(data, size_in_bytes)
 #define memory_byte_retreat(data, size_in_bytes) data = MACRO_memory_byte_retreat(data, size_in_bytes)
 
