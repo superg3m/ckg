@@ -11,7 +11,8 @@
 		"stdint.h": "c",
 		"stdlib.h": "c",
 		"ckg_assert.h": "c",
-		"memory.h": "c"
+		"memory.h": "c",
+		"ckg.h": "c"
 	},
 	"editor.insertSpaces": false
 }
