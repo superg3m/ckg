@@ -4,9 +4,6 @@
  * Date: May 18, 2024
  * Creator: Jovanni Djonaj
 ===========================================================*/
-#include <stdint.h>
-#include <stdio.h>
-
 #include "../include/ckg_string.h"
 #include "../include/ckg_memory.h"
 #include "../include/ckg_assert.h"
