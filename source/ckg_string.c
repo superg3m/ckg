@@ -27,7 +27,7 @@ u32 ckg_cstring_length(const char* cstring) {
     return length;
 }
 
-Boolean ckg_cstring_compare(const char* s1, const char* s2) {
+Boolean ckg_string_compare(const char* s1, const char* s2) {
 	assert_in_function(s1, "string_compare first argument is not valid | null\n");
     assert_in_function(s2, "string_compare second argument is not valid | null\n");
 
@@ -54,6 +54,8 @@ void ckg_string_insert(char* string_buffer, u32 string_buffer_size, const u32 in
 	}
 	
 	u8* dest_ptr = memory_advance_new_ptr(string_buffer, index);
+	// Date: May 18, 2024
+	// NOTE(Jovanni): We don't want source_length + 1 because we don't want to copy the null terminator
 	memory_copy(source, dest_ptr, source_length, string_buffer_size);
 }
 
@@ -91,7 +93,10 @@ void ckg_string_clear(char* string_buffer, u32 string_buffer_size) {
 
 void ckg_string_copy(char* string_buffer, u32 string_buffer_size, const char* source) {
 	u32 source_length = ckg_cstring_length(source);
-	memory_copy(source, string_buffer, source_length, string_buffer_size);
+
+	// Date: May 18, 2024
+	// NOTE(Jovanni): We want to use source_length + 1 because we need inclukde the null terminator
+	memory_copy(source, string_buffer, source_length + 1, string_buffer_size);
 }
 //************************** End Functions **************************
 

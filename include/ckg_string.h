@@ -12,7 +12,7 @@ extern "C" {
 #endif
 
 	u32 ckg_cstring_length(const char* c_string);
-	Boolean ckg_cstring_compare(const char* s1, const char* s2);
+	Boolean ckg_string_compare(const char* s1, const char* s2);
 
 	void ckg_string_append(char* string_buffer, u32 string_buffer_size, const char* source);
 	void ckg_string_append_char(char* string_buffer, u32 string_buffer_size, const char source);

@@ -7,5 +7,6 @@
 		"ckg_assert.h": "c",
 		"ckg_logger.h": "c",
 		"stdarg.h": "c"
-	}
+	},
+	"editor.insertSpaces": false
 }
