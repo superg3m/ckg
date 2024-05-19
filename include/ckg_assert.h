@@ -4,7 +4,6 @@
  * Date: May 18, 2024
  * Creator: Jovanni Djonaj
 ===========================================================*/
-#include "ckg_logger.h"
 #include "ckg_memory.h"
 
 //========================== Begin Types ==========================
@@ -32,7 +31,7 @@ extern "C" {
 				char message_buffer[PLATFORM_CHARACTER_LIMIT];                                                     	\
 				memory_zero(message_buffer, PLATFORM_CHARACTER_LIMIT);                                             	\
 				sprintf(message_buffer, "%s | file: %s:%d | Function: %s", message, __FILE__, __LINE__, __func__); 	\
-				LOG_FATAL("%s\n", message_buffer);                                                                 	\
+				fprintf(stderr, "%s\n", message_buffer);                                                                 	\
 				CRASH;                                                                                             	\
 			}																									 	\
 		} while (FALSE)
@@ -42,7 +41,7 @@ extern "C" {
 		do { 												\
 			if (!(expression))                              \
 			{                                               \
-				LOG_FATAL(message, ##__VA_ARGS__);          \
+				fprintf(stderr,message, ##__VA_ARGS__);          \
 				CRASH;                                      \
 			}												\
 		} while (FALSE)
