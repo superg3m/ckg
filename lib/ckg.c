@@ -1,9 +1,6 @@
 #include "ckg.h"
 
 #pragma region MEMORY
-	#include "../include/ckg_memory.h"
-	#include "../include/ckg_assert.h"
-
 	Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size) {
 		assert_in_function(buffer_one, "memory_byte_compare buffer_one IS NULL\n");
 		assert_in_function(buffer_two, "memory_byte_compare buffer_two IS NULL\n");
@@ -90,9 +87,6 @@
 #pragma endregion
 
 #pragma region STRING
-	#include "../include/ckg_string.h"
-	#include "../include/ckg_assert.h"
-
 	//========================== Begin Types ==========================
 	//=========================== End Types ===========================
 

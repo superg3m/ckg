@@ -4,12 +4,13 @@
 		"ckg_types.h": "c",
 		"ckg_platform_services.h": "c",
 		"ckg_string.h": "c",
-		"ckg_assert.h": "c",
+		"ckg_assert_in_function.h": "c",
 		"ckg_logger.h": "c",
 		"stdarg.h": "c",
 		"ckg_global_context": "c",
 		"stdint.h": "c",
-		"stdlib.h": "c"
+		"stdlib.h": "c",
+		"ckg_assert.h": "c"
 	},
 	"editor.insertSpaces": false
 }

@@ -25,8 +25,8 @@ u32 ckg_cstring_length(const char* cstring) {
 }
 
 Boolean ckg_string_compare(const char* s1, const char* s2) {
-	ckg_assert(s1, "string_compare first argument is not valid | null\n");
-    ckg_assert(s2, "string_compare second argument is not valid | null\n");
+	ckg_assert_in_function(s1, "string_compare first argument is not valid | null\n");
+    ckg_assert_in_function(s2, "string_compare second argument is not valid | null\n");
 
 	u32 s1_length = ckg_cstring_length(s1);
 	u32 s2_length = ckg_cstring_length(s2);
@@ -35,13 +35,13 @@ Boolean ckg_string_compare(const char* s1, const char* s2) {
 }
 
 void ckg_string_insert(char* string_buffer, u32 string_buffer_size, const u32 index, const char* source) {
-	ckg_assert(string_buffer, "string_insert string_buffer is not valid | null\n");
-	ckg_assert(source, "string_insert source is not valid | null\n");
+	ckg_assert_in_function(string_buffer, "string_insert string_buffer is not valid | null\n");
+	ckg_assert_in_function(source, "string_insert source is not valid | null\n");
 
 	u32 string_buffer_length = ckg_cstring_length(string_buffer);
 	u32 source_length = ckg_cstring_length(source);
 
-	ckg_assert(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_insert string_buffer_size is %d but new valid cstring length is %d\n", string_buffer_size, string_buffer_length + source_length + 1);
+	ckg_assert_in_function(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_insert string_buffer_size is %d but new valid cstring length is %d\n", string_buffer_size, string_buffer_length + source_length + 1);
 
 	// Date: May 18, 2024
 	// TODO(Jovanni): Test this
@@ -57,13 +57,13 @@ void ckg_string_insert(char* string_buffer, u32 string_buffer_size, const u32 in
 }
 
 void ckg_string_insert_char(char* string_buffer, u32 string_buffer_size, const u32 index, const char source) {
-	ckg_assert(string_buffer, "string_insert_char string_buffer is not valid | null\n");
-	ckg_assert(source, "string_insert_char source is not valid | null\n");
+	ckg_assert_in_function(string_buffer, "string_insert_char string_buffer is not valid | null\n");
+	ckg_assert_in_function(source, "string_insert_char source is not valid | null\n");
 
 	u32 string_buffer_length = ckg_cstring_length(string_buffer);
 	u32 source_length = 1;
 
-    ckg_assert(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_compare second argument is not valid | null\n");
+    ckg_assert_in_function(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_compare second argument is not valid | null\n");
 
 	// Date: May 18, 2024
 	// TODO(Jovanni): Test this
