@@ -2,8 +2,8 @@
 
 #pragma region MEMORY
 	Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size) {
-		assert_in_function(buffer_one, "memory_byte_compare buffer_one IS NULL\n");
-		assert_in_function(buffer_two, "memory_byte_compare buffer_two IS NULL\n");
+		ckg_assert_in_function(buffer_one, "memory_byte_compare buffer_one IS NULL\n");
+		ckg_assert_in_function(buffer_two, "memory_byte_compare buffer_two IS NULL\n");
 
 		if (buffer_one_size != buffer_one_size) {
 			return FALSE;
@@ -21,9 +21,9 @@
 	}
 
 	void memory_copy(const void* source, void* destination, u32 source_size, u32 destination_size) {
-		assert_in_function(source, "MEMORY COPY SOURCE IS NULL\n");
-		assert_in_function(destination, "MEMORY COPY SOURCE IS NULL\n");
-		assert_in_function((source_size <= destination_size), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
+		ckg_assert_in_function(source, "MEMORY COPY SOURCE IS NULL\n");
+		ckg_assert_in_function(destination, "MEMORY COPY SOURCE IS NULL\n");
+		ckg_assert_in_function((source_size <= destination_size), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
 
 		for (int i = 0; i < source_size; i++) {
 			((u8*)destination)[i] = ((u8*)source)[i];
@@ -101,8 +101,8 @@
 	}
 
 	Boolean ckg_string_compare(const char* s1, const char* s2) {
-		assert_in_function(s1, "string_compare first argument is not valid | null\n");
-		assert_in_function(s2, "string_compare second argument is not valid | null\n");
+		ckg_assert_in_function(s1, "string_compare first argument is not valid | null\n");
+		ckg_assert_in_function(s2, "string_compare second argument is not valid | null\n");
 
 		u32 s1_length = ckg_cstring_length(s1);
 		u32 s2_length = ckg_cstring_length(s2);
@@ -111,13 +111,13 @@
 	}
 
 	void ckg_string_insert(char* string_buffer, u32 string_buffer_size, const u32 index, const char* source) {
-		assert_in_function(string_buffer, "string_insert string_buffer is not valid | null\n");
-		assert_in_function(source, "string_insert source is not valid | null\n");
+		ckg_assert_in_function(string_buffer, "string_insert string_buffer is not valid | null\n");
+		ckg_assert_in_function(source, "string_insert source is not valid | null\n");
 
 		u32 string_buffer_length = ckg_cstring_length(string_buffer);
 		u32 source_length = ckg_cstring_length(source);
 
-		assert_in_function(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_insert string_buffer_size is %d but new valid cstring length is %d\n", string_buffer_size, string_buffer_length + source_length + 1);
+		ckg_assert_in_function(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_insert string_buffer_size is %d but new valid cstring length is %d\n", string_buffer_size, string_buffer_length + source_length + 1);
 
 		// Date: May 18, 2024
 		// TODO(Jovanni): Test this
@@ -133,13 +133,13 @@
 	}
 
 	void ckg_string_insert_char(char* string_buffer, u32 string_buffer_size, const u32 index, const char source) {
-		assert_in_function(string_buffer, "string_insert_char string_buffer is not valid | null\n");
-		assert_in_function(source, "string_insert_char source is not valid | null\n");
+		ckg_assert_in_function(string_buffer, "string_insert_char string_buffer is not valid | null\n");
+		ckg_assert_in_function(source, "string_insert_char source is not valid | null\n");
 
 		u32 string_buffer_length = ckg_cstring_length(string_buffer);
 		u32 source_length = 1;
 
-		assert_in_function(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_compare second argument is not valid | null\n");
+		ckg_assert_in_function(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_compare second argument is not valid | null\n");
 
 		// Date: May 18, 2024
 		// TODO(Jovanni): Test this
