@@ -108,7 +108,7 @@
 	 */
 	#ifdef __cplusplus
 		#define ckg_memory_allocate(allocation_size) (decltype(data))MACRO_ckg_memory_allocate(allocation_size)
-		#define ckg_memory_reallocate(allocation_size) MACRO_ckg_memory_allocate(allocation_size)
+		#define ckg_memory_reallocate(allocation_size) (decltype(data))MACRO_ckg_memory_reallocate(allocation_size)
 
 		#define ckg_memory_free(data) data = (decltype(data))MACRO_ckg_memory_free(data)
 
