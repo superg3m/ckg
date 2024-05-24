@@ -58,8 +58,21 @@ void test_ckg_memory_operations() {
 	// Test ckg_memory_find
 	int arr7[] = {1, 2, 3, 4, 5};
 	Boolean result = FALSE;
+
+	memory_find(arr7, 5, 1, result);
+	ckg_assert_in_function(result, "Error: Memory find failed\n");
+
 	memory_find(arr7, 5, 2, result);
 	ckg_assert_in_function(result, "Error: Memory find failed\n");
+
+	memory_find(arr7, 5, 5, result);
+	ckg_assert_in_function(result, "Error: Memory find failed\n");
+
+	memory_find(arr7, 5, 7, result);
+	ckg_assert_in_function(!result, "Error: Memory find failed\n");
+
+	memory_find(arr7, 5, "SHOULDN'T WORK!" , result);
+	ckg_assert_in_function(!result, "Error: Memory find failed\n");
 
 	printf("All memory tests passed!\n");
 	return;
