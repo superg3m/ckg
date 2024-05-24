@@ -118,8 +118,19 @@
 	#else
 		#define ckg_memory_allocate(allocation_size) MACRO_ckg_memory_allocate(allocation_size)
 		#define ckg_memory_reallocate(data, old_allocation_size, new_allocation_size) MACRO_ckg_memory_reallocate(data, old_allocation_size, new_allocation_size)
-
 		#define ckg_memory_free(data) data = MACRO_ckg_memory_free(data)
+
+		#define memory_find(data, element_count, element_to_find, result) 	\
+		do { 						 										\
+			result = FALSE;													\
+			for (int i = 0; i < element_count; i++) { 						\
+				if (data[i] == element_to_find) { 							\
+					result = TRUE; 											\
+					break; 													\
+				} 															\
+			}																\
+		 } while (FALSE)													\
+
 
 		#define memory_byte_advance(data, size_in_bytes) data = MACRO_memory_byte_advance(data, size_in_bytes)
 		#define memory_byte_retreat(data, size_in_bytes) data = MACRO_memory_byte_retreat(data, size_in_bytes)
