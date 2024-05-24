@@ -1,6 +1,9 @@
 #include "../include/ckg.h"
 
 #pragma region MEMORY
+	internal ckg_MemoryAllocator_func* memory_allocator_callback = NULLPTR;
+	internal ckg_MemoryFree_func* memory_free_callback = NULLPTR;
+
 	void* ckg_memory_default_allocator(u32 allocation_size) {
 		void* ret = malloc(allocation_size);
 		memory_zero(ret, sizeof(allocation_size));
@@ -11,21 +14,37 @@
 		free(data);
 	}
 
-	void* MACRO_ckg_memory_allocate(ckg_MemoryAllocator_func func_allocator, u32 allocation_size) {
-		if (!func_allocator) {
-			return ckg_memory_default_allocator(allocation_size);
+	void ckg_memory_bind_allocator_callback(ckg_MemoryAllocator_func* func_allocator) {
+		memory_allocator_callback = func_allocator;
+	}
+
+	void ckg_memory_bind_free_callback(ckg_MemoryFree_func* func_free) {
+		memory_free_callback = func_free;
+	}
+
+	void* MACRO_ckg_memory_allocate(u32 allocation_size) {
+		if (memory_allocator_callback) {
+			return memory_allocator_callback(allocation_size);
 		} else {
-			return func_allocator(allocation_size);
+			return ckg_memory_default_allocator(allocation_size);
 		}
 	}
 
-	void* MACRO_ckg_memory_free(void* data, ckg_MemoryFree_func func_free) {
-		if (!func_free) {
-			ckg_memory_default_free(data);
+	void* MACRO_ckg_memory_reallocate(void* data, u32 old_allocation_size, u32 new_allocation_size) {
+		void* ret = MACRO_ckg_memory_allocate(new_allocation_size);
+		memory_copy(data, ret, old_allocation_size, new_allocation_size);
+		ckg_memory_free(data);
+		return ret;
+	}
+
+	void* MACRO_ckg_memory_free(void* data) {
+		if (memory_free_callback) {
+			memory_free_callback(data);
 			data = NULLPTR;
 			return data;
 		} else {
-			func_free(data);
+			ckg_memory_default_free(data);
+			data = NULLPTR;
 			return data;
 		}
 	}
@@ -34,7 +53,7 @@
 		ckg_assert_in_function(buffer_one, "memory_byte_compare buffer_one IS NULL\n");
 		ckg_assert_in_function(buffer_two, "memory_byte_compare buffer_two IS NULL\n");
 
-		if (buffer_one_size != buffer_one_size) {
+		if (buffer_one_size != buffer_two_size) {
 			return FALSE;
 		}
 
@@ -127,8 +146,8 @@
 	}
 
 	Boolean ckg_string_compare(const char* s1, const char* s2) {
-		ckg_assert_in_function(s1, "string_compare first argument is not valid | null\n");
-		ckg_assert_in_function(s2, "string_compare second argument is not valid | null\n");
+		ckg_assert_in_function(s1, "string_compare: first argument is not valid | null\n");
+		ckg_assert_in_function(s2, "string_compare: second argument is not valid | null\n");
 
 		u32 s1_length = ckg_cstring_length(s1);
 		u32 s2_length = ckg_cstring_length(s2);
@@ -137,13 +156,14 @@
 	}
 
 	void ckg_string_insert(char* string_buffer, u32 string_buffer_size, const u32 index, const char* source) {
-		ckg_assert_in_function(string_buffer, "string_insert string_buffer is not valid | null\n");
-		ckg_assert_in_function(source, "string_insert source is not valid | null\n");
+		ckg_assert_in_function(string_buffer, "string_insert: string_buffer is not valid | null\n");
+		ckg_assert_in_function(source, "string_insert: source is not valid | null\n");
 
 		u32 string_buffer_length = ckg_cstring_length(string_buffer);
 		u32 source_length = ckg_cstring_length(source);
 
-		ckg_assert_in_function(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_insert string_buffer_size is %d but new valid cstring length is %d\n", string_buffer_size, string_buffer_length + source_length + 1);
+		ckg_assert_in_function(index >= 0 && index <= string_buffer_length, "Index out of bounds");
+		ckg_assert_in_function(string_buffer_length + source_length < string_buffer_size, "string_insert: string_buffer_size is %d but new valid cstring length is %d + %d = %d\n", string_buffer_size, string_buffer_length, source_length + 1, string_buffer_length + source_length + 1);
 
 		// Date: May 18, 2024
 		// TODO(Jovanni): Test this
@@ -187,14 +207,14 @@
 	}
 
 	void ckg_string_clear(char* string_buffer, u32 string_buffer_size) {
-		ckg_assert_in_function(string_buffer, "ckg_string_clear string_buffer is not valid | null\n");
+		ckg_assert_in_function(string_buffer, "ckg_string_clear: string_buffer is not valid | null\n");
 
 		memory_zero(string_buffer, string_buffer_size);
 	}
 
 	void ckg_string_copy(char* string_buffer, u32 string_buffer_size, const char* source) {
-		ckg_assert_in_function(string_buffer, "string_copy string_buffer is not valid | null\n");
-		ckg_assert_in_function(source, "string_copy source is not valid | null\n");
+		ckg_assert_in_function(string_buffer, "ckg_string_copy: string_buffer is not valid | null\n");
+		ckg_assert_in_function(source, "ckg_string_copy: source is not valid | null\n");
 		u32 source_length = ckg_cstring_length(source);
 		ckg_string_clear(string_buffer, string_buffer_size);
 
