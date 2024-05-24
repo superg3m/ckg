@@ -55,39 +55,20 @@ void test_ckg_memory_operations() {
 	ckg_assert_in_function(memory_byte_compare(arr4, arr5, 3 * sizeof(int), 3 * sizeof(int)) == TRUE, "Error: Memory compare failed\n");
 	ckg_assert_in_function(!memory_byte_compare(arr4, arr6, 3 * sizeof(int), 3 * sizeof(int)), "Error: Memory compare failed\n");
 
-	// Test ckg_memory_find
-	int arr7[] = {1, 2, 3, 4, 5};
-	Boolean result = FALSE;
-
-	memory_find(arr7, 5, 1, result);
-	ckg_assert_in_function(result, "Error: Memory find failed\n");
-
-	memory_find(arr7, 5, 2, result);
-	ckg_assert_in_function(result, "Error: Memory find failed\n");
-
-	memory_find(arr7, 5, 5, result);
-	ckg_assert_in_function(result, "Error: Memory find failed\n");
-
-	memory_find(arr7, 5, 7, result);
-	ckg_assert_in_function(!result, "Error: Memory find failed\n");
-
-	memory_find(arr7, 5, "SHOULDN'T WORK!" , result);
-	ckg_assert_in_function(!result, "Error: Memory find failed\n");
-
 	printf("All memory tests passed!\n");
 	return;
 }
 
 void test_ckg_arena_operations() {
-  CKG_Arena* arena = arena_create(1024, "Test Arena");
+  CKG_Arena arena = ckg_arena_create(1024, "Test Arena");
 
   // Test arena_push
-  int* int_ptr = arena_push(arena, int);
+  int* int_ptr = ckg_arena_push(&arena, int);
   *int_ptr = 5;
   ckg_assert_in_function(*int_ptr == 5, "Error: Arena push failed\n");
 
   // Test arena_push_array
-  int* int_array = arena_push_array(arena, int, 5);
+  int* int_array = ckg_arena_push_array(&arena, int, 5);
   for (int i = 0; i < 5; i++) {
     int_array[i] = i;
   }
@@ -96,11 +77,11 @@ void test_ckg_arena_operations() {
   }
 
   // Test arena_clear
-  ckg_arena_clear(arena);
-  ckg_assert_in_function(arena->used == 0, "Error: Arena clear failed\n");
+  ckg_arena_clear(&arena);
+  ckg_assert_in_function(arena.used == 0, "Error: Arena clear failed\n");
 
   // Test arena_free
-  ckg_arena_free(arena);
+  ckg_arena_free(&arena);
 
   printf("All arena tests passed!\n");
   return;
@@ -113,14 +94,30 @@ void test_ckg_arena_operations() {
 #define str8_capacity 14
 
 void test_ckg_string_operations() {
+	CKG_Arena string_pool = ckg_arena_create_custom(6, "string pool", ARENA_FLAG_CIRCULAR);
+
 	// Test ckg_cstring_length
-	char* str1 = "Hello";
+	const int str1_size = 6;
+	char* str1 = ckg_arena_push_array(&string_pool, char, 6);
+	ckg_string_copy(str1, str1_size, "Hello");
+	ckg_assert_in_function(ckg_string_compare(str1, "Hello"), "Error: Incorrect string comparison\n");
+
+	char* str1_P = ckg_arena_push(&string_pool, char);
+	str1_P[0] = 'f';
+	ckg_assert_in_function(ckg_string_compare(str1, str1_P), "Error: Incorrect string comparison\n");
+
+
+	char* str1_PT = ckg_arena_push(&string_pool, char);
+	str1_PT[0] = 'M';
+	ckg_assert_in_function(ckg_string_compare(str1, str1_P), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(ckg_string_compare(str1_PT, "Mllo"), "Error: Incorrect string comparison\n");
+
 	ckg_assert_in_function(ckg_cstring_length(str1) == 5, "Error: Incorrect string length\n");
 
 	// Test ckg_string_compare
 	char* str2 = "Hello";
 	char* str3 = "World";
-	ckg_assert_in_function(ckg_string_compare(str1, str2), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(!ckg_string_compare(str1, str2), "Error: Incorrect string comparison\n");
 	ckg_assert_in_function(ckg_string_compare(str2, str2), "Error: Incorrect string comparison\n");
 	ckg_assert_in_function(!ckg_string_compare(str2, str3), "Error: Incorrect string comparison\n");
 

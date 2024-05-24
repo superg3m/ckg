@@ -109,7 +109,6 @@
 	#ifdef __cplusplus
 		#define ckg_memory_allocate(allocation_size) (decltype(data))MACRO_ckg_memory_allocate(allocation_size)
 		#define ckg_memory_reallocate(allocation_size) (decltype(data))MACRO_ckg_memory_reallocate(allocation_size)
-
 		#define ckg_memory_free(data) data = (decltype(data))MACRO_ckg_memory_free(data)
 
 		#define memory_byte_advance(data, size_in_bytes) data = (decltype(data))MACRO_memory_byte_advance(data, size_in_bytes)
@@ -119,18 +118,6 @@
 		#define ckg_memory_allocate(allocation_size) MACRO_ckg_memory_allocate(allocation_size)
 		#define ckg_memory_reallocate(data, old_allocation_size, new_allocation_size) MACRO_ckg_memory_reallocate(data, old_allocation_size, new_allocation_size)
 		#define ckg_memory_free(data) data = MACRO_ckg_memory_free(data)
-
-		#define memory_find(data, element_count, element_to_find, result) 	\
-		do { 						 										\
-			result = FALSE;													\
-			for (int i = 0; i < element_count; i++) { 						\
-				if (data[i] == element_to_find) { 							\
-					result = TRUE; 											\
-					break; 													\
-				} 															\
-			}																\
-		 } while (FALSE)													\
-
 
 		#define memory_byte_advance(data, size_in_bytes) data = MACRO_memory_byte_advance(data, size_in_bytes)
 		#define memory_byte_retreat(data, size_in_bytes) data = MACRO_memory_byte_retreat(data, size_in_bytes)
@@ -257,7 +244,7 @@ typedef enum ArenaFlag {
 #ifdef __cplusplus
 extern "C" {
 #endif
-	CKG_Arena* MACRO_ckg_arena_create(u32 allocation, const char* name, ArenaFlag flag);
+	CKG_Arena MACRO_ckg_arena_create(u32 allocation, const char* name, ArenaFlag flag);
 	void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size);	
 	
 	void ckg_arena_free(CKG_Arena* arena);
@@ -268,10 +255,10 @@ extern "C" {
 //************************** End Functions **************************
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
-#define arena_create(allocation_size, name) MACRO_ckg_arena_create(allocation_size, name, ARENA_FLAG_DEFAULT)
-#define arena_create_custom(allocation_size, name, flags) MACRO_ckg_arena_create(allocation_size, name, flags)
+#define ckg_arena_create(allocation_size, name) MACRO_ckg_arena_create(allocation_size, name, ARENA_FLAG_DEFAULT)
+#define ckg_arena_create_custom(allocation_size, name, flags) MACRO_ckg_arena_create(allocation_size, name, flags)
 
-#define arena_push(arena, type) ((type*)MACRO_ckg_arena_push(arena, sizeof(type)))
-#define arena_push_array(arena, type, element_count) ((type*)MACRO_ckg_arena_push(arena, sizeof(type) * element_count))
+#define ckg_arena_push(arena, type) ((type*)MACRO_ckg_arena_push(arena, sizeof(type)))
+#define ckg_arena_push_array(arena, type, element_count) ((type*)MACRO_ckg_arena_push(arena, sizeof(type) * element_count))
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 #pragma endregion
