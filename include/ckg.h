@@ -69,9 +69,8 @@
 		 * @brief If you don't bind these callbacks a default callback will be used
 		 * 
 		 */
-		void ckg_memory_bind_allocator_callback();
-		void ckg_memory_bind_free_callback();
-
+		void ckg_memory_bind_allocator_callback(ckg_MemoryAllocator_func* func_allocator);
+		void ckg_memory_bind_free_callback(ckg_MemoryFree_func* func_allocator);
 
 		void* MACRO_ckg_memory_allocate(u32 allocation_size);
 		void* MACRO_ckg_memory_reallocate(void* data, u32 old_allocation_size, u32 new_allocation_size);
