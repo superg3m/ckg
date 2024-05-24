@@ -260,11 +260,10 @@ void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
     ckg_assert_in_function(arena && arena->base_address, "arena_push: arena is null\n");
 
     if (ckg_arena_flag_is_set(arena, ARENA_FLAG_DEFAULT)) {
-        ckg_assert_in_function((arena->used + element_size <= arena->capacity), "arena_push: can't push element ran out of memory\n");
+        ckg_assert_in_function((arena->used + element_size <= arena->capacity), "arena_push: (default arena) can't push element ran out of memory\n");
         
     } else if (ckg_arena_flag_is_set(arena, ARENA_FLAG_CIRCULAR)) {
 		if ((arena->used + element_size > arena->capacity)) {
-			printf("ckg_arena_push: circular write pointer is at the base address\n");
 			arena->used = 0;
 			ckg_assert_in_function((arena->used + element_size <= arena->capacity), "arena_push: can't push element ran out of memory, circular buffer\n");
         }
@@ -273,6 +272,7 @@ void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
             arena->capacity += element_size;
             arena->capacity *= 2;
             arena->base_address = ckg_memory_reallocate(arena->base_address, arena->capacity, arena->capacity * 2);
+        	ckg_assert_in_function(arena->base_address, "arean_push: invalid reallocation address given");
         }
     } else {
         ckg_assert_in_function(FALSE, "arean_push: invalid arena flag set");
