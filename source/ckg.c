@@ -229,11 +229,11 @@
 
 #define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
 
-Boolean ckg_arena_flag_is_set(CKG_Arena* arena, ArenaFlag flag) {
+Boolean ckg_CKG_ARENA_FLAG_is_set(CKG_Arena* arena, CKG_ArenaFlag flag) {
     return arena->flag == flag;
 }
 
-CKG_Arena MACRO_ckg_arena_create(u32 allocation_size, const char* name, ArenaFlag flag) {
+CKG_Arena MACRO_ckg_arena_create(u32 allocation_size, const char* name, CKG_ArenaFlag flag) {
     CKG_Arena arena;
     arena.name = name;
     arena.flag = flag;
@@ -259,15 +259,15 @@ void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
     // TODO(Jovanni): For right now just assert if you don't have enough memory but later on make it grow.
     ckg_assert_in_function(arena && arena->base_address, "arena_push: arena is null\n");
 
-    if (ckg_arena_flag_is_set(arena, ARENA_FLAG_DEFAULT)) {
+    if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_DEFAULT)) {
         ckg_assert_in_function((arena->used + element_size <= arena->capacity), "arena_push: (default arena) can't push element ran out of memory\n");
         
-    } else if (ckg_arena_flag_is_set(arena, ARENA_FLAG_CIRCULAR)) {
+    } else if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_CIRCULAR)) {
 		if ((arena->used + element_size > arena->capacity)) {
 			arena->used = 0;
 			ckg_assert_in_function((arena->used + element_size <= arena->capacity), "arena_push: can't push element ran out of memory, circular buffer\n");
         }
-    } else if (ckg_arena_flag_is_set(arena, ARENA_FLAG_VECTOR)) {
+    } else if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_VECTOR)) {
         if ((arena->used + element_size > arena->capacity)) {
             arena->capacity += element_size;
             arena->capacity *= 2;

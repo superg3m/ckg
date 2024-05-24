@@ -94,7 +94,7 @@ void test_ckg_arena_operations() {
   ckg_arena_free(&default_arena);
 
   // Test circular arena
-  CKG_Arena circular_arena = ckg_arena_create_custom(arena_size_common, "Circular Arena", ARENA_FLAG_CIRCULAR);
+  CKG_Arena circular_arena = ckg_arena_create_custom(arena_size_common, "Circular Arena", CKG_ARENA_FLAG_CIRCULAR);
   for (int i = 0; i < 32; i++) {
     int* ptr = ckg_arena_push(&circular_arena, int);
     *ptr = i;
@@ -107,7 +107,7 @@ void test_ckg_arena_operations() {
   ckg_arena_free(&circular_arena);
 
   // Test vector arena
-  CKG_Arena vector_arena = ckg_arena_create_custom(arena_size_common, "Vector Arena", ARENA_FLAG_VECTOR);
+  CKG_Arena vector_arena = ckg_arena_create_custom(arena_size_common, "Vector Arena", CKG_ARENA_FLAG_VECTOR);
   for (int i = 0; i < 32; i++) {
     int* ptr = ckg_arena_push(&vector_arena, int);
     *ptr = i;
@@ -126,7 +126,7 @@ void test_ckg_arena_operations() {
 #define str8_capacity 14
 
 void test_ckg_string_operations() {
-	CKG_Arena string_pool = ckg_arena_create_custom(6, "string pool", ARENA_FLAG_CIRCULAR);
+	CKG_Arena string_pool = ckg_arena_create_custom(6, "string pool", CKG_ARENA_FLAG_CIRCULAR);
 
 	// Test ckg_cstring_length
 	const int str1_size = 6;
