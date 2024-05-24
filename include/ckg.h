@@ -226,7 +226,13 @@
 
 #pragma region ARENA
 //========================== Begin Types ==========================
-typedef struct CKG_Arena CKG_Arena;
+typedef struct CKG_Arena {
+	const char* name;
+    void* base_address;
+    u64 capacity;
+	u64 used;
+	u32 flag;
+} CKG_Arena;
 
 typedef enum ArenaFlag {
   ARENA_FLAG_DEFAULT,
@@ -240,21 +246,21 @@ typedef enum ArenaFlag {
 #ifdef __cplusplus
 extern "C" {
 #endif
-	CKG_Arena* MACRO_arena_create(u32 allocation, const char* name, ArenaFlag flag);
-	void* MACRO_arena_push(CKG_Arena* arena, u32 element_size);	
+	CKG_Arena* MACRO_ckg_arena_create(u32 allocation, const char* name, ArenaFlag flag);
+	void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size);	
 	
-	void arena_free(CKG_Arena* arena);
-	void arena_clear(CKG_Arena* arena);
+	void ckg_arena_free(CKG_Arena* arena);
+	void ckg_arena_clear(CKG_Arena* arena);
 #ifdef __cplusplus
 }
 #endif
 //************************** End Functions **************************
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
-#define arena_create(allocation_size, name) MACRO_arena_create(allocation_size, name, ARENA_FLAG_DEFAULT)
-#define arena_create_custom(allocation_size, name, flags) MACRO_arena_create(allocation_size, name, flags)
+#define arena_create(allocation_size, name) MACRO_ckg_arena_create(allocation_size, name, ARENA_FLAG_DEFAULT)
+#define arena_create_custom(allocation_size, name, flags) MACRO_ckg_arena_create(allocation_size, name, flags)
 
-#define arena_push(arena, type) ((type*)MACRO_arena_push(arena, sizeof(type)))
-#define arena_push_array(arena, type, element_count) ((type*)MACRO_arena_push(arena, sizeof(type) * element_count))
+#define arena_push(arena, type) ((type*)MACRO_ckg_arena_push(arena, sizeof(type)))
+#define arena_push_array(arena, type, element_count) ((type*)MACRO_ckg_arena_push(arena, sizeof(type) * element_count))
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 #pragma endregion

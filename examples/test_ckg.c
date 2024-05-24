@@ -64,6 +64,34 @@ void test_ckg_memory_operations() {
 	return;
 }
 
+void test_ckg_arena_operations() {
+  CKG_Arena* arena = arena_create(1024, "Test Arena");
+
+  // Test arena_push
+  int* int_ptr = arena_push(arena, int);
+  *int_ptr = 5;
+  ckg_assert_in_function(*int_ptr == 5, "Error: Arena push failed\n");
+
+  // Test arena_push_array
+  int* int_array = arena_push_array(arena, int, 5);
+  for (int i = 0; i < 5; i++) {
+    int_array[i] = i;
+  }
+  for (int i = 0; i < 5; i++) {
+    ckg_assert_in_function(int_array[i] == i, "Error: Arena push array failed\n");
+  }
+
+  // Test arena_clear
+  ckg_arena_clear(arena);
+  ckg_assert_in_function(arena->used == 0, "Error: Arena clear failed\n");
+
+  // Test arena_free
+  ckg_arena_free(arena);
+
+  printf("All arena tests passed!\n");
+  return;
+}
+
 #define str4_capacity 14
 #define str5_capacity 14
 #define str6_capacity 14
@@ -136,6 +164,7 @@ void test_ckg_string_operations() {
 
 int main() {
 	test_ckg_memory_operations();
+	test_ckg_arena_operations();
 	test_ckg_string_operations();
 
 	return 0;

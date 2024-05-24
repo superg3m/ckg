@@ -1,5 +1,7 @@
 @echo off
 
+call clean.bat
+
 if not exist .\build_gcc (
     mkdir .\build_gcc
 )

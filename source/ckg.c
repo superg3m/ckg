@@ -226,21 +226,14 @@
 #pragma endregion
 
 #pragma region ARENA
-typedef struct CKG_Arena {
-	const char* name;
-    void* base_address;
-    u64 capacity;
-	u64 used;
-	u32 flag;
-} CKG_Arenas;
 
 #define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
 
-Boolean arena_flag_is_set(CKG_Arena* arena, ArenaFlag flag) {
+Boolean ckg_arena_flag_is_set(CKG_Arena* arena, ArenaFlag flag) {
     return arena->flag == flag;
 }
 
-CKG_Arena* MACRO_arena_create(u32 allocation_size, const char* name, ArenaFlag flag) {
+CKG_Arena* MACRO_ckg_arena_create(u32 allocation_size, const char* name, ArenaFlag flag) {
     CKG_Arena* arena = ckg_memory_allocate(sizeof(CKG_Arena));
     arena->name = name;
     arena->flag = flag;
@@ -256,23 +249,24 @@ void ckg_arena_free(CKG_Arena* arena) {
     ckg_memory_free(arena);
 }
 
-void arena_clear(CKG_Arena* arena) {
+void ckg_arena_clear(CKG_Arena* arena) {
     ckg_assert_in_function(arena && arena->base_address, "arena_free: arena is null\n");
     memory_zero(arena->base_address, arena->used);
     arena->used = 0;
 }
 
-void* MACRO_arena_push(CKG_Arena* arena, u32 element_size) {
+void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
     // Date: May 11, 2024
     // TODO(Jovanni): For right now just assert if you don't have enough memory but later on make it grow.
     ckg_assert_in_function(arena && arena->base_address, "arena_push: arena is null\n");
 
-    if (arena_flag_is_set(arena, ARENA_FLAG_DEFAULT)) {
+    if (ckg_arena_flag_is_set(arena, ARENA_FLAG_DEFAULT)) {
         ckg_assert_in_function((arena->used + element_size < arena->capacity), "arena_push: can't push element ran out of memory\n");
         
-    } else if (arena_flag_is_set(arena, ARENA_FLAG_CIRCULAR)) {
+    } else if (ckg_arena_flag_is_set(arena, ARENA_FLAG_CIRCULAR)) {
+		printf("ckg_arena_push: circular write pointer is at the base address\n");
         arena->used = 0;
-    } else if (arena_flag_is_set(arena, ARENA_FLAG_VECTOR)) {
+    } else if (ckg_arena_flag_is_set(arena, ARENA_FLAG_VECTOR)) {
         if ((arena->used + element_size >= arena->capacity)) {
             arena->capacity += element_size;
             arena->capacity *= 2;
