@@ -51,7 +51,7 @@
 
 #pragma region MEMORY
 	//========================== Begin Types ==========================
-	typedef void* (ckg_MemoryAllocator_func)(u32);
+	typedef void* (ckg_MemoryAllocator_func)(u64);
 
 	/**
 	 * @brief you should free the data then point the data to NULLPTR and return it
