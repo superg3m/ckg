@@ -57,7 +57,7 @@
 	 * @brief you should free the data then point the data to NULLPTR and return it
 	 * 
 	 */
-	typedef void* (ckg_MemoryFree_func)(void*);
+	typedef void (ckg_MemoryFree_func)(void*);
 	//=========================== End Types ===========================
 
 	//************************* Begin Functions *************************
