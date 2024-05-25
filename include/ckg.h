@@ -72,8 +72,8 @@
 		void ckg_memory_bind_allocator_callback(ckg_MemoryAllocator_func* func_allocator);
 		void ckg_memory_bind_free_callback(ckg_MemoryFree_func* func_allocator);
 
-		void* MACRO_ckg_memory_allocate(u32 allocation_size);
-		void* MACRO_ckg_memory_reallocate(void* data, u32 old_allocation_size, u32 new_allocation_size);
+		void* MACRO_ckg_memory_allocate(u64 allocation_size);
+		void* MACRO_ckg_memory_reallocate(void* data, u64 old_allocation_size, u64 new_allocation_size);
 		void* MACRO_ckg_memory_free(void* data);
 
 		Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size);

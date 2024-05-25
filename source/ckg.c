@@ -1,10 +1,7 @@
 #include "../include/ckg.h"
 
 #pragma region MEMORY
-	internal ckg_MemoryAllocator_func* memory_allocator_callback = NULLPTR;
-	internal ckg_MemoryFree_func* memory_free_callback = NULLPTR;
-
-	void* ckg_memory_default_allocator(u32 allocation_size) {
+	void* ckg_memory_default_allocator(u64 allocation_size) {
 		void* ret = malloc(allocation_size);
 		memory_zero(ret, sizeof(allocation_size));
 		return ret;
@@ -14,6 +11,9 @@
 		free(data);
 	}
 
+	internal ckg_MemoryAllocator_func* memory_allocator_callback = &ckg_memory_default_allocator;
+	internal ckg_MemoryFree_func* memory_free_callback = &ckg_memory_default_free;
+
 	void ckg_memory_bind_allocator_callback(ckg_MemoryAllocator_func* func_allocator) {
 		memory_allocator_callback = func_allocator;
 	}
@@ -22,15 +22,11 @@
 		memory_free_callback = func_free;
 	}
 
-	void* MACRO_ckg_memory_allocate(u32 allocation_size) {
-		if (memory_allocator_callback) {
-			return memory_allocator_callback(allocation_size);
-		} else {
-			return ckg_memory_default_allocator(allocation_size);
-		}
+	void* MACRO_ckg_memory_allocate(u64 allocation_size) {
+		return memory_allocator_callback(allocation_size);
 	}
 
-	void* MACRO_ckg_memory_reallocate(void* data, u32 old_allocation_size, u32 new_allocation_size) {
+	void* MACRO_ckg_memory_reallocate(void* data, u64 old_allocation_size, u64 new_allocation_size) {
 		void* ret = MACRO_ckg_memory_allocate(new_allocation_size);
 		memory_copy(data, ret, old_allocation_size, new_allocation_size);
 		ckg_memory_free(data);
@@ -38,15 +34,9 @@
 	}
 
 	void* MACRO_ckg_memory_free(void* data) {
-		if (memory_free_callback) {
-			memory_free_callback(data);
-			data = NULLPTR;
-			return data;
-		} else {
-			ckg_memory_default_free(data);
-			data = NULLPTR;
-			return data;
-		}
+		memory_free_callback(data);
+		data = NULLPTR;
+		return data;
 	}
 
 	Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size) {
