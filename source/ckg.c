@@ -137,7 +137,7 @@
 
 #pragma region STRING
 	//************************* Begin Functions *************************
-	u32 ckg_cstring_length(const char* cstring) {
+	u32 cstring_length(const char* cstring) {
 		u32 length = 0;
 		char* cursor = (char*)cstring;
 		while(*cursor++ != '\0') {
@@ -146,12 +146,12 @@
 		return length;
 	}
 
-	Boolean ckg_string_compare(const char* s1, const char* s2) {
+	Boolean string_compare(const char* s1, const char* s2) {
 		ckg_assert_in_function(s1, "string_compare: first argument is not valid | null\n");
 		ckg_assert_in_function(s2, "string_compare: second argument is not valid | null\n");
 
-		u32 s1_length = ckg_cstring_length(s1);
-		u32 s2_length = ckg_cstring_length(s2);
+		u32 s1_length = cstring_length(s1);
+		u32 s2_length = cstring_length(s2);
 
 		return memory_byte_compare(s1, s2, s1_length, s2_length);
 	}
@@ -160,8 +160,8 @@
 		ckg_assert_in_function(string_buffer, "string_insert: string_buffer is not valid | null\n");
 		ckg_assert_in_function(source, "string_insert: source is not valid | null\n");
 
-		u32 string_buffer_length = ckg_cstring_length(string_buffer);
-		u32 source_length = ckg_cstring_length(source);
+		u32 string_buffer_length = cstring_length(string_buffer);
+		u32 source_length = cstring_length(source);
 
 		ckg_assert_in_function(index >= 0 && index <= string_buffer_length, "Index out of bounds");
 		ckg_assert_in_function(string_buffer_length + source_length < string_buffer_size, "string_insert: string_buffer_size is %d but new valid cstring length is %d + %d = %d\n", string_buffer_size, string_buffer_length, source_length + 1, string_buffer_length + source_length + 1);
@@ -183,7 +183,7 @@
 		ckg_assert_in_function(string_buffer, "string_insert_char string_buffer is not valid | null\n");
 		ckg_assert_in_function(source, "string_insert_char source is not valid | null\n");
 
-		u32 string_buffer_length = ckg_cstring_length(string_buffer);
+		u32 string_buffer_length = cstring_length(string_buffer);
 		u32 source_length = 1;
 
 		ckg_assert_in_function(index >= 0 && string_buffer_length + source_length < string_buffer_size, "string_compare second argument is not valid | null\n");
@@ -198,12 +198,12 @@
 	}
 
 	void ckg_string_append(char* string_buffer, u32 string_buffer_size, const char* source) {
-		u32 string_buffer_length = ckg_cstring_length(string_buffer);
+		u32 string_buffer_length = cstring_length(string_buffer);
 		ckg_string_insert(string_buffer, string_buffer_size, string_buffer_length, source);
 	}
 
 	void ckg_string_append_char(char* string_buffer, u32 string_buffer_size, const char source) {
-		u32 string_buffer_length = ckg_cstring_length(string_buffer);
+		u32 string_buffer_length = cstring_length(string_buffer);
 		ckg_string_insert_char(string_buffer, string_buffer_size, string_buffer_length, source);
 	}
 
@@ -216,7 +216,7 @@
 	void ckg_string_copy(char* string_buffer, u32 string_buffer_size, const char* source) {
 		ckg_assert_in_function(string_buffer, "ckg_string_copy: string_buffer is not valid | null\n");
 		ckg_assert_in_function(source, "ckg_string_copy: source is not valid | null\n");
-		u32 source_length = ckg_cstring_length(source);
+		u32 source_length = cstring_length(source);
 		ckg_string_clear(string_buffer, string_buffer_size);
 
 		// Date: May 18, 2024

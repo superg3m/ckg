@@ -174,8 +174,8 @@
 	extern "C" {
 	#endif
 
-		u32 ckg_cstring_length(const char* c_string);
-		Boolean ckg_string_compare(const char* s1, const char* s2);
+		u32 cstring_length(const char* c_string);
+		Boolean string_compare(const char* s1, const char* s2);
 
 
 		/**

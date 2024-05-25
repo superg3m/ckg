@@ -128,40 +128,40 @@ void test_ckg_arena_operations() {
 void test_ckg_string_operations() {
 	CKG_Arena string_pool = ckg_arena_create_custom(6, "string pool", CKG_ARENA_FLAG_CIRCULAR);
 
-	// Test ckg_cstring_length
+	// Test cstring_length
 	const int str1_size = 6;
 	char* str1 = ckg_arena_push_array(&string_pool, char, 6);
 	ckg_string_copy(str1, str1_size, "Hello");
-	ckg_assert_in_function(ckg_string_compare(str1, "Hello"), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(string_compare(str1, "Hello"), "Error: Incorrect string comparison\n");
 
 	char* str1_P = ckg_arena_push(&string_pool, char);
 	str1_P[0] = 'f';
-	ckg_assert_in_function(ckg_string_compare(str1, str1_P), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(string_compare(str1, str1_P), "Error: Incorrect string comparison\n");
 
 
 	char* str1_PT = ckg_arena_push(&string_pool, char);
 	str1_PT[0] = 'M';
-	ckg_assert_in_function(ckg_string_compare(str1, str1_P), "Error: Incorrect string comparison\n");
-	ckg_assert_in_function(ckg_string_compare(str1_PT, "Mllo"), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(string_compare(str1, str1_P), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(string_compare(str1_PT, "Mllo"), "Error: Incorrect string comparison\n");
 
-	ckg_assert_in_function(ckg_cstring_length(str1) == 5, "Error: Incorrect string length\n");
+	ckg_assert_in_function(cstring_length(str1) == 5, "Error: Incorrect string length\n");
 
-	// Test ckg_string_compare
+	// Test string_compare
 	char* str2 = "Hello";
 	char* str3 = "World";
-	ckg_assert_in_function(!ckg_string_compare(str1, str2), "Error: Incorrect string comparison\n");
-	ckg_assert_in_function(ckg_string_compare(str2, str2), "Error: Incorrect string comparison\n");
-	ckg_assert_in_function(!ckg_string_compare(str2, str3), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(!string_compare(str1, str2), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(string_compare(str2, str2), "Error: Incorrect string comparison\n");
+	ckg_assert_in_function(!string_compare(str2, str3), "Error: Incorrect string comparison\n");
 
 	// Test ckg_string_append
 	char str4[str4_capacity];
 	memory_zero(str4, str4_capacity);
 	ckg_string_append(str4, str4_capacity, "Hello");
 	ckg_string_append(str4, str4_capacity, " World!");
-	ckg_assert_in_function(!ckg_string_compare(str4, "Hello World"), "Error: Incorrect string append\n");
-	ckg_assert_in_function(ckg_string_compare(str4, "Hello World!"), "Error: Incorrect string append\n");
-	ckg_assert_in_function(!ckg_string_compare(str4, "Goodbye World!"), "Error: Incorrect string append\n");
-	ckg_assert_in_function(!ckg_string_compare(str4, ""), "Error: Incorrect string append\n");
+	ckg_assert_in_function(!string_compare(str4, "Hello World"), "Error: Incorrect string append\n");
+	ckg_assert_in_function(string_compare(str4, "Hello World!"), "Error: Incorrect string append\n");
+	ckg_assert_in_function(!string_compare(str4, "Goodbye World!"), "Error: Incorrect string append\n");
+	ckg_assert_in_function(!string_compare(str4, ""), "Error: Incorrect string append\n");
 
 
 	// Test ckg_string_append_char
@@ -169,37 +169,37 @@ void test_ckg_string_operations() {
 	memory_zero(str5, str5_capacity);
 	ckg_string_append(str5, str5_capacity, "Hello");
 	ckg_string_append_char(str5, str5_capacity, '!');
-	ckg_assert_in_function(ckg_string_compare(str5, "Hello!"), "Error: Incorrect string append char\n");
-	ckg_assert_in_function(!ckg_string_compare(str5, "Goodbye!"), "Error: Incorrect string append char\n");
+	ckg_assert_in_function(string_compare(str5, "Hello!"), "Error: Incorrect string append char\n");
+	ckg_assert_in_function(!string_compare(str5, "Goodbye!"), "Error: Incorrect string append char\n");
 
 	// Test ckg_string_insert
 	char str6[str6_capacity];
 	memory_zero(str6, str6_capacity);
 	ckg_string_insert(str6, str6_capacity, 0, "Hello");
 	ckg_string_insert(str6, str6_capacity, 5, " World");
-	ckg_assert_in_function(ckg_string_compare(str6, "Hello World"), "Error: Incorrect string insert, left: %s | right: %s\n", str6, "Hello World");
-	ckg_assert_in_function(!ckg_string_compare(str6, "Goodbye World"), "Error: Incorrect string insert, left: %s | right: %s\n", str6, "Goodbye World");
+	ckg_assert_in_function(string_compare(str6, "Hello World"), "Error: Incorrect string insert, left: %s | right: %s\n", str6, "Hello World");
+	ckg_assert_in_function(!string_compare(str6, "Goodbye World"), "Error: Incorrect string insert, left: %s | right: %s\n", str6, "Goodbye World");
 
 	ckg_string_insert(str6, str6_capacity, 2, "V");
-	ckg_assert_in_function(ckg_string_compare(str6, "HeVllo World"), "Error: Incorrect string insert, left: %s | right: %s\n", str6, "HeVllo World");
+	ckg_assert_in_function(string_compare(str6, "HeVllo World"), "Error: Incorrect string insert, left: %s | right: %s\n", str6, "HeVllo World");
 
-	ckg_string_insert(str6, str6_capacity, ckg_cstring_length(str6), "!");
-	ckg_assert_in_function(ckg_string_compare(str6, "HeVllo World!"), "Error: Incorrect string insert, left: %s | right: %s\n", str6, "HeVllo World!");
+	ckg_string_insert(str6, str6_capacity, cstring_length(str6), "!");
+	ckg_assert_in_function(string_compare(str6, "HeVllo World!"), "Error: Incorrect string insert, left: %s | right: %s\n", str6, "HeVllo World!");
 
 
 	// Test ckg_string_clear
 	char str7[str7_capacity] = "Hello";
 	ckg_string_clear(str7, str7_capacity);
-	ckg_assert_in_function(ckg_string_compare("", ""), "Error: Incorrect string clear\n");
-	ckg_assert_in_function(!ckg_string_compare("", "should fail?"), "Error: Incorrect string clear\n");
+	ckg_assert_in_function(string_compare("", ""), "Error: Incorrect string clear\n");
+	ckg_assert_in_function(!string_compare("", "should fail?"), "Error: Incorrect string clear\n");
 
 	// Test ckg_string_copy
 	char str8[str8_capacity];
 	memory_zero(str4, str8_capacity);
 	ckg_string_copy(str8, str8_capacity, "Hello!");
-	ckg_assert_in_function(ckg_string_compare(str8, "Hello!"), "Error: Incorrect string copy\n");
-	ckg_assert_in_function(!ckg_string_compare(str8, "Hello"), "Error: Incorrect string copy\n");
-	ckg_assert_in_function(!ckg_string_compare(str8, "Goodbye"), "Error: Incorrect string copy\n");
+	ckg_assert_in_function(string_compare(str8, "Hello!"), "Error: Incorrect string copy\n");
+	ckg_assert_in_function(!string_compare(str8, "Hello"), "Error: Incorrect string copy\n");
+	ckg_assert_in_function(!string_compare(str8, "Goodbye"), "Error: Incorrect string copy\n");
 
 	printf("All string tests passed!\n"); 
 	return;
