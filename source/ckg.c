@@ -3,7 +3,7 @@
 #pragma region MEMORY
 	void* ckg_memory_default_allocator(u64 allocation_size) {
 		void* ret = malloc(allocation_size);
-		memory_zero(ret, sizeof(allocation_size));
+		memory_zero(ret, allocation_size);
 		return ret;
 	}
 
