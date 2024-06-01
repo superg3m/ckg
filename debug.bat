@@ -1,11 +1,11 @@
 @echo off
 
-if not exist .\examples\cl\test_ckg.sln (
-    if not exist .\examples\cl\test_ckg.exe (
-        powershell -nologo -command "Write-Host 'ERROR: check if exe exists and re-build' -ForegroundColor Red"
-    ) else (
-        devenv .\examples\cl\test_ckg.exe
-    )
+set "executable_file_path=.\examples\cl\test_ckg.exe"
+
+if not exist "%executable_file_path%" (
+    powershell -nologo -command "Write-Host 'ERROR: Can''t find exe, building...' -ForegroundColor Red"
+    call build_example.bat
+    raddbg "%executable_file_path%"
 ) else (
-    devenv .\examples\cl\test_ckg.sln
+    raddbg "%executable_file_path%"
 )
