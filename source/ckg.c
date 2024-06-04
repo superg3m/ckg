@@ -11,14 +11,8 @@
 		free(data);
 	}
 
-	void* ckg_memory_default_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
-		ckg_memory_reallocate(data, old_allocation_size, new_allocation_size);
-		return data;
-	}
-
 	internal CKG_MemoryAllocator* memory_allocate_callback = &ckg_memory_default_allocator;
 	internal CKG_MemoryFree* memory_free_callback = &ckg_memory_default_free;
-	internal CKG_MemoryReallocator* memory_reallocate_callback = &ckg_memory_default_reallocate;
 
 	void ckg_memory_bind_allocator_callback(CKG_MemoryAllocator* allocator) {
 		memory_allocate_callback = allocator;
@@ -32,7 +26,7 @@
 		return memory_allocate_callback(allocation_size);
 	}
 
-	void* MACRO_ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
+	void* ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
 		void* ret = MACRO_ckg_memory_allocate(new_allocation_size);
 		memory_copy(data, ret, old_allocation_size, new_allocation_size);
 		ckg_memory_free(data);
@@ -216,7 +210,7 @@
 #pragma region VECTOR
 	void* ckg_vector_grow(void* vector, size_t element_size) {
 		if (vector == NULLPTR) {
-			vector = memory_allocate_callback(sizeof(VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
+			vector = ckg_memory_allocate(sizeof(VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
 			memory_byte_advance(vector, sizeof(VectorHeader));
 			ckg_vector_capacity(vector) = VECTOR_DEFAULT_CAPACITY;
 		}
@@ -229,7 +223,7 @@
 			u32 new_capactiy = capactiy * 2;
 			size_t new_allocation_size = sizeof(VectorHeader) + (new_capactiy * element_size);
 
-			vector = memory_reallocate_callback(ckg_vector_header_base(vector), old_allocation_size, new_allocation_size);
+			vector = ckg_memory_reallocate(ckg_vector_header_base(vector), old_allocation_size, new_allocation_size);
 			memory_byte_advance(vector, sizeof(VectorHeader));
 
 			ckg_vector_length(vector) = length;

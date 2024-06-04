@@ -70,7 +70,7 @@
 		void ckg_memory_bind_free_callback(CKG_MemoryFree* func_allocator);
 
 		void* MACRO_ckg_memory_allocate(size_t allocation_size);
-		void* MACRO_ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size);
+		void* ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size);
 		void* MACRO_ckg_memory_free(void* data);
 
 		Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 b1_allocation_size, u32 b2_allocation_size);
@@ -104,7 +104,6 @@
 	 */
 	#ifdef __cplusplus
 		#define ckg_memory_allocate(allocation_size) (decltype(data))MACRO_ckg_memory_allocate(allocation_size)
-		#define ckg_memory_reallocate(allocation_size) (decltype(data))MACRO_ckg_memory_reallocate(allocation_size)
 		#define ckg_memory_free(data) data = (decltype(data))MACRO_ckg_memory_free(data)
 
 		#define memory_byte_advance(data, size_in_bytes) data = (decltype(data))MACRO_memory_byte_advance(data, size_in_bytes)
@@ -112,7 +111,6 @@
 		
 	#else
 		#define ckg_memory_allocate(allocation_size) MACRO_ckg_memory_allocate(allocation_size)
-		#define ckg_memory_reallocate(data, old_allocation_size, new_allocation_size) data = MACRO_ckg_memory_reallocate(data, old_allocation_size, new_allocation_size)
 		#define ckg_memory_free(data) data = MACRO_ckg_memory_free(data)
 
 		#define memory_byte_advance(data, size_in_bytes) data = MACRO_memory_byte_advance(data, size_in_bytes)
