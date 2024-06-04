@@ -8,14 +8,14 @@ param(
 $extension = ".c"
 
 if(!(Test-Path -Path ".\ckg")) {
-    Write-Host "missing ckg"
-    git clone https://github.com/superg3m/ckg.git
+    #Write-Host "missing ckg"
+    #git clone https://github.com/superg3m/ckg.git
 } else {
-    Push-Location  ".\ckg"
-    git stash
-    git stash drop
-    git pull
-    Pop-Location
+    #Push-Location  ".\ckg"
+    #git stash
+    #git stash drop
+    #git pull
+    #Pop-Location
 }
 
 if(!(Test-Path -Path ".\build_cl")) {

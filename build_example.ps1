@@ -1,4 +1,4 @@
-./build.ps1
+./build.ps1 "c99"
 
 if(!(Test-Path -Path ".\examples\cl")) {
     mkdir ".\examples\cl"

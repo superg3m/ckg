@@ -208,7 +208,13 @@ void test_ckg_string_operations() {
 void test_ckg_vector_operations() {
 	int* int_vector = NULLPTR;
 
-	
+	for (int i = 0; i < 200; i++) {
+		vector_push(int_vector, i);
+	}
+
+	for (int i = 0; i < vector_length(int_vector); i++) {
+		ckg_assert_in_function(int_vector[i] == i, "VECTOR FAILED!\n");
+	}
 
 	vector_push(int_vector, 4);
 

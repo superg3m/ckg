@@ -212,17 +212,24 @@
 		if (vector == NULLPTR) {
 			vector = ckg_memory_allocate(sizeof(VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
 			memory_byte_advance(vector, sizeof(VectorHeader));
-			vector_header(vector)->capacity = VECTOR_DEFAULT_CAPACITY;
+			vector_capacity(vector) = VECTOR_DEFAULT_CAPACITY;
 		}
-		if (vector_capacity(vector) < vector_length(vector) + 1) {
-			size_t old_allocation_size = vector_capacity(vector) * element_size;
-			vector_mutable_capacity(vector) *= 2;
-			size_t new_allocation_size = vector_capacity(vector) * element_size;
 
-			vector = ckg_memory_reallocate(vector_header(vector), old_allocation_size, new_allocation_size);
-			u8* temp_ptr = memory_advance_new_ptr(vector, sizeof(VectorHeader));
-			vector = temp_ptr;
+		u32 length = vector_length(vector);
+		u32 capactiy = vector_capacity(vector);
+
+		if (capactiy < length + 1) {
+			size_t old_allocation_size = sizeof(VectorHeader) + (capactiy * element_size);
+			u32 new_capactiy = capactiy * 2;
+			size_t new_allocation_size = sizeof(VectorHeader) + (new_capactiy * element_size);
+
+			vector = ckg_memory_reallocate(vector_header_base(vector), old_allocation_size, new_allocation_size);
+			memory_byte_advance(vector, sizeof(VectorHeader));
+
+			vector_length(vector) = length;
+			vector_capacity(vector) = new_capactiy;
 		}
+
 		return vector;
 	}
 #pragma endregion
