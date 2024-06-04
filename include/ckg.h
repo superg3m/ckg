@@ -53,7 +53,6 @@
 	//========================== Begin Types ==========================
 	typedef void* (CKG_MemoryAllocator)(size_t);
 	typedef void (CKG_MemoryFree)(void*);
-	typedef void* (CKG_MemoryReallocator)(void*, size_t, size_t);
 
 	//=========================== End Types ===========================
 
@@ -216,14 +215,14 @@
 #pragma endregion
 
 #pragma region VECTOR
-	typedef struct VectorHeader {
+	typedef struct CKG_VectorHeader {
 		u32 length;
 		u32 capacity;
-	} VectorHeader;
+	} CKG_VectorHeader;
 	
 	#define VECTOR_DEFAULT_CAPACITY 1
 
-	#define ckg_vector_header_base(vector) ((VectorHeader*)(((u8*)vector) - sizeof(VectorHeader)))
+	#define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
 
 	#define ckg_vector_length(vector) ckg_vector_header_base(vector)->length
 	#define ckg_vector_capacity(vector) ckg_vector_header_base(vector)->capacity
