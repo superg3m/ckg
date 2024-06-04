@@ -210,14 +210,13 @@
 #pragma region VECTOR
 	void* vector_grow(void* vector, size_t element_size) {
 		if (vector == NULLPTR) {
-			vector = ckg_memory_allocate(sizeof(VectorHeader) + element_size);
+			vector = ckg_memory_allocate(sizeof(VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
+			memory_byte_advance(vector, sizeof(VectorHeader));
 			vector_header(vector)->capacity = VECTOR_DEFAULT_CAPACITY;
-			u8* temp_ptr = memory_advance_new_ptr(vector, sizeof(VectorHeader));
-			vector = temp_ptr;
 		}
 		if (vector_capacity(vector) < vector_length(vector) + 1) {
 			size_t old_allocation_size = vector_capacity(vector) * element_size;
-			vector_capacity(vector) *= 2;
+			vector_mutable_capacity(vector) *= 2;
 			size_t new_allocation_size = vector_capacity(vector) * element_size;
 
 			vector = ckg_memory_reallocate(vector_header(vector), old_allocation_size, new_allocation_size);

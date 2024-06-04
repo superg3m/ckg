@@ -207,6 +207,9 @@ void test_ckg_string_operations() {
 
 void test_ckg_vector_operations() {
 	int* int_vector = NULLPTR;
+
+	
+
 	vector_push(int_vector, 4);
 
 	printf("All vector tests passed!\n"); 
