@@ -205,10 +205,19 @@ void test_ckg_string_operations() {
 	return;
 }
 
+void test_ckg_vector_operations() {
+	int* int_vector = NULLPTR;
+	vector_push(int_vector, 4);
+
+	printf("All vector tests passed!\n"); 
+	return;
+}
+
 int main() {
 	test_ckg_memory_operations();
 	test_ckg_arena_operations();
 	test_ckg_string_operations();
+	test_ckg_vector_operations();
 
 	return 0;
 }

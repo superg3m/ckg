@@ -220,6 +220,23 @@
 	//************************** End Functions **************************
 #pragma endregion
 
+#pragma region VECTOR
+	typedef struct VectorHeader {
+		u32 length;
+		u32 capacity;
+	} VectorHeader;
+	
+	#define VECTOR_DEFAULT_CAPACITY 1;
+
+	#define vector_header(vector) ((VectorHeader*)(((u8*)vector) - sizeof(VectorHeader)))
+	#define vector_length(vector) vector_header(vector)->length
+	#define vector_capacity(vector) vector_header(vector)->capacity
+
+	#define vector_push(vector, element) (vector = vector_grow(vector, sizeof(element)), vector[vector_length(vector)++] = element)
+	#define vector_free(vector) memory_free(vector_header(vector))
+
+	void* vector_grow(void* vector, size_t element_size);
+#pragma endregion
 
 #pragma region ARENA
 //========================== Begin Types ==========================
