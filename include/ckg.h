@@ -51,13 +51,10 @@
 
 #pragma region MEMORY
 	//========================== Begin Types ==========================
-	typedef void* (ckg_MemoryAllocator_func)(u64);
+	typedef void* (CKG_MemoryAllocator)(size_t);
+	typedef void (CKG_MemoryFree)(void*);
+	typedef void* (CKG_MemoryReallocator)(void*, size_t, size_t);
 
-	/**
-	 * @brief you should free the data then point the data to NULLPTR and return it
-	 * 
-	 */
-	typedef void (ckg_MemoryFree_func)(void*);
 	//=========================== End Types ===========================
 
 	//************************* Begin Functions *************************
@@ -69,24 +66,24 @@
 		 * @brief If you don't bind these callbacks a default callback will be used
 		 * 
 		 */
-		void ckg_memory_bind_allocator_callback(ckg_MemoryAllocator_func* func_allocator);
-		void ckg_memory_bind_free_callback(ckg_MemoryFree_func* func_allocator);
+		void ckg_memory_bind_allocator_callback(CKG_MemoryAllocator* func_allocator);
+		void ckg_memory_bind_free_callback(CKG_MemoryFree* func_allocator);
 
-		void* MACRO_ckg_memory_allocate(u64 allocation_size);
-		void* MACRO_ckg_memory_reallocate(void* data, u64 old_allocation_size, u64 new_allocation_size);
+		void* MACRO_ckg_memory_allocate(size_t allocation_size);
+		void* MACRO_ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size);
 		void* MACRO_ckg_memory_free(void* data);
 
-		Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size);
-		void memory_copy(const void* source, void* destination, u32 source_size, u32 destination_size);
-		void memory_zero(void* data, u32 data_size_in_bytes);
-		void memory_set(u8* data, u32 data_size_in_bytes, u8 element);
+		Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 b1_allocation_size, u32 b2_allocation_size);
+		void memory_copy(const void* source, void* destination, size_t source_size, size_t destination_size);
+		void memory_zero(void* data, size_t data_size_in_bytes);
+		void memory_set(u8* data, size_t data_size_in_bytes, u8 element);
 
-		void memory_buffer_delete_index(const void* data, u32 size_in_bytes, u32 buffer_count, u32 index);
+		void memory_buffer_delete_index(const void* data, size_t size_in_bytes, u32 buffer_count, u32 index);
 
-		u8* memory_advance_new_ptr(const void* data, u32 size_in_bytes);
-		u8* memory_retreat_new_ptr(const void* data, u32 size_in_bytes);
-		void* MACRO_memory_byte_advance(const void* data, u32 size_in_bytes);
-		void* MACRO_memory_byte_retreat(const void* data, u32 size_in_bytes);
+		u8* memory_advance_new_ptr(const void* data, size_t size_in_bytes);
+		u8* memory_retreat_new_ptr(const void* data, size_t size_in_bytes);
+		void* MACRO_memory_byte_advance(const void* data, size_t size_in_bytes);
+		void* MACRO_memory_byte_retreat(const void* data, size_t size_in_bytes);
 
 	#ifdef __cplusplus
 	}
@@ -115,7 +112,7 @@
 		
 	#else
 		#define ckg_memory_allocate(allocation_size) MACRO_ckg_memory_allocate(allocation_size)
-		#define ckg_memory_reallocate(data, old_allocation_size, new_allocation_size) MACRO_ckg_memory_reallocate(data, old_allocation_size, new_allocation_size)
+		#define ckg_memory_reallocate(data, old_allocation_size, new_allocation_size) data = MACRO_ckg_memory_reallocate(data, old_allocation_size, new_allocation_size)
 		#define ckg_memory_free(data) data = MACRO_ckg_memory_free(data)
 
 		#define memory_byte_advance(data, size_in_bytes) data = MACRO_memory_byte_advance(data, size_in_bytes)
@@ -228,15 +225,15 @@
 	
 	#define VECTOR_DEFAULT_CAPACITY 1
 
-	#define vector_header_base(vector) ((VectorHeader*)(((u8*)vector) - sizeof(VectorHeader)))
+	#define ckg_vector_header_base(vector) ((VectorHeader*)(((u8*)vector) - sizeof(VectorHeader)))
 
-	#define vector_length(vector) vector_header_base(vector)->length
-	#define vector_capacity(vector) vector_header_base(vector)->capacity
+	#define ckg_vector_length(vector) ckg_vector_header_base(vector)->length
+	#define ckg_vector_capacity(vector) ckg_vector_header_base(vector)->capacity
 
-	#define vector_push(vector, element) (vector = vector_grow(vector, sizeof(element)), vector[vector_length(vector)++] = element)
-	#define vector_free(vector) memory_free(vector_header_base(vector))
-
-	void* vector_grow(void* vector, size_t element_size);
+	void* ckg_vector_grow(void* vector, size_t element_size);
+	#define ckg_vector_push(vector, element) (vector = ckg_vector_grow(vector, sizeof(element)), vector[ckg_vector_length(vector)++] = element)
+	#define ckg_vector_free(vector) ckg_memory_free(ckg_vector_header_base(vector))
+	
 #pragma endregion
 
 #pragma region ARENA

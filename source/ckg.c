@@ -1,7 +1,7 @@
 #include "../include/ckg.h"
 
 #pragma region MEMORY
-	void* ckg_memory_default_allocator(u64 allocation_size) {
+	void* ckg_memory_default_allocator(size_t allocation_size) {
 		void* ret = malloc(allocation_size);
 		memory_zero(ret, allocation_size);
 		return ret;
@@ -11,22 +11,28 @@
 		free(data);
 	}
 
-	internal ckg_MemoryAllocator_func* memory_allocator_callback = &ckg_memory_default_allocator;
-	internal ckg_MemoryFree_func* memory_free_callback = &ckg_memory_default_free;
-
-	void ckg_memory_bind_allocator_callback(ckg_MemoryAllocator_func* func_allocator) {
-		memory_allocator_callback = func_allocator;
+	void* ckg_memory_default_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
+		ckg_memory_reallocate(data, old_allocation_size, new_allocation_size);
+		return data;
 	}
 
-	void ckg_memory_bind_free_callback(ckg_MemoryFree_func* func_free) {
-		memory_free_callback = func_free;
+	internal CKG_MemoryAllocator* memory_allocate_callback = &ckg_memory_default_allocator;
+	internal CKG_MemoryFree* memory_free_callback = &ckg_memory_default_free;
+	internal CKG_MemoryReallocator* memory_reallocate_callback = &ckg_memory_default_reallocate;
+
+	void ckg_memory_bind_allocator_callback(CKG_MemoryAllocator* allocator) {
+		memory_allocate_callback = allocator;
 	}
 
-	void* MACRO_ckg_memory_allocate(u64 allocation_size) {
-		return memory_allocator_callback(allocation_size);
+	void ckg_memory_bind_free_callback(CKG_MemoryFree* free) {
+		memory_free_callback = free;
 	}
 
-	void* MACRO_ckg_memory_reallocate(void* data, u64 old_allocation_size, u64 new_allocation_size) {
+	void* MACRO_ckg_memory_allocate(size_t allocation_size) {
+		return memory_allocate_callback(allocation_size);
+	}
+
+	void* MACRO_ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
 		void* ret = MACRO_ckg_memory_allocate(new_allocation_size);
 		memory_copy(data, ret, old_allocation_size, new_allocation_size);
 		ckg_memory_free(data);
@@ -58,7 +64,7 @@
 		return TRUE;
 	}
 
-	void memory_copy(const void* source, void* destination, u32 source_size, u32 destination_size) {
+	void memory_copy(const void* source, void* destination, size_t source_size, size_t destination_size) {
 		ckg_assert_in_function(source, "MEMORY COPY SOURCE IS NULL\n");
 		ckg_assert_in_function(destination, "MEMORY COPY SOURCE IS NULL\n");
 		ckg_assert_in_function((source_size <= destination_size), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
@@ -68,13 +74,13 @@
 		}
 	}
 
-	void memory_zero(void* data, u32 data_size_in_bytes) {
+	void memory_zero(void* data, size_t data_size_in_bytes) {
 		for (int i = 0; i < data_size_in_bytes; i++) {
 			((u8*)data)[i] = 0;
 		}
 	}
 
-	void memory_set(u8* data, u32 data_size_in_bytes, u8 element) {
+	void memory_set(u8* data, size_t data_size_in_bytes, u8 element) {
 		for (int i = 0; i < data_size_in_bytes; i++) {
 			((u8*)data)[i] = element;
 		}
@@ -88,7 +94,7 @@
 	 * @param buffer_count 
 	 * @param index 
 	 */
-	void memory_buffer_delete_index(const void* data, u32 size_in_bytes, u32 buffer_count, u32 index) {
+	void memory_buffer_delete_index(const void* data, size_t size_in_bytes, u32 buffer_count, u32 index) {
 		u32 size_of_element = size_in_bytes / buffer_count;
 
 		u8* source_ptr = memory_advance_new_ptr(data, (index + 1) * size_of_element);
@@ -99,19 +105,19 @@
 		memory_copy(source_ptr, dest_ptr, source_ptr_size, dest_ptr_size);
 	}
 
-	u8* memory_advance_new_ptr(const void* data, u32 size_in_bytes) {
+	u8* memory_advance_new_ptr(const void* data, size_t size_in_bytes) {
 		return ((u8*)data) + size_in_bytes;
 	}
 
-	u8* memory_retreat_new_ptr(const void* data, u32 size_in_bytes) {
+	u8* memory_retreat_new_ptr(const void* data, size_t size_in_bytes) {
 		return ((u8*)data) - size_in_bytes;
 	}
 
-	void* MACRO_memory_byte_advance(const void* data, u32 size_in_bytes) {
+	void* MACRO_memory_byte_advance(const void* data, size_t size_in_bytes) {
 		return ((u8*)data) + size_in_bytes;
 	}
 
-	void* MACRO_memory_byte_retreat(const void* data, u32 size_in_bytes) {
+	void* MACRO_memory_byte_retreat(const void* data, size_t size_in_bytes) {
 		return ((u8*)data) - size_in_bytes;
 	}
 #pragma endregion
@@ -208,26 +214,26 @@
 #pragma endregion
 
 #pragma region VECTOR
-	void* vector_grow(void* vector, size_t element_size) {
+	void* ckg_vector_grow(void* vector, size_t element_size) {
 		if (vector == NULLPTR) {
-			vector = ckg_memory_allocate(sizeof(VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
+			vector = memory_allocate_callback(sizeof(VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
 			memory_byte_advance(vector, sizeof(VectorHeader));
-			vector_capacity(vector) = VECTOR_DEFAULT_CAPACITY;
+			ckg_vector_capacity(vector) = VECTOR_DEFAULT_CAPACITY;
 		}
 
-		u32 length = vector_length(vector);
-		u32 capactiy = vector_capacity(vector);
+		u32 length = ckg_vector_length(vector);
+		u32 capactiy = ckg_vector_capacity(vector);
 
 		if (capactiy < length + 1) {
 			size_t old_allocation_size = sizeof(VectorHeader) + (capactiy * element_size);
 			u32 new_capactiy = capactiy * 2;
 			size_t new_allocation_size = sizeof(VectorHeader) + (new_capactiy * element_size);
 
-			vector = ckg_memory_reallocate(vector_header_base(vector), old_allocation_size, new_allocation_size);
+			vector = memory_reallocate_callback(ckg_vector_header_base(vector), old_allocation_size, new_allocation_size);
 			memory_byte_advance(vector, sizeof(VectorHeader));
 
-			vector_length(vector) = length;
-			vector_capacity(vector) = new_capactiy;
+			ckg_vector_length(vector) = length;
+			ckg_vector_capacity(vector) = new_capactiy;
 		}
 
 		return vector;
