@@ -7,7 +7,7 @@
         "$should_run" : true,
 
         "$build_name" : "build ckg",
-        "$projects_to_build" : ["ckit"],
+        "$projects_to_build" : [""],
 
         "$output_name" : "ckg.lib",
         "$compile_time_defines" : "",
