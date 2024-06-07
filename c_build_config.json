@@ -1,5 +1,5 @@
 {
-    "$project_name" : "ckit",
+    "$project_name" : "CKG",
 
     "$debug_with_visual_studio" : false,
 
