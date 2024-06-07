@@ -39,3 +39,4 @@ examples/gcc/
 
 *.ps1
 compilation_errors.txt
+c-build/
