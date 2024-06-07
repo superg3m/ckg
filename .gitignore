@@ -38,3 +38,4 @@ examples/cl/
 examples/gcc/
 
 *.ps1
+c-build/
