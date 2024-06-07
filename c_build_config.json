@@ -5,10 +5,10 @@
 
     "./build_cl" : {
         "$build_name" : "build ckg",
-
         "$projects_to_build" : [""],
 
         "$output_name" : "ckg.lib",
+        "$compile_time_defines" : "",
         "$include_paths" : "",
         "$source_paths" : "./source/*.c",
 
@@ -21,10 +21,10 @@
 
     "./examples/cl" : {
         "$build_name" : "test ckg",
-
         "$projects_to_build" : [""],
 
         "$output_name" : "test_ckg.exe",
+        "$compile_time_defines" : "",
         "$include_paths" : "",
         "$source_paths" : "../*.c",
 
