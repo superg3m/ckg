@@ -1,5 +1,5 @@
 {
-    "$project_name" : "CKG",
+    "$project_name" : "ckit",
 
     "$debug_with_visual_studio" : false,
 
@@ -7,7 +7,7 @@
         "$should_run" : true,
 
         "$build_name" : "build ckg",
-        "$projects_to_build" : [""],
+        "$projects_to_build" : ["ckit"],
 
         "$output_name" : "ckg.lib",
         "$compile_time_defines" : "",
