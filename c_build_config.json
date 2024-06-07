@@ -1,0 +1,37 @@
+{
+    "$project_name" : "CKG",
+
+    "$debug_with_visual_studio" : false,
+
+    "./build_cl" : {
+        "$build_name" : "build ckg",
+
+        "$projects_to_build" : [""],
+
+        "$output_name" : "ckg.lib",
+        "$include_paths" : "",
+        "$source_paths" : "./source/*.c",
+
+        "$std_version" : "c11",
+        "$build_lib" : true,
+        "$generate_object_files" : false,
+
+        "$additional_libs" : "./ckg.lib"
+    },
+
+    "./examples/cl" : {
+        "$build_name" : "test ckg",
+
+        "$projects_to_build" : [""],
+
+        "$output_name" : "test_ckg.exe",
+        "$include_paths" : "",
+        "$source_paths" : "../*.c",
+
+        "$std_version" : "c11",
+        "$build_lib" : true,
+        "$generate_object_files" : false,
+
+        "$additional_libs" : ""
+    }
+}
