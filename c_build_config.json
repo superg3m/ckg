@@ -9,7 +9,7 @@
         "$should_fully_rebuild_project_depedencies" : false,
 
         "$should_build_lib" : true,
-        "$should_execute" : true,
+        "$should_execute" : false,
 
         "$build_procedure_name" : "build ckg",
         "$projects_dependencies_to_build" : [""],
@@ -30,7 +30,7 @@
         "$should_project_rebuild" : true,
         "$should_fully_rebuild_project_depedencies" : false,
 
-        "$should_build_lib" : true,
+        "$should_build_lib" : false,
         "$should_execute" : true,
 
         "$build_procedure_name" : "test ckg",
