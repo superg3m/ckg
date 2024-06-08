@@ -27,7 +27,6 @@
 
     "./examples/cl" : {
         "$should_build_procedure" : true,
-        "$should_procedure_rebuild" : true,
         "$should_fully_rebuild_project_depedencies" : false,
 
         "$should_build_lib" : false,
