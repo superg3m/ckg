@@ -21,14 +21,13 @@
 	typedef uint32_t u32;
 	typedef uint64_t u64;
 
-	typedef enum Boolean{
-		FALSE = 0,
-		TRUE
-	} Boolean;
+	typedef u8 Boolean;
 
 	//=========================== End Types ===========================
 
 	//+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
+	#define FALSE 0
+	#define TRUE 1
 	#define NULLPTR 0
 
 	#define stringify(entry) #entry
