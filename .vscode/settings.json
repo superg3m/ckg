@@ -12,7 +12,8 @@
 		"stdlib.h": "c",
 		"ckg_assert.h": "c",
 		"memory.h": "c",
-		"ckg.h": "c"
+		"ckg.h": "c",
+		"stdbool.h": "c"
 	},
 	"editor.insertSpaces": false
 }
