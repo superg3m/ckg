@@ -18,7 +18,7 @@
         "additional_libs" : ""
     },
 
-    "./examples/cl" : {
+    "./example/cl" : {
         "output_name" : "test_ckg.exe",
         "compile_time_defines" : "",
         "include_paths" : "",
