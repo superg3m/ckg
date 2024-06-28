@@ -6,6 +6,8 @@
     "debug_with_visual_studio" : true,
     "should_rebuild_project_dependencies" : false,
 
+    "compiler_type" : "cl",
+
     "std_version" : "c11",
     "project_dependencies" : [""],
 
@@ -15,7 +17,7 @@
         "include_paths" : "",
         "source_paths" : "../source/*.c",
 
-        "additional_libs" : ""
+        "additional_libs" : [""]
     },
 
     "./example/cl" : {
@@ -24,7 +26,7 @@
         "include_paths" : "",
         "source_paths" : "../test_ckg.c",
 
-        "additional_libs" : "../../build_cl/ckg.lib"
+        "additional_libs" : ["../../build_cl/ckg.lib"]
     },
 
     "execute" : "test_ckg.exe"
