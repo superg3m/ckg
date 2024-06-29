@@ -4,7 +4,7 @@
     "project_name" : "CKG",
     
     "debug_with_visual_studio" : true,
-    "should_rebuild_project_dependencies" : false,
+    "should_rebuild_project_dependencies" : true,
 
     "compiler_type" : "cl",
 
@@ -15,7 +15,9 @@
         "output_name" : "ckg.lib",
         "compile_time_defines" : "",
         "include_paths" : "",
-        "source_paths" : "../source/*.c",
+        "source_paths" : [
+            "../source/*.c"
+        ],
 
         "additional_libs" : [""]
     },
@@ -28,7 +30,9 @@
             "../test_ckg.c"
         ],
 
-        "additional_libs" : ["../../build_cl/ckg.lib"]
+        "additional_libs" : [
+            "../../build_cl/ckg.lib"
+        ]
     },
 
     "execute" : "test_ckg.exe"
