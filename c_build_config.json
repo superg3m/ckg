@@ -3,7 +3,7 @@
 
     "project_name" : "CKG",
     
-    "debug_with_visual_studio" : true,
+    "debug_with_visual_studio" : false,
     "should_rebuild_project_dependencies" : true,
 
     "compiler_type" : "cl",
