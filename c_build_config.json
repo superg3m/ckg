@@ -24,7 +24,9 @@
         "output_name" : "test_ckg.exe",
         "compile_time_defines" : "",
         "include_paths" : "",
-        "source_paths" : "../test_ckg.c",
+        "source_paths" : [
+            "../test_ckg.c"
+        ],
 
         "additional_libs" : ["../../build_cl/ckg.lib"]
     },
