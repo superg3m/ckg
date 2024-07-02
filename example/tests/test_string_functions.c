@@ -51,7 +51,7 @@ void test_ckg_string_append_char() {
         ckg_string_append_char(str5, 50, '!');
     });
 
-    ckg_assert(!ckg_string_equal(str5, "Hello!"), "Test: ckg_string_append_char failed.\n");
+    ckg_assert(ckg_string_equal(str5, "Hello!"), "Test: ckg_string_append_char failed.\n");
     CKG_LOG_SUCCESS("Test ckg_string_append_char passed.\n");
 }
 
