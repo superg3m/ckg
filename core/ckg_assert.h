@@ -6,7 +6,7 @@
 #include "./ckg_error.h"
 
 //========================== Begin Types ==========================
-#define ASSERT_ENABLED TRUE
+#define CKG_ASSERT_ENABLED TRUE
 #define CRASH *((int *)0) = 0
 //=========================== End Types ===========================
 
@@ -21,13 +21,13 @@ extern "C" {
 //************************** End Functions **************************
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
-#if ASSERT_ENABLED == TRUE	    
+#if CKG_ASSERT_ENABLED == TRUE	    
     #define ckg_assert_in_macro(expression, message, ...)								                    \
         do {																								\
             if (!(expression))                                                       		               	\
             {                                                                        		               	\
                 char buffer[CKG_PLATFORM_CHARACTER_LIMIT];                                                  \
-                memory_zero(buffer, CKG_PLATFORM_CHARACTER_LIMIT);                                          \
+                ckg_memory_zero(buffer, CKG_PLATFORM_CHARACTER_LIMIT);                                          \
                 sprintf(buffer, "file: %s:%d | Function: %s | %s", __FILE__, __LINE__, __func__, message); 	\
                 ckg_error_dump_stack();                                                                     \
                 CKG_LOG_FATAL(buffer, ##__VA_ARGS__);                                                       \

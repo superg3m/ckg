@@ -25,7 +25,7 @@ void ckg_arena_free(CKG_Arena* arena) {
 
 void ckg_arena_clear(CKG_Arena* arena) {
     ckg_assert_in_function(arena && arena->base_address, "arena_free: arena is null\n");
-    memory_zero(arena->base_address, arena->used);
+    ckg_memory_zero(arena->base_address, arena->used);
     arena->used = 0;
 }
 
@@ -53,7 +53,7 @@ void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
         ckg_assert_in_function(FALSE, "arean_push: invalid arena flag set");
     }
 
-    u8* ret = memory_advance_new_ptr(arena->base_address, arena->used);
+    u8* ret = ckg_memory_advance_new_ptr(arena->base_address, arena->used);
 	arena->used += element_size;
 
     return ret;

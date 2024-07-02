@@ -50,7 +50,7 @@ internal void hashmap_grow(CKG_HashMap* hashmap) {
 
 CKG_HashMap hashmap_create(size_t element_size) {
     CKG_HashMap hashmap;
-    memory_zero(&hashmap, sizeof(CKG_HashMap));
+    ckg_memory_zero(&hashmap, sizeof(CKG_HashMap));
 
     hashmap.capacity = 128;
     hashmap.entries = ckg_memory_allocate(sizeof(CKG_HashMapEntry) * hashmap.capacity);
@@ -88,7 +88,7 @@ void hashmap_get(CKG_HashMap hashmap, char* key, void* value_returned) {
     u64 inital_hash_index = hashmap_get_valid_hash_index(hashmap, key);
 
     u64 cannonical_hash_index = hashmap_resolve_collision(hashmap, key, inital_hash_index);
-    memory_copy(hashmap.entries[cannonical_hash_index].value, value_returned, hashmap.element_size, hashmap.element_size);
+    ckg_memory_copy(hashmap.entries[cannonical_hash_index].value, value_returned, hashmap.element_size, hashmap.element_size);
 }
 
 Boolean hashmap_has(CKG_HashMap hashmap, char* key) {

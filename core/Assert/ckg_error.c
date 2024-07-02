@@ -11,7 +11,7 @@ CKG_Error ckg_error_create(char* file, int line, char* function, char* message, 
     va_list va_arguments;
 
     char out_message[CKG_ERROR_OUT_MESSAGE_LIMIT];
-    memory_zero(out_message, CKG_ERROR_OUT_MESSAGE_LIMIT);
+    ckg_memory_zero(out_message, CKG_ERROR_OUT_MESSAGE_LIMIT);
  
     va_start(va_arguments, message);
     vsnprintf(out_message, CKG_ERROR_OUT_MESSAGE_LIMIT, message, va_arguments);

@@ -19,7 +19,7 @@ char* ckg_string_allocate(const char* s1) {
 	u32 s1_capacity = s1_length + 1;
 
 	char* ret = ckg_memory_allocate(s1_capacity);
-	memory_copy(s1, ret, s1_capacity, s1_capacity);
+	ckg_memory_copy(s1, ret, s1_capacity, s1_capacity);
 
 	return ret;
 }
@@ -53,10 +53,10 @@ void ckg_string_insert(char* string_buffer, size_t string_buffer_capacity, const
 
 	memory_move(string_buffer,  string_buffer_capacity - string_buffer_length, source_length, string_buffer_length);
 	
-	u8* dest_ptr = memory_advance_new_ptr(string_buffer, index);
+	u8* dest_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
 	// Date: May 18, 2024
 	// NOTE(Jovanni): We don't want source_length + 1 because we don't want to copy the null terminator
-	memory_copy(source, dest_ptr, source_length, string_buffer_capacity);
+	ckg_memory_copy(source, dest_ptr, source_length, string_buffer_capacity);
 }
 
 void ckg_string_insert_char(char* string_buffer, size_t string_buffer_capacity, const char source, const u32 index) {
@@ -69,7 +69,7 @@ void ckg_string_insert_char(char* string_buffer, size_t string_buffer_capacity, 
 	Boolean expression = index >= 0 && string_buffer_length + source_length < string_buffer_capacity;
 	ckg_assert_in_function(expression, "ckg_string_insert_char: string_buffer overflow new_capacity_required: %d >= current_capacity: %lld\n",  string_buffer_length + source_length, string_buffer_capacity);
 
-	char* source_ptr = memory_advance_new_ptr(string_buffer, index);
+	char* source_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
 	size_t data_payload_size = cstring_length(source_ptr);
 
 	memory_move(source_ptr,  string_buffer_capacity - index, source_length, data_payload_size);
@@ -90,7 +90,7 @@ void ckg_string_clear(char* string_buffer) {
 	ckg_assert_in_function(string_buffer, "ckg_string_clear: string_buffer is not valid | null\n");
 
 	size_t string_buffer_length = cstring_length(string_buffer); 
-	memory_zero(string_buffer, string_buffer_length);
+	ckg_memory_zero(string_buffer, string_buffer_length);
 }
 
 void ckg_string_copy(char* string_buffer, size_t string_buffer_capacity, const char* source) {
@@ -101,7 +101,7 @@ void ckg_string_copy(char* string_buffer, size_t string_buffer_capacity, const c
 
 	// Date: May 18, 2024
 	// NOTE(Jovanni): We want to use source_length + 1 because we want to include the null terminator
-	memory_copy(source, string_buffer, source_length + 1, string_buffer_capacity);
+	ckg_memory_copy(source, string_buffer, source_length + 1, string_buffer_capacity);
 }
 
 void string_random(char *dest, size_t length) {

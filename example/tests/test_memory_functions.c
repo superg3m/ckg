@@ -27,15 +27,15 @@ void test_ckg_memory_operations() {
 	ckg_assert_in_function(*ptr4 == 5, "Error: Memory reallocation failed\n");
 	ckg_memory_free(ptr4);
 
-	// Test ckg_memory_copy
+	// Test ckg_ckg_memory_copy
 	int arr1[] = {1, 2, 3};
 	int arr2[3];
-	memory_copy(arr2, arr1, 3 * sizeof(int), 3 * sizeof(int));
+	ckg_memory_copy(arr2, arr1, 3 * sizeof(int), 3 * sizeof(int));
 	ckg_assert_in_function(arr1[0] == arr2[0] && arr1[1] == arr2[1] && arr1[2] == arr2[2], "Error: Memory copy failed\n");
 
-	// Test ckg_memory_zero
+	// Test ckg_ckg_memory_zero
 	int arr3[3] = {1, 2, 3};
-	memory_zero(arr3, 3 * sizeof(int));
+	ckg_memory_zero(arr3, 3 * sizeof(int));
 	ckg_assert_in_function(arr3[0] == 0 && arr3[1] == 0 && arr3[2] == 0, "Error: Memory zero failed\n");
 
 	// Test ckg_memory_compare
