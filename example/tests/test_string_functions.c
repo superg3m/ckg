@@ -44,14 +44,15 @@ void test_ckg_string_append() {
 }
 
 void test_ckg_string_append_char() {
+    char str5[50] = {0};
+
     ckg_errorable({
-        char str5[50] = {0};
-        ckg_string_copy(str5, 50, "Hello");
+        ckg_string_copy(str5, 1, "Hello");
         ckg_string_append_char(str5, 50, '!');
-        ckg_assert(!ckg_string_equal(str5, "Hello!"), "Test: ckg_string_append_char failed.\n");
-        
-        CKG_LOG_SUCCESS("Test ckg_string_append_char passed.\n");
     });
+
+    ckg_assert(!ckg_string_equal(str5, "Hello!"), "Test: ckg_string_append_char failed.\n");
+    CKG_LOG_SUCCESS("Test ckg_string_append_char passed.\n");
 }
 
 void test_ckg_string_clear() {
