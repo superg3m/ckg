@@ -1,7 +1,7 @@
 # CKG
 The point of the ckit granular (ckg) is building out everything at a granular level  and then using these building block to build a good common use case version. so very few types and allocation is decided by the caller in most cases.
 
-# how to build
+# How to build
 1. ./bootstrap.ps1
 2. ./build.ps1
 2. ./run.ps1
@@ -10,6 +10,7 @@ The point of the ckit granular (ckg) is building out everything at a granular le
 - If cl.exe is not defined in your terminal run vars.ps1
 - Compile with CUSTOM_PLATFORM_IMPL defined if you want to change how platform specific functions work.
 
+# Goals
 
 - CORE
     - memory.c
