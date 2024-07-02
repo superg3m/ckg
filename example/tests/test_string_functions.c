@@ -47,7 +47,7 @@ void test_ckg_string_append_char() {
     char str5[50] = {0};
 
     ckg_errorable({
-        ckg_string_copy(str5, 1, "Hello");
+        ckg_string_copy(str5, 50, "Hello");
         ckg_string_append_char(str5, 50, '!');
     });
 
