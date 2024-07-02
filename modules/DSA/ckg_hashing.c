@@ -5,11 +5,11 @@
 
 internal const u32 prime_numbers[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
 
-u32 get_prime_by_index(u32 index) {
+u32 ckg_get_prime_by_index(u32 index) {
 	return prime_numbers[index % ArrayCount(prime_numbers)];
 }
 
-u64 hash(unsigned char *str) {
+u64 ckg_hash(unsigned char *str) {
     u64 hash = 5381;
     int c;
 
@@ -22,7 +22,7 @@ u64 hash(unsigned char *str) {
     return hash;
 }
 
-void test_collisions() {
+void ckg_test_collisions() {
     srand(time(NULL));
 
     const u32 STRING_LENGTH = 14;
@@ -35,7 +35,7 @@ void test_collisions() {
 
     for (s32 i = 0; i < NUM_TESTS; i++) {
         string_random(test_string, STRING_LENGTH);
-        u64 h = hash(test_string);
+        u64 h = ckg_hash(test_string);
 
         u32 hash_index = h % NUM_TESTS;
 

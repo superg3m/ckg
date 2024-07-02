@@ -6,7 +6,7 @@
 extern "C" {
 #endif
     u64 ckg_hash(unsigned char *str);
-    void test_collisions();
+    void ckg_test_collisions();
 #ifdef __cplusplus
 }
 #endif
