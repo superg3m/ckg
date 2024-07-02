@@ -30,7 +30,7 @@ internal CKG_HashMapEntry hashmap_entry_create() {
 }
 
 internal void hashmap_assert_if_not_valid(CKG_HashMap hashmap) {
-    ckg_assert_in_function(hashmap.isValid, "hashmap is not valid");
+    ckg_assert(hashmap.isValid, "hashmap is not valid");
 }
 
 internal float hashmap_load_factor(CKG_HashMap hashmap) {
@@ -76,7 +76,7 @@ u32 hashmap_get_valid_hash_index(CKG_HashMap hashmap, char* key) {
 // TODO(Jovanni): This is complete trash i'm to tired to actually code this right lmao
 internal u64 hashmap_resolve_collision(CKG_HashMap hashmap, char* key, u64 inital_hash_index) {
     u64 cannonical_hash_index = inital_hash_index;
-    while (!string_equal(hashmap.entries[cannonical_hash_index].value, key)) {
+    while (!ckg_string_equal(hashmap.entries[cannonical_hash_index].value, key)) {
         cannonical_hash_index++;
         cannonical_hash_index = cannonical_hash_index % (hashmap.capacity - 1);
     }

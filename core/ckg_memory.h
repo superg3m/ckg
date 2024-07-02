@@ -23,13 +23,13 @@ extern "C" {
     void* ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size);
     void* MACRO_ckg_memory_free(void* data);
 
-    Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 b1_allocation_size, u32 b2_allocation_size);
+    Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 b1_allocation_size, u32 b2_allocation_size);
     void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_size);
-    void memory_move(void* buffer, size_t buffer_capacity, size_t offset_into_buffer, size_t data_patload_size);
+    void ckg_memory_move(void* buffer, size_t buffer_capacity, size_t offset_into_buffer, size_t data_patload_size);
     void ckg_memory_zero(void* data, size_t data_size_in_bytes);
     void ckg_memory_set(u8* data, size_t data_size_in_bytes, u8 element);
 
-    void memory_buffer_delete_index(const void* data, size_t size_in_bytes, u32 buffer_count, u32 index);
+    void ckg_memory_buffer_delete_index(const void* data, size_t size_in_bytes, u32 buffer_count, u32 index);
 
     u8* ckg_memory_advance_new_ptr(const void* data, size_t size_in_bytes);
     u8* ckg_memory_retreat_new_ptr(const void* data, size_t size_in_bytes);

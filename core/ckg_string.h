@@ -7,7 +7,7 @@
 	#endif
 		u32 cstring_length(const char* c_string);
 		char* ckg_string_allocate(const char* s1);
-		Boolean string_equal(const char* s1, const char* s2);
+		Boolean ckg_string_equal(const char* s1, const char* s2);
 
 
 		/**
@@ -57,13 +57,11 @@
 		 */
 		void string_random(char *dest, size_t length);
 
-		char* string_substring(const char* string_buffer, u32 start_range, u32 end_range);
-		Boolean string_contains(const char* string_buffer, const char* contains);
-		Boolean string_starts_with(const char* string_buffer, const char* starts_with);
-		Boolean string_ends_with(const char* string_buffer, const char* ends_with);
-		char* string_reverse(const char* string_buffer);
-		char* string_temp_reverse(const char* string_buffer);
-
+		char* ckg_string_substring(const char* string_buffer, u32 start_range, u32 end_range);
+		Boolean ckg_string_contains(const char* string_buffer, const char* contains);
+		Boolean ckg_string_starts_with(const char* string_buffer, const char* starts_with);
+		Boolean ckg_string_ends_with(const char* string_buffer, const char* ends_with);
+		char* ckg_string_reverse(const char* string_buffer);
 	#ifdef __cplusplus
 	}
 	#endif

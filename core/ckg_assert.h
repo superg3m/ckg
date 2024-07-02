@@ -22,20 +22,7 @@ extern "C" {
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
 #if CKG_ASSERT_ENABLED == TRUE	    
-    #define ckg_assert_in_macro(expression, message, ...)								                    \
-        do {																								\
-            if (!(expression))                                                       		               	\
-            {                                                                        		               	\
-                char buffer[CKG_PLATFORM_CHARACTER_LIMIT];                                                  \
-                ckg_memory_zero(buffer, CKG_PLATFORM_CHARACTER_LIMIT);                                          \
-                sprintf(buffer, "file: %s:%d | Function: %s | %s", __FILE__, __LINE__, __func__, message); 	\
-                ckg_error_dump_stack();                                                                     \
-                CKG_LOG_FATAL(buffer, ##__VA_ARGS__);                                                       \
-                CRASH;                                                                                     	\
-            }																								\
-        } while (FALSE)
-
-    #define ckg_assert_in_function(expression, message, ...)	                                        \
+    #define ckg_assert(expression, message, ...)	                                        \
         do { 													                                        \
             if (!(expression))                          		                                        \
             {                                           		                                        \
@@ -46,7 +33,6 @@ extern "C" {
             }													                                        \
         } while (FALSE)
 #else
-        #define ckg_assert_in_function(expression, message, ...)
-        #define ckg_assert_in_macro(expression, message, ...)
+        #define ckg_assert(expression, message, ...)
 #endif
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++

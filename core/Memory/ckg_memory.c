@@ -41,9 +41,9 @@ void* MACRO_ckg_memory_free(void* data) {
     return data;
 }
 
-Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size) {
-    ckg_assert_in_function(buffer_one, "memory_byte_compare buffer_one IS NULL\n");
-    ckg_assert_in_function(buffer_two, "memory_byte_compare buffer_two IS NULL\n");
+Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size) {
+    ckg_assert(buffer_one, "ckg_memory_compare buffer_one IS NULL\n");
+    ckg_assert(buffer_two, "ckg_memory_compare buffer_two IS NULL\n");
 
     if (buffer_one_size != buffer_two_size) {
         return FALSE;
@@ -61,9 +61,9 @@ Boolean memory_byte_compare(const void* buffer_one, const void* buffer_two, u32 
 }
 
 void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_size) {
-    ckg_assert_in_function(source, "MEMORY COPY SOURCE IS NULL\n");
-    ckg_assert_in_function(destination, "MEMORY COPY SOURCE IS NULL\n");
-    ckg_assert_in_function((source_size <= destination_size), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
+    ckg_assert(source, "MEMORY COPY SOURCE IS NULL\n");
+    ckg_assert(destination, "MEMORY COPY SOURCE IS NULL\n");
+    ckg_assert((source_size <= destination_size), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
 
     for (int i = 0; i < source_size; i++) {
         u8 temp = ((u8*)source)[i];
@@ -71,9 +71,9 @@ void ckg_memory_copy(const void* source, void* destination, size_t source_size, 
     }
 }
 
-void memory_move(void* buffer, size_t buffer_capacity, size_t offset_into_buffer, size_t data_patload_size) {
-    ckg_assert_in_function(buffer, "MEMORY MOVE buffer IS NULL\n");
-    ckg_assert_in_function((data_patload_size + offset_into_buffer <= buffer_capacity), "MEMORY MOVE OFFSET IS TOO BIG FOR DESTINATION\n");
+void ckg_memory_move(void* buffer, size_t buffer_capacity, size_t offset_into_buffer, size_t data_patload_size) {
+    ckg_assert(buffer, "MEMORY MOVE buffer IS NULL\n");
+    ckg_assert((data_patload_size + offset_into_buffer <= buffer_capacity), "MEMORY MOVE OFFSET IS TOO BIG FOR DESTINATION\n");
     if (data_patload_size == 0) {
         return;
     }
@@ -114,7 +114,7 @@ void ckg_memory_set(u8* data, size_t data_size_in_bytes, u8 element) {
  * @param buffer_count 
  * @param index 
  */
-void memory_buffer_delete_index(const void* data, size_t size_in_bytes, u32 buffer_count, u32 index) {
+void ckg_memory_buffer_delete_index(const void* data, size_t size_in_bytes, u32 buffer_count, u32 index) {
     u32 size_of_element = size_in_bytes / buffer_count;
 
     u8* source_ptr = ckg_memory_advance_new_ptr(data, (index + 1) * size_of_element);

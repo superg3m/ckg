@@ -12,7 +12,7 @@ void win32_memory_free_callback(void* data) {
 }
 
 void error_test3(int value) {
-	ckg_assert_in_function(FALSE, "ERR TEST3 FAILED | value: %d", value);
+	ckg_assert(FALSE, "ERR TEST3 FAILED | value: %d", value);
 }
 
 void error_test2(int value) {
