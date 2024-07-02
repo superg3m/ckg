@@ -1,6 +1,10 @@
 {
     "files.associations": {
         "ckg_types.h": "c",
-        "ckg_logger.h": "c"
+        "ckg_logger.h": "c",
+        "ckg.h": "c",
+        "ckg_arena.h": "c",
+        "ckg_memory.h": "c",
+        "ckg_error.h": "c"
     }
 }
