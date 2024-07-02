@@ -34,11 +34,11 @@
 #Debug Info
 *.pdb
 
-examples/cl/
-examples/gcc/
+
 
 *.ps1
 !bootstrap.ps1
 compilation_errors.txt
 c-build/
-cl/
+build_cl/
+example/cl/

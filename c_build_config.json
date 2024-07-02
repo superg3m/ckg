@@ -2,32 +2,36 @@
     "c_build_version" : "0.8",
 
     "project_name" : "CKG",
-    
-    "debug_with_visual_studio" : false,
-    "should_rebuild_project_dependencies" : true,
-
     "compiler_type" : "cl",
 
+    "debug_with_visual_studio" : false,
+    "should_rebuild_project_dependencies" : true,
     "std_version" : "c11",
     "project_dependencies" : [""],
 
     "./build_cl" : {
         "output_name" : "ckg.lib",
-        "compile_time_defines" : "",
+        "compile_time_defines" : [""],
         "include_paths" : "",
         "source_paths" : [
-            "../source/*.c"
+            "../core/Assert/*.c",
+            "../core/Memory/*.c",
+            "../core/String/*.c",
+            "../core/Logger/*.c",
+            "../modules/DSA/*.c"
         ],
 
-        "additional_libs" : [""]
+        "additional_libs" : [
+            ""
+        ]
     },
 
     "./example/cl" : {
         "output_name" : "test_ckg.exe",
-        "compile_time_defines" : "",
+        "compile_time_defines" : [""],
         "include_paths" : "",
         "source_paths" : [
-            "../test_ckg.c"
+            "../*.c"
         ],
 
         "additional_libs" : [
