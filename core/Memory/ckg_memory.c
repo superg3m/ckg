@@ -30,7 +30,7 @@ void* MACRO_ckg_memory_allocate(size_t allocation_size) {
 
 void* ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
     void* ret = MACRO_ckg_memory_allocate(new_allocation_size);
-    ckg_memory_copy(data, ret, old_allocation_size, new_allocation_size);
+    ckg_errorable(ckg_memory_copy(data, ret, old_allocation_size, new_allocation_size));
     ckg_memory_free(data);
     return ret;
 }
@@ -85,7 +85,7 @@ void ckg_memory_move(void* buffer, size_t buffer_capacity, size_t offset_into_bu
     // to store the next byte value
 
     u8* data_payload = ckg_memory_allocate(data_patload_size);
-    ckg_memory_copy(buffer, data_payload, data_patload_size, data_patload_size);
+    ckg_errorable(ckg_memory_copy(buffer, data_payload, data_patload_size, data_patload_size));
     u8* dest_ptr = ckg_memory_advance_new_ptr(buffer, offset_into_buffer);
 
     for (int i = 0; i < data_patload_size; i++) {

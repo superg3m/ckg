@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "ckg_types.h": "c"
+        "ckg_types.h": "c",
+        "ckg_logger.h": "c"
     }
 }

@@ -44,12 +44,14 @@ void test_ckg_string_append() {
 }
 
 void test_ckg_string_append_char() {
-    char str5[50] = {0};
-    ckg_string_copy(str5, 40, "Hello");
-    ckg_string_append_char(str5, 50, '!');
-    ckg_assert(ckg_string_equal(str5, "Hello!"), "Test: ckg_string_append_char failed.\n");
-    
-    CKG_LOG_SUCCESS("Test ckg_string_append_char passed.\n");
+    ckg_errorable({
+        char str5[50] = {0};
+        ckg_string_copy(str5, 50, "Hello");
+        ckg_string_append_char(str5, 50, '!');
+        ckg_assert(!ckg_string_equal(str5, "Hello!"), "Test: ckg_string_append_char failed.\n");
+        
+        CKG_LOG_SUCCESS("Test ckg_string_append_char passed.\n");
+    });
 }
 
 void test_ckg_string_clear() {
@@ -172,19 +174,21 @@ void test_ckg_ckg_string_reverse() {
 }
 
 void test_ckg_string_operations() { 
-    CKG_LOG_PRINT("\n");
-    CKG_LOG_DEBUG("======================= Testing String Functions =======================\n");
-    test_cstring_length();
-    test_string_compare();
-    test_ckg_string_insert_char();
-    test_ckg_string_insert();
-    test_ckg_string_append();
-    test_ckg_string_append_char();
-    test_ckg_string_clear();
-    test_ckg_string_copy();
-    test_ckg_ckg_string_contains();
-    test_ckg_ckg_string_starts_with();
-    test_ckg_ckg_string_ends_with();
-    test_ckg_ckg_string_reverse();
-    CKG_LOG_DEBUG("======================= String Functions All Passed =======================\n");
+    ckg_errorable({
+        CKG_LOG_PRINT("\n");
+        CKG_LOG_DEBUG("======================= Testing String Functions =======================\n");
+        test_cstring_length();
+        test_string_compare();
+        test_ckg_string_insert_char();
+        test_ckg_string_insert();
+        test_ckg_string_append();
+        test_ckg_string_append_char();
+        test_ckg_string_clear();
+        test_ckg_string_copy();
+        test_ckg_ckg_string_contains();
+        test_ckg_ckg_string_starts_with();
+        test_ckg_ckg_string_ends_with();
+        test_ckg_ckg_string_reverse();
+        CKG_LOG_DEBUG("======================= String Functions All Passed =======================\n");
+    });
 }
