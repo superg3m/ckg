@@ -16,26 +16,26 @@ void ckg_memory_default_free(void* data) {
 internal CKG_MemoryAllocator* memory_allocate_callback = &ckg_memory_default_allocator;
 internal CKG_MemoryFree* memory_free_callback = &ckg_memory_default_free;
 
-void ckg_memory_bind_allocator_callback(CKG_MemoryAllocator* allocator) {
+void ckg_bind_allocator_callback(CKG_MemoryAllocator* allocator) {
     memory_allocate_callback = allocator;
 }
 
-void ckg_memory_bind_free_callback(CKG_MemoryFree* free) {
+void ckg_bind_free_callback(CKG_MemoryFree* free) {
     memory_free_callback = free;
 }
 
-void* MACRO_ckg_memory_allocate(size_t allocation_size) {
+void* MACRO_ckg_allocate(size_t allocation_size) {
     return memory_allocate_callback(allocation_size);
 }
 
-void* ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
-    void* ret = MACRO_ckg_memory_allocate(new_allocation_size);
+void* ckg_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
+    void* ret = MACRO_ckg_allocate(new_allocation_size);
     ckg_memory_copy(data, ret, old_allocation_size, new_allocation_size);
-    ckg_memory_free(data);
+    ckg_free(data);
     return ret;
 }
 
-void* MACRO_ckg_memory_free(void* data) {
+void* MACRO_ckg_free(void* data) {
     memory_free_callback(data);
     data = NULLPTR;
     return data;
@@ -84,14 +84,14 @@ void ckg_memory_move(void* buffer, size_t buffer_capacity, size_t offset_into_bu
     // also I think its possible not not ckg_memory_copy the whole array i should be able to get by with just a constant time temp variable
     // to store the next byte value
 
-    u8* data_payload = ckg_memory_allocate(data_patload_size);
+    u8* data_payload = ckg_allocate(data_patload_size);
     ckg_memory_copy(buffer, data_payload, data_patload_size, data_patload_size);
     u8* dest_ptr = ckg_memory_advance_new_ptr(buffer, offset_into_buffer);
 
     for (int i = 0; i < data_patload_size; i++) {
         ((u8*)dest_ptr)[i] = data_payload[i];
     }
-    ckg_memory_free(data_payload);
+    ckg_free(data_payload);
 }
 
 void ckg_memory_zero(void* data, size_t data_size_in_bytes) {

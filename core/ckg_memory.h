@@ -16,12 +16,12 @@ extern "C" {
      * @brief If you don't bind these callbacks a default callback will be used
      * 
      */
-    void ckg_memory_bind_allocator_callback(CKG_MemoryAllocator* func_allocator);
-    void ckg_memory_bind_free_callback(CKG_MemoryFree* func_allocator);
+    void ckg_bind_allocator_callback(CKG_MemoryAllocator* func_allocator);
+    void ckg_bind_free_callback(CKG_MemoryFree* func_allocator);
 
-    void* MACRO_ckg_memory_allocate(size_t allocation_size);
-    void* ckg_memory_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size);
-    void* MACRO_ckg_memory_free(void* data);
+    void* MACRO_ckg_allocate(size_t allocation_size);
+    void* ckg_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size);
+    void* MACRO_ckg_free(void* data);
 
     Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 b1_allocation_size, u32 b2_allocation_size);
     void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_size);
@@ -54,15 +54,15 @@ extern "C" {
  * 
  */
 #ifdef __cplusplus
-    #define ckg_memory_allocate(allocation_size) (decltype(data))MACRO_ckg_memory_allocate(allocation_size)
-    #define ckg_memory_free(data) data = (decltype(data))MACRO_ckg_memory_free(data)
+    #define ckg_allocate(allocation_size) (decltype(data))MACRO_ckg_allocate(allocation_size)
+    #define ckg_free(data) data = (decltype(data))MACRO_ckg_free(data)
 
     #define ckg_memory_advance(data, size_in_bytes) data = (decltype(data))MACRO_memory_advance(data, size_in_bytes)
     #define ckg_memory_retreat(data, size_in_bytes) data = (decltype(data))MACRO_memory_retreat(data, size_in_bytes)
     
 #else
-    #define ckg_memory_allocate(allocation_size) MACRO_ckg_memory_allocate(allocation_size)
-    #define ckg_memory_free(data) data = MACRO_ckg_memory_free(data)
+    #define ckg_allocate(allocation_size) MACRO_ckg_allocate(allocation_size)
+    #define ckg_free(data) data = MACRO_ckg_free(data)
 
     #define ckg_memory_advance(data, size_in_bytes) data = MACRO_memory_advance(data, size_in_bytes)
     #define ckg_memory_retreat(data, size_in_bytes) data = MACRO_memory_retreat(data, size_in_bytes)

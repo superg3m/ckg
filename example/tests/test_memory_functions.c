@@ -1,15 +1,15 @@
 #include "../../ckg.h"
 
 void test_ckg_memory_operations() {
-	// Test ckg_memory_allocate
-	int* ptr1 = ckg_memory_allocate(sizeof(int));
+	// Test ckg_allocate
+	int* ptr1 = ckg_allocate(sizeof(int));
 	ckg_assert(ptr1 != NULLPTR, "Error: Memory allocation failed\n");
 	*ptr1 = 5;
 	ckg_assert(*ptr1 == 5, "Error: Memory allocation failed\n");
-	ckg_memory_free(ptr1);
+	ckg_free(ptr1);
 
 	// Test ckg_memory_callocate
-	int* ptr2 = ckg_memory_allocate(10 * sizeof(int));
+	int* ptr2 = ckg_allocate(10 * sizeof(int));
 	ckg_assert(ptr2 != NULLPTR, "Error: Memory allocation failed\n");
 	for (int i = 0; i < 10; i++) {
 		ptr2[i] = i;
@@ -17,15 +17,15 @@ void test_ckg_memory_operations() {
 	for (int i = 0; i < 10; i++) {
 		ckg_assert(ptr2[i] == i, "Error: Memory allocation failed\n");
 	}
-	ckg_memory_free(ptr2);
+	ckg_free(ptr2);
 
-	// Test ckg_memory_reallocate
-	int* ptr3 = ckg_memory_allocate(sizeof(int));
-	int* ptr4 = ckg_memory_reallocate(ptr3, 2 * sizeof(int), 4 * sizeof(int));
+	// Test ckg_reallocate
+	int* ptr3 = ckg_allocate(sizeof(int));
+	int* ptr4 = ckg_reallocate(ptr3, 2 * sizeof(int), 4 * sizeof(int));
 	ckg_assert(ptr4 != NULLPTR, "Error: Memory reallocation failed\n");
 	*ptr4 = 5;
 	ckg_assert(*ptr4 == 5, "Error: Memory reallocation failed\n");
-	ckg_memory_free(ptr4);
+	ckg_free(ptr4);
 
 	// Test ckg_ckg_memory_copy
 	int arr1[] = {1, 2, 3};

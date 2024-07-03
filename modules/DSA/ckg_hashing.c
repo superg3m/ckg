@@ -28,8 +28,8 @@ void ckg_test_collisions() {
     const u32 STRING_LENGTH = 14;
     const u32 NUM_TESTS = 500;
 
-    u8* hash_map = ckg_memory_allocate(NUM_TESTS * sizeof(u8));
-    char* test_string = ckg_memory_allocate(sizeof(char) * (STRING_LENGTH + 1));
+    u8* hash_map = ckg_allocate(NUM_TESTS * sizeof(u8));
+    char* test_string = ckg_allocate(sizeof(char) * (STRING_LENGTH + 1));
 
     s32 collisions = 0;
 
@@ -46,8 +46,8 @@ void ckg_test_collisions() {
         hash_map[h % NUM_TESTS]++;
     }
 
-    ckg_memory_free(hash_map);
-    ckg_memory_free(test_string);
+    ckg_free(hash_map);
+    ckg_free(test_string);
 
     CKG_LOG_PRINT("Number of collisions: %d / %d\n", collisions, NUM_TESTS);
     CKG_LOG_PRINT("Collision rate: %f%%\n", ((double)collisions / (double)NUM_TESTS) * 100);

@@ -71,10 +71,10 @@ void test_ckg_string_copy() {
 
 void test_ckg_ckg_string_contains() {
     char* t1 = "hello";
-	char* sub_str = ckg_string_substring(t1, 0, 1);
+	char* sub_str = ckg_substring(t1, 0, 1);
 
 	ckg_assert(ckg_string_contains(sub_str, "he"), "test_ckg_ckg_string_contains failed");
-	ckg_memory_free(sub_str);
+	ckg_free(sub_str);
 
 	ckg_assert(!ckg_string_contains(t1, ""), "test_ckg_ckg_string_contains failed");
 	ckg_assert(ckg_string_contains(t1, "ell"), "test_ckg_ckg_string_contains failed");
@@ -94,9 +94,9 @@ void test_ckg_ckg_string_contains() {
 
 void test_ckg_ckg_string_starts_with() {
     char* t1 = "hello";
-	char* sub_str = ckg_string_substring(t1, 0, 1);
+	char* sub_str = ckg_substring(t1, 0, 1);
 	ckg_assert(ckg_string_starts_with(sub_str, "he"), "test_ckg_ckg_string_starts_with failed");
-	ckg_memory_free(sub_str);
+	ckg_free(sub_str);
 
 	ckg_assert(ckg_string_starts_with(t1, "hell"), "test_ckg_ckg_string_starts_with failed");
 	ckg_assert(ckg_string_starts_with(t1, "hello"), "test_ckg_ckg_string_starts_with failed");
@@ -117,9 +117,9 @@ void test_ckg_ckg_string_starts_with() {
 
 void test_ckg_ckg_string_ends_with() {
     char* t1 = "hello";
-	char* sub_str = ckg_string_substring(t1, 0, 1);
+	char* sub_str = ckg_substring(t1, 0, 1);
 	ckg_assert(!ckg_string_ends_with(sub_str, "llo"), "test_ckg_ckg_string_ends_with failed");
-	ckg_memory_free(sub_str);
+	ckg_free(sub_str);
 
 	ckg_assert(ckg_string_ends_with(t1, ""), "test_ckg_ckg_string_ends_with failed");
 	ckg_assert(ckg_string_ends_with(t1, "lo"), "test_ckg_ckg_string_ends_with failed");
@@ -139,11 +139,11 @@ void test_ckg_ckg_string_ends_with() {
 
 void test_ckg_ckg_string_reverse() {
     char* t1 = "hello";
-	char* sub_str = ckg_string_substring(t1, 0, 1);
+	char* sub_str = ckg_substring(t1, 0, 1);
     char* reversed_string = ckg_string_reverse(sub_str);
 	ckg_assert(ckg_string_equal(reversed_string, "eh"), "test_ckg_ckg_string_reverse failed");
-	ckg_memory_free(sub_str);
-	ckg_memory_free(reversed_string);
+	ckg_free(sub_str);
+	ckg_free(reversed_string);
 
     char* reversed_string2 = ckg_string_reverse("Chicken");
     char* reversed_string3 = ckg_string_reverse("Roast");
@@ -153,21 +153,21 @@ void test_ckg_ckg_string_reverse() {
 	ckg_assert(ckg_string_equal(reversed_string3, "tsaoR"), "test_ckg_ckg_string_reverse failed expected: %s | got: %s", "tsaoR", reversed_string3);
 	ckg_assert(ckg_string_equal(reversed_string4, "puoS"), "test_ckg_ckg_string_reverse failed expected: %s | got: %s", "puoS", reversed_string4);
 
-	ckg_memory_free(reversed_string2);
-	ckg_memory_free(reversed_string3);
-	ckg_memory_free(reversed_string4);
+	ckg_free(reversed_string2);
+	ckg_free(reversed_string3);
+	ckg_free(reversed_string4);
 
 
 	char* t2 = "";
     char* reversed_t2 = ckg_string_reverse(t2);
 	ckg_assert(ckg_string_equal(reversed_t2, ""), "test_ckg_ckg_string_reverse failed expected: %s | got: %s", "", reversed_t2);
-    ckg_memory_free(reversed_t2);
+    ckg_free(reversed_t2);
 
 	t2 = "f";
     reversed_t2 = ckg_string_reverse(t2);
 	ckg_assert(ckg_string_equal(reversed_t2, "f"), "test_ckg_ckg_string_reverse failed expected: %s | got: %s", "f", reversed_t2);
 	ckg_assert(!ckg_string_equal(reversed_t2, "g"), "test_ckg_ckg_string_reverse failed expected: %s | got: %s", "f", reversed_t2);
-    ckg_memory_free(reversed_t2);
+    ckg_free(reversed_t2);
 
     CKG_LOG_SUCCESS("Test ckg_ckg_string_reverse passed.\n");
 }

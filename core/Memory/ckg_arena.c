@@ -14,13 +14,13 @@ CKG_Arena MACRO_ckg_arena_create(u32 allocation_size, const char* name, CKG_Aren
     arena.flag = flag;
     arena.capacity = allocation_size;
     arena.used = 0;
-    arena.base_address = ckg_memory_allocate(allocation_size != 0 ? allocation_size : ARENA_DEFAULT_ALLOCATION_SIZE);
+    arena.base_address = ckg_allocate(allocation_size != 0 ? allocation_size : ARENA_DEFAULT_ALLOCATION_SIZE);
     return arena;
 }
 
 void ckg_arena_free(CKG_Arena* arena) {
     ckg_assert(arena && arena->base_address, "arena_free: arena is null\n");
-    ckg_memory_free(arena->base_address);
+    ckg_free(arena->base_address);
 }
 
 void ckg_arena_clear(CKG_Arena* arena) {
@@ -46,7 +46,7 @@ void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
         if ((arena->used + element_size > arena->capacity)) {
             arena->capacity += element_size;
             arena->capacity *= 2;
-            arena->base_address = ckg_memory_reallocate(arena->base_address, arena->capacity, arena->capacity * 2);
+            arena->base_address = ckg_reallocate(arena->base_address, arena->capacity, arena->capacity * 2);
         	ckg_assert(arena->base_address, "arean_push: invalid reallocation address given");
         }
     } else {

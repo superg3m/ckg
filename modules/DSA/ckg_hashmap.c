@@ -53,7 +53,7 @@ CKG_HashMap hashmap_create(size_t element_size) {
     ckg_memory_zero(&hashmap, sizeof(CKG_HashMap));
 
     hashmap.capacity = 128;
-    hashmap.entries = ckg_memory_allocate(sizeof(CKG_HashMapEntry) * hashmap.capacity);
+    hashmap.entries = ckg_allocate(sizeof(CKG_HashMapEntry) * hashmap.capacity);
     hashmap.isValid = TRUE;
     hashmap.element_size = element_size;
 
@@ -62,7 +62,7 @@ CKG_HashMap hashmap_create(size_t element_size) {
 
 void hashmap_free(CKG_HashMap* hashmap) {
     hashmap->isValid = FALSE;
-    ckg_memory_free(hashmap->entries);
+    ckg_free(hashmap->entries);
     hashmap->element_size = 0;
     hashmap->capacity = 0;
     hashmap->count = 0;

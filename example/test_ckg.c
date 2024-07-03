@@ -12,8 +12,8 @@ void win32_memory_free_callback(void* data) {
 }
 
 int main() {
-	ckg_memory_bind_allocator_callback(win32_memory_allocator_callback);
-	ckg_memory_bind_free_callback(win32_memory_free_callback);
+	ckg_bind_allocator_callback(win32_memory_allocator_callback);
+	ckg_bind_free_callback(win32_memory_free_callback);
 	test_ckg_memory_operations();
 	test_ckg_arena_operations();
 	test_ckg_string_operations();

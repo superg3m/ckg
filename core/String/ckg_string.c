@@ -19,7 +19,7 @@ char* ckg_string_allocate(const char* s1) {
 	u32 s1_length = cstring_length(s1);
 	u32 s1_capacity = s1_length + 1;
 
-	ret = ckg_memory_allocate(s1_capacity);
+	ret = ckg_allocate(s1_capacity);
 	ckg_memory_copy(s1, ret, s1_capacity, s1_capacity);
 	
 	return ret;
@@ -126,17 +126,17 @@ void string_random(char *dest, size_t length) {
  * @param end_range 
  * @return char* 
  */
-char* ckg_string_substring(const char* string_buffer, u32 start, u32 end) {
-	ckg_assert(string_buffer, "ckg_string_substring: string_buffer is null!");
+char* ckg_substring(const char* string_buffer, u32 start, u32 end) {
+	ckg_assert(string_buffer, "ckg_substring: string_buffer is null!");
 	size_t string_buffer_length = cstring_length(string_buffer); 
 
 
 	Boolean start_check = start >= 0 && start <= string_buffer_length - 1;
 	Boolean end_check = end >= 0 && end <= string_buffer_length - 1;
 
-	ckg_assert(start_check, "ckg_string_substring: Start range is outside expected range: [%d - %lld] got: %d", 0, string_buffer_length - 1, start);
-	ckg_assert(end_check, "ckg_string_substring: End range is outside expected range: [%d - %lld] got: %d", 0, string_buffer_length - 1, end);
-	ckg_assert(start <= end, "ckg_string_substring: Start range is greater than end range[start: %d > end: %d]", start, end);
+	ckg_assert(start_check, "ckg_substring: Start range is outside expected range: [%d - %lld] got: %d", 0, string_buffer_length - 1, start);
+	ckg_assert(end_check, "ckg_substring: End range is outside expected range: [%d - %lld] got: %d", 0, string_buffer_length - 1, end);
+	ckg_assert(start <= end, "ckg_substring: Start range is greater than end range[start: %d > end: %d]", start, end);
 
 	//char* str = "hello"
 	//0 - 4 = hello\0 = 6
@@ -145,7 +145,7 @@ char* ckg_string_substring(const char* string_buffer, u32 start, u32 end) {
 	//1 - 4 = ello\0 = 5
 
 	size_t allocation_size = (end - start) + 2;
-	char* ret_sub_string = ckg_memory_allocate(allocation_size);
+	char* ret_sub_string = ckg_allocate(allocation_size);
 
 	u32 counter = 0;
 	for (int i = start; i <= end; i++) {
@@ -189,14 +189,90 @@ Boolean ckg_string_contains(const char* string_buffer, const char* contains) {
 			break;
 		}
 
-		char* temp_string = ckg_string_substring(string_buffer, i, end_index);
+		char* temp_string = ckg_substring(string_buffer, i, end_index);
 		if (ckg_string_equal(temp_string, contains)) {
 			contains_substring = TRUE;
 		}
-		ckg_memory_free(temp_string);
+		ckg_free(temp_string);
 	}
 
 	return contains_substring;
+}
+
+u32 ckg_string_index_of(const char* string_buffer, const char* sub_string) {
+	ckg_assert(string_buffer, "string_buffer is null!");
+	ckg_assert(sub_string, "sub_string is null!");
+	
+	size_t string_buffer_length = cstring_length(string_buffer); 
+	size_t contains_length = cstring_length(sub_string);
+
+	if (string_buffer_length == 0 && contains_length == 0) {
+		return TRUE;
+	} else if (contains_length == 0) {
+		return FALSE;
+	} else if (string_buffer_length == 0) {
+		return FALSE;
+	}
+
+	if (contains_length > string_buffer_length) {
+		return FALSE;
+	}
+
+	// "\0" = 0
+	// "a\0" = 0
+	// "fss\0" = 2
+	
+	u32 ret_index = -1;
+	for (int i = 0; (ret_index == -1) && (i < string_buffer_length + 1); i++) {
+		if (string_buffer[i] != sub_string[0]) {
+			continue;
+		}
+
+		u32 end_index = (i + (contains_length - 1));
+		if (end_index > string_buffer_length) {
+			break;
+		}
+
+		char* temp_string = ckg_substring(string_buffer, i, end_index);
+		if (ckg_string_equal(temp_string, sub_string)) {
+			ret_index = i;
+		}
+		ckg_free(temp_string);
+	}
+
+	return ret_index;
+}
+
+char** ckg_string_split(const char* string_buffer, const char* delimitor) {
+	ckg_assert(string_buffer, "string_buffer is null!");
+	ckg_assert(delimitor, "delimitor is null!");
+
+	size_t string_buffer_length = cstring_length(string_buffer); 
+	size_t delmitor_length = cstring_length(delimitor); 
+
+	if (delmitor_length <= 0) {
+		return NULLPTR;
+	}
+
+	// "Hello tabmer joke"
+	// delimitor " "
+
+	for (int i = 0; i < string_buffer_length; i++) {
+		char* temp_substring = ckg_substring(string_buffer, i, delmitor_length - 1);
+		if (ckg_string_equal(temp_substring, delimitor)) {
+
+		}
+
+		ckg_free(temp_substring);
+	}
+
+	
+	char* temp_string = ckg_allocate(string_buffer_length);
+	
+
+	char* current_string = ckg_string_allocate(temp_string);
+
+	// biggest_string_legnth =  
 }
 
 Boolean ckg_string_starts_with(const char* string_buffer, const char* starts_with) {
@@ -214,11 +290,11 @@ Boolean ckg_string_starts_with(const char* string_buffer, const char* starts_wit
 	}
 
 	Boolean starts_with_substring = FALSE;
-	char* temp_string = ckg_string_substring(string_buffer, 0, starts_with_length - 1);
+	char* temp_string = ckg_substring(string_buffer, 0, starts_with_length - 1);
 	if (ckg_string_equal(temp_string, starts_with)) {
 		starts_with_substring = TRUE;
 	}
-	ckg_memory_free(temp_string);
+	ckg_free(temp_string);
 
 	return starts_with_substring;
 }
@@ -242,11 +318,11 @@ Boolean ckg_string_ends_with(const char* string_buffer, const char* ends_with) {
 	}
 
 	Boolean starts_with_substring = FALSE;
-	char* temp_string = ckg_string_substring(string_buffer, start_index, string_buffer_length - 1);
+	char* temp_string = ckg_substring(string_buffer, start_index, string_buffer_length - 1);
 	if (ckg_string_equal(temp_string, ends_with)) {
 		starts_with_substring = TRUE;
 	}
-	ckg_memory_free(temp_string);
+	ckg_free(temp_string);
 
 	return starts_with_substring;
 }
@@ -257,7 +333,7 @@ char* ckg_string_reverse(const char* string_buffer) {
 	u32 string_buffer_length = cstring_length(string_buffer);
 	u32 string_buffer_guarenteed_capacity = string_buffer_length + 1;
 	
-	char* ret_reversed_string = ckg_memory_allocate(string_buffer_guarenteed_capacity);
+	char* ret_reversed_string = ckg_allocate(string_buffer_guarenteed_capacity);
 	for (int i = string_buffer_length - 1; i >= 0; i--) {
 		ckg_string_append_char(ret_reversed_string, string_buffer_guarenteed_capacity, string_buffer[i]);
 	}

@@ -57,11 +57,10 @@
 		 */
 		void string_random(char *dest, size_t length);
 
-		char* ckg_string_substring(const char* string_buffer, u32 start_range, u32 end_range);
+		char* ckg_substring(const char* string_buffer, u32 start_range, u32 end_range);
 		Boolean ckg_string_contains(const char* string_buffer, const char* contains);
-		// Date: July 03, 2024
-		// TODO(Jovanni): Implement this
-		u32 ckg_string_index_of(const char* string_buffer, const char* sub_string); // returns the starting index of the substring
+		u32 ckg_string_index_of(const char* string_buffer, const char* sub_string);
+		char** ckg_string_split(const char* string_buffer, const char* delimitor);
 		Boolean ckg_string_starts_with(const char* string_buffer, const char* starts_with);
 		Boolean ckg_string_ends_with(const char* string_buffer, const char* ends_with);
 		char* ckg_string_reverse(const char* string_buffer);

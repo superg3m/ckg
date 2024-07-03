@@ -13,6 +13,9 @@
         "system_error": "c",
         "ckg_stack_trace.h": "c",
         "ckg_assert.h": "c",
-        "ckg_string.h": "c"
+        "ckg_string.h": "c",
+        "xstring": "c",
+        "xhash": "c",
+        "xtree": "c"
     }
 }
