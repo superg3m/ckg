@@ -95,8 +95,9 @@ void ckg_string_clear(char* string_buffer) {
 }
 
 void ckg_string_copy(char* string_buffer, size_t string_buffer_capacity, const char* source) {
-	ckg_assert(string_buffer, "ckg_string_copy: string_buffer is not valid | null\n");
-	ckg_assert(source, "ckg_string_copy: source is not valid | null\n");
+	ckg_assert(source, "source is not valid | null\n");
+	ckg_assert(string_buffer, "dest is not valid | null\n");
+
 	u32 source_length = cstring_length(source);
 	ckg_string_clear(string_buffer);
 
@@ -217,10 +218,6 @@ u32 ckg_string_index_of(const char* string_buffer, const char* sub_string) {
 	if (contains_length > string_buffer_length) {
 		return FALSE;
 	}
-
-	// "\0" = 0
-	// "a\0" = 0
-	// "fss\0" = 2
 	
 	u32 ret_index = -1;
 	for (int i = 0; (ret_index == -1) && (i < string_buffer_length + 1); i++) {
@@ -244,6 +241,8 @@ u32 ckg_string_index_of(const char* string_buffer, const char* sub_string) {
 }
 
 char** ckg_string_split(const char* string_buffer, const char* delimitor) {
+	ckg_assert(FALSE, "NOT IMPLMENTED YET");
+
 	ckg_assert(string_buffer, "string_buffer is null!");
 	ckg_assert(delimitor, "delimitor is null!");
 
@@ -257,22 +256,33 @@ char** ckg_string_split(const char* string_buffer, const char* delimitor) {
 	// "Hello tabmer joke"
 	// delimitor " "
 
-	for (int i = 0; i < string_buffer_length; i++) {
-		char* temp_substring = ckg_substring(string_buffer, i, delmitor_length - 1);
-		if (ckg_string_equal(temp_substring, delimitor)) {
+	char** ret = ckg_allocate(sizeof(char*) * 100);
 
+
+	char* temp_buffer = ckg_allocate(string_buffer_length + 1);
+
+	u32 sub_string_counter = 0;
+	for (int i = 0; i < string_buffer_length; i++) {
+		ckg_string_append_char(temp_buffer, string_buffer_length + 1, string_buffer[i]);
+		char* temp_substring = ckg_substring(string_buffer, i, delmitor_length - 1);
+		if (temp_substring[i] != delimitor[0]) {
+			continue;
 		}
 
+		if (ckg_string_equal(temp_substring, delimitor)) {
+			ckg_string_copy(ret[sub_string_counter++], cstring_length(temp_buffer) + 1, temp_buffer);
+			ckg_string_clear(temp_buffer);
+		}
 		ckg_free(temp_substring);
 	}
+	ckg_free(temp_buffer);
+
 
 	
 	char* temp_string = ckg_allocate(string_buffer_length);
-	
-
 	char* current_string = ckg_string_allocate(temp_string);
 
-	// biggest_string_legnth =  
+	return ret;
 }
 
 Boolean ckg_string_starts_with(const char* string_buffer, const char* starts_with) {
