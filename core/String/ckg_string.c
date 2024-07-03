@@ -253,11 +253,7 @@ char** ckg_string_split(const char* string_buffer, const char* delimitor) {
 		return NULLPTR;
 	}
 
-	// "Hello tabmer joke"
-	// delimitor " "
-
 	char** ret = ckg_allocate(sizeof(char*) * 100);
-
 
 	char* temp_buffer = ckg_allocate(string_buffer_length + 1);
 

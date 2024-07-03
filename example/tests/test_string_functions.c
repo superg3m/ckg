@@ -69,7 +69,7 @@ void test_ckg_string_copy() {
     CKG_LOG_SUCCESS("Test ckg_string_copy passed.\n");
 }
 
-void test_ckg_ckg_string_contains() {
+void test_ckg_string_contains() {
     char* t1 = "hello";
 	char* sub_str = ckg_substring(t1, 0, 1);
 
@@ -92,7 +92,7 @@ void test_ckg_ckg_string_contains() {
     CKG_LOG_SUCCESS("Test ckg_ckg_string_contains passed.\n");
 }
 
-void test_ckg_ckg_string_starts_with() {
+void test_ckg_string_starts_with() {
     char* t1 = "hello";
 	char* sub_str = ckg_substring(t1, 0, 1);
 	ckg_assert(ckg_string_starts_with(sub_str, "he"), "test_ckg_ckg_string_starts_with failed");
@@ -115,7 +115,7 @@ void test_ckg_ckg_string_starts_with() {
     CKG_LOG_SUCCESS("Test ckg_ckg_string_starts_with passed.\n");
 }
 
-void test_ckg_ckg_string_ends_with() {
+void test_ckg_string_ends_with() {
     char* t1 = "hello";
 	char* sub_str = ckg_substring(t1, 0, 1);
 	ckg_assert(!ckg_string_ends_with(sub_str, "llo"), "test_ckg_ckg_string_ends_with failed");
@@ -137,7 +137,7 @@ void test_ckg_ckg_string_ends_with() {
     CKG_LOG_SUCCESS("Test ckg_ckg_string_ends_with passed.\n");
 }
 
-void test_ckg_ckg_string_reverse() {
+void test_ckg_string_reverse() {
     char* t1 = "hello";
 	char* sub_str = ckg_substring(t1, 0, 1);
     char* reversed_string = ckg_string_reverse(sub_str);
@@ -172,6 +172,29 @@ void test_ckg_ckg_string_reverse() {
     CKG_LOG_SUCCESS("Test ckg_ckg_string_reverse passed.\n");
 }
 
+void test_ckg_string_index_of() {
+    char* t1 = "hello";
+	char* sub_str = ckg_substring(t1, 0, 1);
+
+	ckg_assert(ckg_string_index_of(sub_str, "he") == 0, "test_ckg_string_index_of failed");
+	ckg_free(sub_str);
+
+	ckg_assert(ckg_string_contains(t1, "") == -1, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_contains(t1, "ell") == 1, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_contains(t1, "hello") == 0, "test_ckg_string_index_of failed");
+	ckg_assert(!ckg_string_contains(t1, "hllo") == -1, "test_ckg_string_index_of failed");
+
+	char* t2 = "";
+	ckg_assert(ckg_string_contains(t2, "") == 0, "test_ckg_string_index_of failed");
+	
+
+	t2 = "f";
+	ckg_assert(!ckg_string_contains(t2, "g") == -1, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_contains(t2, "f") == 0, "test_ckg_string_index_of failed");
+
+    CKG_LOG_SUCCESS("Test test_ckg_string_index_of passed.\n");
+}
+
 void test_ckg_string_operations() { 
     CKG_LOG_PRINT("\n");
     CKG_LOG_DEBUG("======================= Testing String Functions =======================\n");
@@ -183,9 +206,11 @@ void test_ckg_string_operations() {
     test_ckg_string_append_char();
     test_ckg_string_clear();
     test_ckg_string_copy();
-    test_ckg_ckg_string_contains();
-    test_ckg_ckg_string_starts_with();
-    test_ckg_ckg_string_ends_with();
-    test_ckg_ckg_string_reverse();
+    test_ckg_string_contains();
+    test_ckg_string_starts_with();
+    test_ckg_string_ends_with();
+    test_ckg_string_reverse();
+    test_ckg_string_index_of();
+    test_ckg_string_reverse();
     CKG_LOG_DEBUG("======================= String Functions All Passed =======================\n");
 }
