@@ -1,4 +1,4 @@
-#include "../ckg_error.h"
+#include "../ckg_stack_trace.h"
 #include "../ckg_logger.h"
 #include "../ckg_memory.h"
 #include <stdarg.h>
@@ -6,7 +6,7 @@
 #include <DbgHelp.h>
 #pragma comment(lib, "dbghelp")
 
-void ckg_error_dump_stack() {
+void ckg_stack_trace_dump() {
     CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
     // Date: July 02, 2024
     // TODO(Jovanni): This only works for windows and when debug symbols are compiled into the program
@@ -19,7 +19,7 @@ void ckg_error_dump_stack() {
     SymInitialize(process, NULL, TRUE);
 
     number_of_captured_frames = CaptureStackBackTrace(0, 100, stack, NULL);
-    symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+    symbol = (SYMBOL_INFO *)ckg_memory_allocate(sizeof(SYMBOL_INFO) + 256 * sizeof(char));
     symbol->MaxNameLen = 255;
     symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
@@ -39,6 +39,6 @@ void ckg_error_dump_stack() {
         count++;
     }
 
-    free(symbol);
+    ckg_memory_free(symbol);
     CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
 }

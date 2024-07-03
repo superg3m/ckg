@@ -4,7 +4,7 @@
 #include "./core/ckg_arena.h"
 #include "./core/ckg_string.h"
 #include "./core/ckg_assert.h"
-#include "./core/ckg_error.h"
+#include "./core/ckg_stack_trace.h"
 #include "./core/ckg_memory.h"
 #include "./core/ckg_logger.h"
 

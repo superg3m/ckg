@@ -1,7 +1,7 @@
 #include "../ckg_types.h"
 #include "../ckg_memory.h"
 #include "../ckg_assert.h"
-#include "../ckg_error.h"
+#include "../ckg_stack_trace.h"
 
 void* ckg_memory_default_allocator(size_t allocation_size) {
     void* ret = malloc(allocation_size);

@@ -3,7 +3,7 @@
 #include "./ckg_types.h"
 #include "./ckg_memory.h"
 #include "./ckg_logger.h"
-#include "./ckg_error.h"
+#include "./ckg_stack_trace.h"
 
 //========================== Begin Types ==========================
 #define CKG_ASSERT_ENABLED TRUE
@@ -26,7 +26,7 @@ extern "C" {
         do { 													                \
             if (!(expression))                          		                \
             {                                           		                \
-                ckg_error_dump_stack();                                         \
+                ckg_stack_trace_dump();                                         \
                 CKG_LOG_FATAL(message, ##__VA_ARGS__);                          \
                 CRASH;                                                          \
             }													                \

@@ -9,6 +9,10 @@
         "algorithm": "c",
         "xiosbase": "c",
         "xlocale": "c",
-        "xutility": "c"
+        "xutility": "c",
+        "system_error": "c",
+        "ckg_stack_trace.h": "c",
+        "ckg_assert.h": "c",
+        "ckg_string.h": "c"
     }
 }
