@@ -4,37 +4,41 @@
 #include <stdarg.h>
 #include <windows.h>
 #include <DbgHelp.h>
+#pragma comment(lib, "dbghelp")
 
-#define CKG_ERROR_OUT_MESSAGE_LIMIT 2048
- 
-CKG_Error ckg_error_create(char* file, int line, char* function) {
-    CKG_Error ret;
-
-    ret.file = file;
-    ret.function = function;
-    ret.line = line;
-
-    return ret;
-}
-
-internal void ckg_error_print(CKG_Error error) {
-    CKG_LOG_PRINT("     file: %s:%d\n", error.file, error.line);
-    CKG_LOG_PRINT("     function: %s\n", error.function);
-}
- 
 void ckg_error_dump_stack() {
     CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
-    for (u32 i = 0; i < ckg_error_stack_size; i++) {
-        CKG_LOG_PRINT(" Stack Level: %d\n", i + 1);
-        ckg_error_print(ckg_error_stack[i]);
+    // Date: July 02, 2024
+    // TODO(Jovanni): This only works for windows and when debug symbols are compiled into the program
+    void *stack[100];
+    unsigned short number_of_captured_frames;
+    SYMBOL_INFO *symbol;
+    HANDLE process;
+
+    process = GetCurrentProcess();
+    SymInitialize(process, NULL, TRUE);
+
+    number_of_captured_frames = CaptureStackBackTrace(0, 100, stack, NULL);
+    symbol = (SYMBOL_INFO *)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+    symbol->MaxNameLen = 255;
+    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+    int count = 0;
+    for (int i = number_of_captured_frames - 4; i > 0; i--) {
+        DWORD64 displacement = 0;
+        if (SymFromAddr(process, (DWORD64)(stack[i]), &displacement, symbol)) {
+            DWORD displacementLine = 0;
+            IMAGEHLP_LINE64 line;
+            line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+            if (SymGetLineFromAddr64(process, (DWORD64)(stack[i]), &displacementLine, &line)) {
+                printf("%d: %s - %s:%d\n", count, symbol->Name, line.FileName, line.LineNumber);
+            } else {
+                printf("%d: %s\n", count, symbol->Name, symbol->Address);
+            }
+        }
+        count++;
     }
+
+    free(symbol);
     CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
-}
-
-void ckg_error_push(CKG_Error error) {
-    ckg_error_stack[ckg_error_stack_size++] = error;
-}
-
-void ckg_error_pop() {
-    ckg_error_stack_size--;
 }

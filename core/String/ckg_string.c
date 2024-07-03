@@ -14,15 +14,14 @@ u32 cstring_length(const char* cstring) {
 
 char* ckg_string_allocate(const char* s1) {
 	char* ret = NULLPTR;
-	ckg_errorable({
-		ckg_assert(s1, "ckg_string_equal: first argument is not valid | null\n");
+	ckg_assert(s1, "ckg_string_equal: first argument is not valid | null\n");
 
-		u32 s1_length = cstring_length(s1);
-		u32 s1_capacity = s1_length + 1;
+	u32 s1_length = cstring_length(s1);
+	u32 s1_capacity = s1_length + 1;
 
-		ret = ckg_memory_allocate(s1_capacity);
-		ckg_memory_copy(s1, ret, s1_capacity, s1_capacity);
-	});
+	ret = ckg_memory_allocate(s1_capacity);
+	ckg_memory_copy(s1, ret, s1_capacity, s1_capacity);
+	
 	return ret;
 }
 

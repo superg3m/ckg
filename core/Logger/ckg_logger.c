@@ -1,5 +1,6 @@
 #include "../ckg_logger.h"
 #include "../ckg_memory.h"
+#include "../ckg_string.h"
 #if (_WIN32)
     #include <windows.h>
 #endif
@@ -20,7 +21,7 @@ void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
         CKG_PURPLE,
         CKG_BLUE,
         CKG_GREEN,
-        COLOR_RESET,
+        CKG_COLOR_RESET,
     };
 
     Boolean is_fatal = (log_level == 0);
@@ -38,6 +39,8 @@ void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
 
     sprintf(out_message2, "%s%s", log_level_strings[log_level], out_message);
 
+    int out_message2_length = cstring_length(out_message2);
+
     #if (_WIN32)
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
         DWORD dwMode = 0;
@@ -46,5 +49,9 @@ void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
         SetConsoleMode(hOut, dwMode);
     #endif
 
-    printf("%s%s%s", log_level_format[log_level], out_message2, COLOR_RESET);
+    if (out_message2[out_message2_length - 1] == '\n') {
+        printf("%s%.*s%s\n", log_level_format[log_level], out_message2_length - 1, out_message2, CKG_COLOR_RESET);
+    } else {
+        printf("%s%.*s%s", log_level_format[log_level], out_message2_length, out_message2, CKG_COLOR_RESET);
+    }
 }

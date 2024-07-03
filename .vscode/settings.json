@@ -5,6 +5,10 @@
         "ckg.h": "c",
         "ckg_arena.h": "c",
         "ckg_memory.h": "c",
-        "ckg_error.h": "c"
+        "ckg_error.h": "c",
+        "algorithm": "c",
+        "xiosbase": "c",
+        "xlocale": "c",
+        "xutility": "c"
     }
 }

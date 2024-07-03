@@ -26,7 +26,6 @@ extern "C" {
         do { 													                \
             if (!(expression))                          		                \
             {                                           		                \
-                ckg_error_push(ckg_error_create(__FILE__, __LINE__, __func__)); \
                 ckg_error_dump_stack();                                         \
                 CKG_LOG_FATAL(message, ##__VA_ARGS__);                          \
                 CRASH;                                                          \
