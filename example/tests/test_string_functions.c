@@ -179,18 +179,19 @@ void test_ckg_string_index_of() {
 	ckg_assert(ckg_string_index_of(sub_str, "he") == 0, "test_ckg_string_index_of failed");
 	ckg_free(sub_str);
 
-	ckg_assert(ckg_string_contains(t1, "") == -1, "test_ckg_string_index_of failed");
-	ckg_assert(ckg_string_contains(t1, "ell") == 1, "test_ckg_string_index_of failed");
-	ckg_assert(ckg_string_contains(t1, "hello") == 0, "test_ckg_string_index_of failed");
-	ckg_assert(!ckg_string_contains(t1, "hllo") == -1, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t1, "") == -1, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t1, "ell") == 1, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t1, "l") == 2, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t1, "hello") == 0, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t1, "hllo") == -1, "test_ckg_string_index_of failed");
 
 	char* t2 = "";
-	ckg_assert(ckg_string_contains(t2, "") == 0, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t2, "") == 0, "test_ckg_string_index_of failed");
 	
 
 	t2 = "f";
-	ckg_assert(!ckg_string_contains(t2, "g") == -1, "test_ckg_string_index_of failed");
-	ckg_assert(ckg_string_contains(t2, "f") == 0, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t2, "g") == -1, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t2, "f") == 0, "test_ckg_string_index_of failed");
 
     CKG_LOG_SUCCESS("Test test_ckg_string_index_of passed.\n");
 }

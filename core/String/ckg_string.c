@@ -208,15 +208,15 @@ u32 ckg_string_index_of(const char* string_buffer, const char* sub_string) {
 	size_t contains_length = cstring_length(sub_string);
 
 	if (string_buffer_length == 0 && contains_length == 0) {
-		return TRUE;
+		return 0;
 	} else if (contains_length == 0) {
-		return FALSE;
+		return -1;
 	} else if (string_buffer_length == 0) {
-		return FALSE;
+		return -1;
 	}
 
 	if (contains_length > string_buffer_length) {
-		return FALSE;
+		return -1;
 	}
 	
 	u32 ret_index = -1;
