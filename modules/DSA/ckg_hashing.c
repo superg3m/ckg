@@ -13,7 +13,7 @@ u64 ckg_hash(unsigned char *str) {
     u64 hash = 5381;
     int c;
 
-    u32 str_length = cstring_length(str);
+    u32 str_length = ckg_cstr_length(str);
 
     while (c = *str++) {
         hash = (((hash << 5) + hash) + c) + str_length;
@@ -28,8 +28,8 @@ void ckg_test_collisions() {
     const u32 STRING_LENGTH = 14;
     const u32 NUM_TESTS = 500;
 
-    u8* hash_map = ckg_allocate(NUM_TESTS * sizeof(u8));
-    char* test_string = ckg_allocate(sizeof(char) * (STRING_LENGTH + 1));
+    u8* hash_map = ckg_alloc(NUM_TESTS * sizeof(u8));
+    char* test_string = ckg_alloc(sizeof(char) * (STRING_LENGTH + 1));
 
     s32 collisions = 0;
 

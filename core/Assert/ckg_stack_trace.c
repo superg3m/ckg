@@ -19,7 +19,7 @@ void ckg_stack_trace_dump() {
     SymInitialize(process, NULL, TRUE);
 
     number_of_captured_frames = CaptureStackBackTrace(0, 100, stack, NULL);
-    symbol = (SYMBOL_INFO *)ckg_allocate(sizeof(SYMBOL_INFO) + 256 * sizeof(char));
+    symbol = (SYMBOL_INFO *)ckg_alloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char));
     symbol->MaxNameLen = 255;
     symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 

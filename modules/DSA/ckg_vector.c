@@ -3,7 +3,7 @@
 
 void* ckg_vector_grow(void* vector, size_t element_size) {
     if (vector == NULLPTR) {
-        vector = ckg_allocate(sizeof(CKG_VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
+        vector = ckg_alloc(sizeof(CKG_VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
         ckg_memory_advance(vector, sizeof(CKG_VectorHeader));
         ckg_vector_capacity(vector) = VECTOR_DEFAULT_CAPACITY;
     }

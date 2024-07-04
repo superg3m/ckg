@@ -53,7 +53,7 @@ CKG_HashMap hashmap_create(size_t element_size) {
     ckg_memory_zero(&hashmap, sizeof(CKG_HashMap));
 
     hashmap.capacity = 128;
-    hashmap.entries = ckg_allocate(sizeof(CKG_HashMapEntry) * hashmap.capacity);
+    hashmap.entries = ckg_alloc(sizeof(CKG_HashMapEntry) * hashmap.capacity);
     hashmap.isValid = TRUE;
     hashmap.element_size = element_size;
 
@@ -76,7 +76,7 @@ u32 hashmap_get_valid_hash_index(CKG_HashMap hashmap, char* key) {
 // TODO(Jovanni): This is complete trash i'm to tired to actually code this right lmao
 internal u64 hashmap_resolve_collision(CKG_HashMap hashmap, char* key, u64 inital_hash_index) {
     u64 cannonical_hash_index = inital_hash_index;
-    while (!ckg_string_equal(hashmap.entries[cannonical_hash_index].value, key)) {
+    while (!ckg_str_equal(hashmap.entries[cannonical_hash_index].value, key)) {
         cannonical_hash_index++;
         cannonical_hash_index = cannonical_hash_index % (hashmap.capacity - 1);
     }

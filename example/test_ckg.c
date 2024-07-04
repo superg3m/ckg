@@ -16,7 +16,7 @@ int main() {
 	ckg_bind_free_callback(win32_memory_free_callback);
 	test_ckg_memory_operations();
 	test_ckg_arena_operations();
-	test_ckg_string_operations();
+	test_ckg_str_operations();
 	test_ckg_vector_operations();
 	return 0;
 }

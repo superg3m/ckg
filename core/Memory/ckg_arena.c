@@ -14,7 +14,7 @@ CKG_Arena MACRO_ckg_arena_create(u32 allocation_size, const char* name, CKG_Aren
     arena.flag = flag;
     arena.capacity = allocation_size;
     arena.used = 0;
-    arena.base_address = ckg_allocate(allocation_size != 0 ? allocation_size : ARENA_DEFAULT_ALLOCATION_SIZE);
+    arena.base_address = ckg_alloc(allocation_size != 0 ? allocation_size : ARENA_DEFAULT_ALLOCATION_SIZE);
     return arena;
 }
 

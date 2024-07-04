@@ -22,14 +22,13 @@ extern "C" {
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
 #if CKG_ASSERT_ENABLED == TRUE	    
-    #define ckg_assert(expression, message, ...)	                            \
-        do { 													                \
-            if (!(expression))                          		                \
-            {                                           		                \
-                ckg_stack_trace_dump();                                         \
-                CKG_LOG_FATAL(message, ##__VA_ARGS__);                          \
-                CRASH;                                                          \
-            }													                \
+    #define ckg_assert(expression, message, ...)	   \
+        do { 				                           \
+            if (!(expression)) {                       \
+                ckg_stack_trace_dump();                \
+                CKG_LOG_FATAL(message, ##__VA_ARGS__); \
+                CRASH;                                 \
+            }				                           \
         } while (FALSE)
 #else
         #define ckg_assert(expression, message, ...)

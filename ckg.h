@@ -8,7 +8,6 @@
 #include "./core/ckg_memory.h"
 #include "./core/ckg_logger.h"
 
-
 #include "./modules/ckg_algorithm.h"
 #include "./modules/ckg_hashing.h"
 #include "./modules/ckg_hashmap.h"

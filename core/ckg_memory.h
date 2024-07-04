@@ -19,7 +19,7 @@ extern "C" {
     void ckg_bind_allocator_callback(CKG_MemoryAllocator* func_allocator);
     void ckg_bind_free_callback(CKG_MemoryFree* func_allocator);
 
-    void* MACRO_ckg_allocate(size_t allocation_size);
+    void* MACRO_ckg_alloc(size_t allocation_size);
     void* ckg_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size);
     void* MACRO_ckg_free(void* data);
 
@@ -54,14 +54,14 @@ extern "C" {
  * 
  */
 #ifdef __cplusplus
-    #define ckg_allocate(allocation_size) (decltype(data))MACRO_ckg_allocate(allocation_size)
+    #define ckg_alloc(allocation_size) (decltype(data))MACRO_ckg_alloc(allocation_size)
     #define ckg_free(data) data = (decltype(data))MACRO_ckg_free(data)
 
     #define ckg_memory_advance(data, size_in_bytes) data = (decltype(data))MACRO_memory_advance(data, size_in_bytes)
     #define ckg_memory_retreat(data, size_in_bytes) data = (decltype(data))MACRO_memory_retreat(data, size_in_bytes)
     
 #else
-    #define ckg_allocate(allocation_size) MACRO_ckg_allocate(allocation_size)
+    #define ckg_alloc(allocation_size) MACRO_ckg_alloc(allocation_size)
     #define ckg_free(data) data = MACRO_ckg_free(data)
 
     #define ckg_memory_advance(data, size_in_bytes) data = MACRO_memory_advance(data, size_in_bytes)
