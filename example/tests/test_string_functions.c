@@ -214,4 +214,5 @@ void test_ckg_string_operations() {
     test_ckg_string_index_of();
     test_ckg_string_reverse();
     CKG_LOG_DEBUG("======================= String Functions All Passed =======================\n");
+    CKG_LOG_PRINT("\n");
 }
