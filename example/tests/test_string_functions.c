@@ -183,6 +183,7 @@ void test_ckg_string_index_of() {
 	ckg_assert(ckg_string_index_of(t1, "ell") == 1, "test_ckg_string_index_of failed");
 	ckg_assert(ckg_string_index_of(t1, "l") == 2, "test_ckg_string_index_of failed");
 	ckg_assert(ckg_string_index_of(t1, "o") == 4, "test_ckg_string_index_of failed");
+	ckg_assert(ckg_string_index_of(t1, "7") == -1, "test_ckg_string_index_of failed");
 	ckg_assert(ckg_string_index_of(t1, "hello") == 0, "test_ckg_string_index_of failed");
 	ckg_assert(ckg_string_index_of(t1, "hllo") == -1, "test_ckg_string_index_of failed");
 
