@@ -52,6 +52,7 @@ void ckg_str_insert(char* string_buffer, size_t string_buffer_capacity, const ch
 		// string_buffer[i - 1] = 'x';
 	// }
 
+	// This needs to be rethought I can't bro strings are so complicated lmao
 	ckg_memory_move(string_buffer, string_buffer_capacity - string_buffer_length, source_length, string_buffer_length);
 	
 	u8* dest_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
