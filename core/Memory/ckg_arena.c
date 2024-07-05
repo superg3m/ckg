@@ -53,7 +53,7 @@ void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
         ckg_assert(FALSE, "arean_push: invalid arena flag set");
     }
 
-    u8* ret = ckg_memory_advance_new_ptr(arena->base_address, arena->used);
+    u8* ret = ((u8*)arena->base_address) + arena->used;
 	arena->used += element_size;
 
     return ret;

@@ -29,7 +29,9 @@ extern "C" {
     void ckg_memory_zero(void* data, size_t data_size_in_bytes);
     void ckg_memory_set(u8* data, size_t data_size_in_bytes, u8 element);
 
-    void ckg_memory_buffer_delete_index(const void* data, size_t size_in_bytes, u32 buffer_count, u32 index);
+    // Date: July 05, 2024
+    // TODO(Jovanni): Test this
+    void MACRO_ckg_memory_buffer_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index);
 
     u8* ckg_memory_advance_new_ptr(const void* data, size_t size_in_bytes);
     u8* ckg_memory_retreat_new_ptr(const void* data, size_t size_in_bytes);
@@ -56,13 +58,14 @@ extern "C" {
 #ifdef __cplusplus
     #define ckg_alloc(allocation_size) (decltype(data))MACRO_ckg_alloc(allocation_size)
     #define ckg_free(data) data = (decltype(data))MACRO_ckg_free(data)
+    #define ckg_memory_buffer_delete_index(data, data_capacity, index) MACRO_ckg_memory_buffer_delete_index(data, data_capacity, sizeof(data[0]), index)
 
     #define ckg_memory_advance(data, size_in_bytes) data = (decltype(data))MACRO_memory_advance(data, size_in_bytes)
     #define ckg_memory_retreat(data, size_in_bytes) data = (decltype(data))MACRO_memory_retreat(data, size_in_bytes)
-    
 #else
     #define ckg_alloc(allocation_size) MACRO_ckg_alloc(allocation_size)
     #define ckg_free(data) data = MACRO_ckg_free(data)
+    #define ckg_memory_buffer_delete_index(data, data_capacity, index) MACRO_ckg_memory_buffer_delete_index(data, data_capacity, sizeof(data[0]), index)
 
     #define ckg_memory_advance(data, size_in_bytes) data = MACRO_memory_advance(data, size_in_bytes)
     #define ckg_memory_retreat(data, size_in_bytes) data = MACRO_memory_retreat(data, size_in_bytes)

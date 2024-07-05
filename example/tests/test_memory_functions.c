@@ -45,6 +45,35 @@ void test_ckg_memory_operations() {
 	ckg_assert(ckg_memory_compare(arr4, arr5, 3 * sizeof(int), 3 * sizeof(int)) == TRUE, "Error: Memory compare failed\n");
 	ckg_assert(!ckg_memory_compare(arr4, arr6, 3 * sizeof(int), 3 * sizeof(int)), "Error: Memory compare failed\n");
 
+	int test_data[] = {1, 2, 3, 12, 22, 23, 41, 52, 73};
+	ckg_memory_buffer_delete_index(test_data, 9, 0);
+	CKG_LOG_PRINT("[ ");
+	for (int i = 0; i < 8; i++) {
+		CKG_LOG_PRINT("%d ", test_data[i]);
+	}
+	CKG_LOG_PRINT("]\n");
+
+	ckg_memory_buffer_delete_index(test_data, 8, 5);
+	CKG_LOG_PRINT("[ ");
+	for (int i = 0; i < 7; i++) {
+		CKG_LOG_PRINT("%d ", test_data[i]);
+	}
+	CKG_LOG_PRINT("]\n");
+
+	ckg_memory_buffer_delete_index(test_data, 7, 2);
+	CKG_LOG_PRINT("[ ");
+	for (int i = 0; i < 6; i++) {
+		CKG_LOG_PRINT("%d ", test_data[i]);
+	}
+	CKG_LOG_PRINT("]\n");
+
+	ckg_memory_buffer_delete_index(test_data, 6, 5);
+	CKG_LOG_PRINT("[ ");
+	for (int i = 0; i < 5; i++) {
+		CKG_LOG_PRINT("%d ", test_data[i]);
+	}
+	CKG_LOG_PRINT("]\n");
+
 	CKG_LOG_SUCCESS("All memory tests passed!\n");
 	return;
 }

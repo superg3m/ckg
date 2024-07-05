@@ -16,6 +16,9 @@
         "ckg_string.h": "c",
         "xstring": "c",
         "xhash": "c",
-        "xtree": "c"
+        "xtree": "c",
+        "array": "c",
+        "vector": "c",
+        "chrono": "c"
     }
 }

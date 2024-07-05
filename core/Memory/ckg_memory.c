@@ -79,12 +79,6 @@ void ckg_memory_move(const void* source, void* destination, size_t data_payload_
         return;
     }
 
-    // Date: June 30, 2024
-    // TODO(Jovanni): If the offset is greater than data_payload_size then its not overlapping
-    // if its not overlapping you don't have to copy
-    // also I think its possible not not ckg_memory_copy the whole array i should be able to get by with just a constant time temp variable
-    // to store the next byte value
-
     u8* data_payload = ckg_alloc(data_payload_source_size);
     ckg_memory_copy(source, data_payload, data_payload_source_size, data_payload_source_size);
     for (int i = 0; i < data_payload_source_size; i++) {
@@ -114,15 +108,18 @@ void ckg_memory_set(u8* data, size_t data_size_in_bytes, u8 element) {
  * @param buffer_count 
  * @param index 
  */
-void ckg_memory_buffer_delete_index(const void* data, size_t size_in_bytes, u32 buffer_count, u32 index) {
-    u32 size_of_element = size_in_bytes / buffer_count;
+void MACRO_ckg_memory_buffer_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
+    ckg_assert(index < data_capacity, "index greater than capacity\n");
+    ckg_assert(index >= 0, "index is less than 0\n");
 
-    u8* source_ptr = ckg_memory_advance_new_ptr(data, (index + 1) * size_of_element);
-    u8* dest_ptr = ckg_memory_advance_new_ptr(data, index * size_of_element);
+    u8* byte_data = (u8*)data;
 
-    u32 source_ptr_size = (buffer_count - (index + 1)) * size_of_element;
-    u32 dest_ptr_size = (buffer_count - (index)) * size_of_element;
-    ckg_memory_copy(source_ptr, dest_ptr, source_ptr_size, dest_ptr_size);
+    size_t total_size = element_size_in_bytes * data_capacity;
+    size_t source_offset = (index + 1) * element_size_in_bytes;
+    size_t dest_offset =  index * element_size_in_bytes;
+
+    size_t payload_source_size = total_size - source_offset;
+    ckg_memory_move(byte_data + source_offset, byte_data + dest_offset, payload_source_size);
 }
 
 u8* ckg_memory_advance_new_ptr(const void* data, size_t size_in_bytes) {
