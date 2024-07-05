@@ -30,13 +30,10 @@ void ckg_arena_clear(CKG_Arena* arena) {
 }
 
 void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
-    // Date: May 11, 2024
-    // TODO(Jovanni): For right now just assert if you don't have enough memory but later on make it grow.
     ckg_assert(arena && arena->base_address, "arena_push: arena is null\n");
 
     if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_DEFAULT)) {
         ckg_assert((arena->used + element_size <= arena->capacity), "arena_push: (default arena) can't push element ran out of memory\n");
-        
     } else if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_CIRCULAR)) {
 		if ((arena->used + element_size > arena->capacity)) {
 			arena->used = 0;

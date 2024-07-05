@@ -2,6 +2,7 @@
 #include "../ckg_memory.h"
 #include "../ckg_assert.h"
 #include "../ckg_stack_trace.h"
+#include "../ckg_math.h"
 
 void* ckg_memory_default_allocator(size_t allocation_size) {
     void* ret = malloc(allocation_size);
@@ -16,7 +17,7 @@ void ckg_memory_default_free(void* data) {
 internal CKG_MemoryAllocator* memory_allocate_callback = &ckg_memory_default_allocator;
 internal CKG_MemoryFree* memory_free_callback = &ckg_memory_default_free;
 
-void ckg_bind_allocator_callback(CKG_MemoryAllocator* allocator) {
+void ckg_bind_alloc_callback(CKG_MemoryAllocator* allocator) {
     memory_allocate_callback = allocator;
 }
 
@@ -60,10 +61,10 @@ Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 b
     return TRUE;
 }
 
-void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_size) {
+void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_capacity) {
     ckg_assert(source, "MEMORY COPY SOURCE IS NULL\n");
     ckg_assert(destination, "MEMORY COPY SOURCE IS NULL\n");
-    ckg_assert((source_size <= destination_size), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
+    ckg_assert((source_size <= destination_capacity), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
 
     for (int i = 0; i < source_size; i++) {
         u8 temp = ((u8*)source)[i];
@@ -71,17 +72,17 @@ void ckg_memory_copy(const void* source, void* destination, size_t source_size, 
     }
 }
 
-void ckg_memory_move(const void* source, void* destination, size_t data_payload_source_size) {
+void ckg_memory_move(const void* source, void* destination, size_t source_payload_size) {
     ckg_assert(source, "MEMORY MOVE source is null\n");
     ckg_assert(destination, "MEMORY MOVE destination IS NULL\n");
 
-    if (data_payload_source_size == 0) {
+    if (source_payload_size == 0) {
         return;
     }
 
-    u8* data_payload = ckg_alloc(data_payload_source_size);
-    ckg_memory_copy(source, data_payload, data_payload_source_size, data_payload_source_size);
-    for (int i = 0; i < data_payload_source_size; i++) {
+    u8* data_payload = ckg_alloc(source_payload_size);
+    ckg_memory_copy(source, data_payload, source_payload_size, source_payload_size);
+    for (int i = 0; i < source_payload_size; i++) {
         ((u8*)destination)[i] = data_payload[i];
     }
 
@@ -94,21 +95,7 @@ void ckg_memory_zero(void* data, size_t data_size_in_bytes) {
     }
 }
 
-void ckg_memory_set(u8* data, size_t data_size_in_bytes, u8 element) {
-    for (int i = 0; i < data_size_in_bytes; i++) {
-        ((u8*)data)[i] = element;
-    }
-}
-
-/**
- * @brief O(n)
- * 
- * @param data 
- * @param size_in_bytes 
- * @param buffer_count 
- * @param index 
- */
-void MACRO_ckg_memory_buffer_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
+void MACRO_ckg_memory_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
     ckg_assert(index < data_capacity, "index greater than capacity\n");
     ckg_assert(index >= 0, "index is less than 0\n");
 
@@ -120,20 +107,4 @@ void MACRO_ckg_memory_buffer_delete_index(void* data, u32 data_capacity, size_t 
 
     size_t payload_source_size = total_size - source_offset;
     ckg_memory_move(byte_data + source_offset, byte_data + dest_offset, payload_source_size);
-}
-
-u8* ckg_memory_advance_new_ptr(const void* data, size_t size_in_bytes) {
-    return ((u8*)data) + size_in_bytes;
-}
-
-u8* ckg_memory_retreat_new_ptr(const void* data, size_t size_in_bytes) {
-    return ((u8*)data) - size_in_bytes;
-}
-
-void* MACRO_memory_advance(const void* data, size_t size_in_bytes) {
-    return ((u8*)data) + size_in_bytes;
-}
-
-void* MACRO_memory_retreat(const void* data, size_t size_in_bytes) {
-    return ((u8*)data) - size_in_bytes;
 }

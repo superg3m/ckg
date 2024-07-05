@@ -35,30 +35,30 @@ Boolean ckg_str_equal(const char* s1, const char* s2) {
 	return ckg_memory_compare(s1, s2, s1_length, s2_length);
 }
 
-void ckg_str_insert(char* string_buffer, size_t string_buffer_capacity, const char* source, const u32 index) {
+void ckg_str_insert(char* string_buffer, size_t string_buffer_capacity, const char* to_insert, const u32 index) {
 	ckg_assert(string_buffer, "string_insert: string_buffer is not valid | null\n");
-	ckg_assert(source, "string_insert: source is not valid | null\n");
+	ckg_assert(to_insert, "string_insert: source is not valid | null\n");
 
-	u32 string_buffer_length = ckg_cstr_length(string_buffer);
-	u32 source_length = ckg_cstr_length(source);
+	const u32 string_buffer_length = ckg_cstr_length(string_buffer);
+	const u32 to_insert_length = ckg_cstr_length(to_insert);
 
-	ckg_assert(index >= 0 && index <= string_buffer_length, "Index out of bounds");
-	ckg_assert(string_buffer_length + source_length < string_buffer_capacity, "string_insert: string_buffer_capacity is %lld but new valid cstring length is %d + %d = %d\n", string_buffer_capacity, string_buffer_length, source_length + 1, string_buffer_length + source_length + 1);
+	const u32 new_length = string_buffer_length + to_insert_length;
 
-	u8* src_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
-	u32 src_length = string_buffer_length - index;
+	ckg_assert(index >= 0 && index <= string_buffer_length, "Index out of bounds\n");
+	ckg_assert(new_length < string_buffer_capacity, "string_insert: string_buffer_capacity is %lld but new valid cstring length is %d + %d + 1(null_term)= %d\n", string_buffer_capacity, string_buffer_length, to_insert_length, new_length + 1);
 
-	ckg_memory_move(src_ptr, src_ptr + source_length, src_length);
+	u8* move_source_ptr = string_buffer + index;
+	u8* move_dest_ptr = move_source_ptr + to_insert_length;
+
+	ckg_memory_move(move_source_ptr, move_dest_ptr, string_buffer_length - index);
 	
-	u8* dest_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
-	// Date: May 18, 2024
-	// NOTE(Jovanni): We don't want source_length + 1 because we don't want to copy the null terminator
-	ckg_memory_copy(source, dest_ptr, source_length, string_buffer_capacity);
+	u8* copy_dest_ptr = string_buffer + index;
+	ckg_memory_copy(to_insert, copy_dest_ptr, to_insert_length, string_buffer_capacity);
 }
 
-void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, const char source, const u32 index) {
+void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, const char to_insert, const u32 index) {
 	ckg_assert(string_buffer, "string_insert_char string_buffer is not valid | null\n");
-	ckg_assert(source, "string_insert_char source is not valid | null\n");
+	ckg_assert(to_insert, "string_insert_char source is not valid | null\n");
 
 	u32 string_buffer_length = ckg_cstr_length(string_buffer);
 	u32 source_length = 1;
@@ -66,21 +66,21 @@ void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, con
 	Boolean expression = index >= 0 && string_buffer_length + source_length < string_buffer_capacity;
 	ckg_assert(expression, "ckg_str_insert_char: string_buffer overflow new_capacity_required: %d >= current_capacity: %lld\n",  string_buffer_length + source_length, string_buffer_capacity);
 
-	char* source_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
+	char* source_ptr = string_buffer + index;
 	size_t data_payload_size = ckg_cstr_length(source_ptr);
 
-	ckg_memory_move(source_ptr, source_ptr + 1, data_payload_size);
-	string_buffer[index] = source;
+	ckg_memory_move(source_ptr, source_ptr + 1, string_buffer_length - index);
+	string_buffer[index] = to_insert;
 }
 
-void ckg_str_append(char* string_buffer, size_t string_buffer_capacity, const char* source) {
+void ckg_str_append(char* string_buffer, size_t string_buffer_capacity, const char* to_append) {
 	u32 string_buffer_length = ckg_cstr_length(string_buffer);
-	ckg_str_insert(string_buffer, string_buffer_capacity, source, string_buffer_length);
+	ckg_str_insert(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
 }
 
-void ckg_str_append_char(char* string_buffer, size_t string_buffer_capacity, const char source) {
+void ckg_str_append_char(char* string_buffer, size_t string_buffer_capacity, const char to_append) {
 	u32 string_buffer_length = ckg_cstr_length(string_buffer);
-	ckg_str_insert_char(string_buffer, string_buffer_capacity, source, string_buffer_length);
+	ckg_str_insert_char(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
 }
 
 void ckg_str_clear(char* string_buffer) {
@@ -90,16 +90,14 @@ void ckg_str_clear(char* string_buffer) {
 	ckg_memory_zero(string_buffer, string_buffer_length);
 }
 
-void ckg_str_copy(char* string_buffer, size_t string_buffer_capacity, const char* source) {
-	ckg_assert(source, "source is not valid | null\n");
+void ckg_str_copy(char* string_buffer, size_t string_buffer_capacity, const char* to_copy) {
+	ckg_assert(to_copy, "source is not valid | null\n");
 	ckg_assert(string_buffer, "dest is not valid | null\n");
 
-	u32 source_length = ckg_cstr_length(source);
+	u32 source_length = ckg_cstr_length(to_copy);
 	ckg_str_clear(string_buffer);
 
-	// Date: May 18, 2024
-	// NOTE(Jovanni): We want to use source_length + 1 because we want to include the null terminator
-	ckg_memory_copy(source, string_buffer, source_length + 1, string_buffer_capacity);
+	ckg_memory_copy(to_copy, string_buffer, source_length + 1, string_buffer_capacity);
 }
 
 void string_random(char *dest, size_t length) {

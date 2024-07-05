@@ -9,7 +9,7 @@
 void ckg_stack_trace_dump() {
     CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
     // Date: July 02, 2024
-    // TODO(Jovanni): This only works for windows and when debug symbols are compiled into the program
+    // NOTE(Jovanni): This only works for windows and when debug symbols are compiled into the program
     void *stack[100];
     unsigned short number_of_captured_frames;
     SYMBOL_INFO *symbol;

@@ -19,6 +19,7 @@
         "xtree": "c",
         "array": "c",
         "vector": "c",
-        "chrono": "c"
+        "chrono": "c",
+        "ckg_math.h": "c"
     }
 }

@@ -7,6 +7,7 @@
 #include "./core/ckg_stack_trace.h"
 #include "./core/ckg_memory.h"
 #include "./core/ckg_logger.h"
+#include "./core/ckg_math.h"
 
 #include "./modules/ckg_algorithm.h"
 #include "./modules/ckg_hashing.h"
