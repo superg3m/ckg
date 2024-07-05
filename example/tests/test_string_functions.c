@@ -265,6 +265,37 @@ void test_ckg_string_assertions() {
     ckg_assert(!ckg_str_equal(str2, "ShortX"), "Test: ckg_str_append_char failed on overflow\n");
 }
 
+void test_ckg_string_edgecases() {
+    ckg_assert(ckg_cstr_length("") == 0, "Test ckg_cstr_length failed on empty string\n");
+    ckg_assert(ckg_cstr_length(NULL), "Test ckg_cstr_length failed on null string\n");
+
+    // Test edge cases for ckg_str_equal
+    ckg_assert(ckg_str_equal(NULL, NULL), "Test ckg_str_equal failed on two null strings\n");
+    ckg_assert(!ckg_str_equal("Hello", NULL), "Test ckg_str_equal failed on comparing with null string\n");
+    ckg_assert(!ckg_str_equal(NULL, "Hello"), "Test ckg_str_equal failed on comparing with null string\n");
+
+    // Test edge cases for ckg_str_insert_char
+    char str1[50] = "Hello";
+    ckg_str_insert_char(str1, 50, 'V', 10); // Insert at a position beyond the string length
+    ckg_assert(ckg_str_equal(str1, "HelloV"), "Test ckg_str_insert_char failed on inserting beyond length\n");
+
+    char str2[50] = "";
+    ckg_str_insert_char(str2, 50, 'Z', 0); // Insert into an empty string
+    ckg_assert(ckg_str_equal(str2, "Z"), "Test ckg_str_insert_char failed on inserting into empty string\n");
+
+    // Test edge cases for ckg_str_append
+    char str3[50] = "Hello";
+    ckg_str_append(str3, 50, NULL); // Append a null string
+    ckg_assert(ckg_str_equal(str3, "Hello"), "Test ckg_str_append failed on appending null string\n");
+
+    char str4[50] = "";
+    ckg_str_append(str4, 50, "Appended"); // Append to an empty string
+    ckg_assert(ckg_str_equal(str4, "Appended"), "Test ckg_str_append failed on appending to empty string\n");
+
+    CKG_LOG_SUCCESS("Test ckg_string_edgecases passed.\n");
+
+}
+
 void test_ckg_str_operations() { 
     CKG_LOG_PRINT("\n");
     CKG_LOG_DEBUG("======================= Testing String Functions =======================\n");
@@ -281,6 +312,7 @@ void test_ckg_str_operations() {
     test_ckg_str_ends_with();
     test_ckg_str_reverse();
     test_ckg_str_index_of();
+    // test_ckg_string_edgecases();
     // test_ckg_string_assertions();
     CKG_LOG_DEBUG("======================= String Functions All Passed =======================\n");
     CKG_LOG_PRINT("\n");

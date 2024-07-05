@@ -4,6 +4,8 @@
 
 //************************* Begin Functions *************************
 u32 ckg_cstr_length(const char* cstring) {
+	ckg_assert(cstring, "cstring is null");
+
 	u32 length = 0;
 	char* cursor = (char*)cstring;
 	while(*cursor++ != '\0') {
@@ -46,7 +48,6 @@ void ckg_str_insert(char* string_buffer, size_t string_buffer_capacity, const ch
 
 	ckg_assert(index >= 0 && index <= string_buffer_length, "Index out of bounds\n");
 	ckg_assert(new_length < string_buffer_capacity, "string_insert: string_buffer_capacity is %lld but new valid cstring length is %d + %d + 1(null_term)= %d\n", string_buffer_capacity, string_buffer_length, to_insert_length, new_length + 1);
-
 	u8* move_source_ptr = string_buffer + index;
 	u8* move_dest_ptr = move_source_ptr + to_insert_length;
 
@@ -63,7 +64,8 @@ void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, con
 	u32 string_buffer_length = ckg_cstr_length(string_buffer);
 	u32 source_length = 1;
 
-	Boolean expression = index >= 0 && string_buffer_length + source_length < string_buffer_capacity;
+	ckg_assert(index >= 0 && index <= string_buffer_length, "Index out of bounds\n");
+	Boolean expression = string_buffer_length + source_length < string_buffer_capacity;
 	ckg_assert(expression, "ckg_str_insert_char: string_buffer overflow new_capacity_required: %d >= current_capacity: %lld\n",  string_buffer_length + source_length, string_buffer_capacity);
 
 	char* source_ptr = string_buffer + index;
