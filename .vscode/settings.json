@@ -20,6 +20,17 @@
         "array": "c",
         "vector": "c",
         "chrono": "c",
-        "ckg_math.h": "c"
+        "ckg_math.h": "c",
+        "compare": "c",
+        "format": "c",
+        "memory": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "xmemory": "c",
+        "xtr1common": "c",
+        "main.h": "c",
+        "ckg_linked_list.h": "c",
+        "sstream": "c"
     }
 }

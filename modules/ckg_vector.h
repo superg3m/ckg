@@ -28,7 +28,7 @@ extern "C" {
 	#define ckg_vector_length(vector) ckg_vector_header_base(vector)->length
 	#define ckg_vector_capacity(vector) ckg_vector_header_base(vector)->capacity
 
-	#define ckg_vector_push(vector, element) (vector = ckg_vector_grow(vector, sizeof(element)), vector[ckg_vector_length(vector)++] = element)
+	#define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_length(vector)++] = element
 	#define ckg_vector_free(vector) ckg_free(ckg_vector_header_base(vector))
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 
