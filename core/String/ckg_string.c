@@ -45,15 +45,10 @@ void ckg_str_insert(char* string_buffer, size_t string_buffer_capacity, const ch
 	ckg_assert(index >= 0 && index <= string_buffer_length, "Index out of bounds");
 	ckg_assert(string_buffer_length + source_length < string_buffer_capacity, "string_insert: string_buffer_capacity is %lld but new valid cstring length is %d + %d = %d\n", string_buffer_capacity, string_buffer_length, source_length + 1, string_buffer_length + source_length + 1);
 
-	// Date: May 18, 2024
-	// TODO(Jovanni): Test this
-	// for (int i = string_buffer_length; i > index; i--) {
-		// string_buffer[(i - 1) + source_length] = string_buffer[i - 1];
-		// string_buffer[i - 1] = 'x';
-	// }
+	u8* src_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
+	u32 src_length = string_buffer_length - index;
 
-	// This needs to be rethought I can't bro strings are so complicated lmao
-	ckg_memory_move(string_buffer, string_buffer_capacity - string_buffer_length, source_length, string_buffer_length);
+	ckg_memory_move(src_ptr, src_ptr + source_length, src_length);
 	
 	u8* dest_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
 	// Date: May 18, 2024
@@ -74,7 +69,7 @@ void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, con
 	char* source_ptr = ckg_memory_advance_new_ptr(string_buffer, index);
 	size_t data_payload_size = ckg_cstr_length(source_ptr);
 
-	ckg_memory_move(source_ptr,  string_buffer_capacity - index, source_length, data_payload_size);
+	ckg_memory_move(source_ptr, source_ptr + 1, data_payload_size);
 	string_buffer[index] = source;
 }
 

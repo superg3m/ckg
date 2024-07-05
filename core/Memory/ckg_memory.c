@@ -71,10 +71,11 @@ void ckg_memory_copy(const void* source, void* destination, size_t source_size, 
     }
 }
 
-void ckg_memory_move(void* buffer, size_t buffer_capacity, size_t offset_into_buffer, size_t data_patload_size) {
-    ckg_assert(buffer, "MEMORY MOVE buffer IS NULL\n");
-    ckg_assert((data_patload_size + offset_into_buffer <= buffer_capacity), "MEMORY MOVE OFFSET IS TOO BIG FOR DESTINATION\n");
-    if (data_patload_size == 0) {
+void ckg_memory_move(const void* source, void* destination, size_t data_payload_source_size) {
+    ckg_assert(source, "MEMORY MOVE source is null\n");
+    ckg_assert(destination, "MEMORY MOVE destination IS NULL\n");
+
+    if (data_payload_source_size == 0) {
         return;
     }
 
@@ -84,13 +85,12 @@ void ckg_memory_move(void* buffer, size_t buffer_capacity, size_t offset_into_bu
     // also I think its possible not not ckg_memory_copy the whole array i should be able to get by with just a constant time temp variable
     // to store the next byte value
 
-    u8* data_payload = ckg_alloc(data_patload_size);
-    ckg_memory_copy(buffer, data_payload, data_patload_size, data_patload_size);
-    u8* dest_ptr = ckg_memory_advance_new_ptr(buffer, offset_into_buffer);
-
-    for (int i = 0; i < data_patload_size; i++) {
-        ((u8*)dest_ptr)[i] = data_payload[i];
+    u8* data_payload = ckg_alloc(data_payload_source_size);
+    ckg_memory_copy(source, data_payload, data_payload_source_size, data_payload_source_size);
+    for (int i = 0; i < data_payload_source_size; i++) {
+        ((u8*)destination)[i] = data_payload[i];
     }
+
     ckg_free(data_payload);
 }
 
