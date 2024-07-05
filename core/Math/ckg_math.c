@@ -34,6 +34,9 @@ double ckg_f64_abs(double val) {
     return ret.d;
 }
 
+// Date: July 05, 2024
+// TODO(Jovanni): Ensure that this is bullet proof
+// I highly, highly doubt this is the correct way to do this
 s32 ckg_s32_abs(s32 val) {
     return ~(val - 1);
 }
