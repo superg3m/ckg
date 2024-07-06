@@ -23,7 +23,7 @@ typedef struct CKG_LinkedList {
 #ifdef __cplusplus
 extern "C" {
 #endif
-    CKG_LinkedList MACRO_ckg_linked_list_create(size_t element_size_in_bytes);
+    CKG_LinkedList* MACRO_ckg_linked_list_create(size_t element_size_in_bytes);
     CKG_Node* MACRO_ckg_node_create(void* data, size_t element_size_in_bytes);
     void ckg_node_get(CKG_Node* node, void* returned_value);
     CKG_Node* ckg_linked_list_insert(CKG_LinkedList linked_list, u32 index);
