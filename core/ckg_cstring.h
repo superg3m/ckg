@@ -13,7 +13,7 @@ extern "C" {
 	 * @param s1 
 	 * @return char* 
 	 */
-	char* ckg_str_allocate(const char* s1);
+	char* ckg_cstr_alloc(const char* s1);
 
 	/**
 	 * @brief Tests each charater in the string for equaility
@@ -35,8 +35,8 @@ extern "C" {
 	 * @param string_buffer_size 
 	 * @param source 
 	 */
-	void ckg_str_append(char* string_buffer, size_t string_buffer_capacity, const char* to_append);
-	void ckg_str_append_char(char* string_buffer, size_t string_buffer_capacity, const char to_append);
+	void ckg_cstr_append(char* string_buffer, size_t string_buffer_capacity, const char* to_append);
+	void ckg_cstr_append_char(char* string_buffer, size_t string_buffer_capacity, const char to_append);
 
 	/**
 	 * @brief Requires the string buffer to be cleared to zero terminated
@@ -45,8 +45,8 @@ extern "C" {
 	 * @param string_buffer_size 
 	 * @param index 
 	 */
-	void ckg_str_insert(char* string_buffer, size_t string_buffer_capacity, const char* to_insert, const u32 index);
-	void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, const char to_insert, const u32 index);
+	void ckg_cstr_insert(char* string_buffer, size_t string_buffer_capacity, const char* to_insert, const u32 index);
+	void ckg_cstr_insert_char(char* string_buffer, size_t string_buffer_capacity, const char to_insert, const u32 index);
 
 	/**
 	 * @brief clears a string_buffer to zero
@@ -63,7 +63,7 @@ extern "C" {
 	 * @param string_buffer 
 	 * @param string_buffer_size 
 	 */
-	void ckg_str_copy(char* string_buffer, size_t string_buffer_capacity, const char* to_copy);
+	void ckg_cstr_copy(char* string_buffer, size_t string_buffer_capacity, const char* to_copy);
 
 	/**
 	 * @brief generate a random string and copy it to the dest pointer
@@ -71,7 +71,7 @@ extern "C" {
 	 * @param dest 
 	 * @param length 
 	 */
-	void string_random(char *dest, size_t length);
+	void ckg_cstr_random(char *dest, size_t length);
 
 	
 	char* ckg_substring(const char* string_buffer, u32 start_range, u32 end_range);

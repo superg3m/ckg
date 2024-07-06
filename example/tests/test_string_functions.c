@@ -35,81 +35,81 @@ void test_ckg_string_equal() {
     CKG_LOG_SUCCESS("Test ckg_str_equal passed.\n");
 }
 
-void test_ckg_str_insert_char() {
+void test_ckg_cstr_insert_char() {
     char str1[50] = "Hello";
-    ckg_str_insert_char(str1, 50, 'V', 2);
-    ckg_assert(ckg_str_equal(str1, "HeVllo"), "Test: ckg_str_insert_char failed -> got: %s | expected: %s\n", str1, "HeVllo");
+    ckg_cstr_insert_char(str1, 50, 'V', 2);
+    ckg_assert(ckg_str_equal(str1, "HeVllo"), "Test: ckg_cstr_insert_char failed -> got: %s | expected: %s\n", str1, "HeVllo");
 
-    ckg_str_copy(str1, 50, "Hello");
-    ckg_str_insert_char(str1, 50, 'X', 0);
-    ckg_assert(ckg_str_equal(str1, "XHello"), "Test: ckg_str_insert_char failed at beginning\n");
+    ckg_cstr_copy(str1, 50, "Hello");
+    ckg_cstr_insert_char(str1, 50, 'X', 0);
+    ckg_assert(ckg_str_equal(str1, "XHello"), "Test: ckg_cstr_insert_char failed at beginning\n");
 
-    ckg_str_copy(str1, 50, "Hello");
-    ckg_str_insert_char(str1, 50, 'Y', 5);
-    ckg_assert(ckg_str_equal(str1, "HelloY"), "Test: ckg_str_insert_char failed at end\n");
+    ckg_cstr_copy(str1, 50, "Hello");
+    ckg_cstr_insert_char(str1, 50, 'Y', 5);
+    ckg_assert(ckg_str_equal(str1, "HelloY"), "Test: ckg_cstr_insert_char failed at end\n");
 
     char str2[50] = "";
-    ckg_str_insert_char(str2, 50, 'Z', 0);
-    ckg_assert(ckg_str_equal(str2, "Z"), "Test: ckg_str_insert_char failed in empty string\n");
+    ckg_cstr_insert_char(str2, 50, 'Z', 0);
+    ckg_assert(ckg_str_equal(str2, "Z"), "Test: ckg_cstr_insert_char failed in empty string\n");
 
-    CKG_LOG_SUCCESS("Test ckg_str_insert_char passed.\n");
+    CKG_LOG_SUCCESS("Test ckg_cstr_insert_char passed.\n");
 }
 
-void test_ckg_str_insert() {
+void test_ckg_cstr_insert() {
     char str1[50] = "Hello";
-    ckg_str_insert(str1, 50, "|TESTINGS|", 2);
-    ckg_assert(ckg_str_equal(str1, "He|TESTINGS|llo"), "Test: ckg_str_insert failed\n");
+    ckg_cstr_insert(str1, 50, "|TESTINGS|", 2);
+    ckg_assert(ckg_str_equal(str1, "He|TESTINGS|llo"), "Test: ckg_cstr_insert failed\n");
 
-    ckg_str_copy(str1, 50, "Hello");
-    ckg_str_insert(str1, 50, "Start-", 0);
-    ckg_assert(ckg_str_equal(str1, "Start-Hello"), "Test: ckg_str_insert failed at beginning\n");
+    ckg_cstr_copy(str1, 50, "Hello");
+    ckg_cstr_insert(str1, 50, "Start-", 0);
+    ckg_assert(ckg_str_equal(str1, "Start-Hello"), "Test: ckg_cstr_insert failed at beginning\n");
 
-    ckg_str_copy(str1, 50, "Hello");
-    ckg_str_insert(str1, 50, "-End", 5);
+    ckg_cstr_copy(str1, 50, "Hello");
+    ckg_cstr_insert(str1, 50, "-End", 5);
 
-    ckg_assert(ckg_str_equal(str1, "Hello-End"), "Test: ckg_str_insert failed at end s1: %s\n", str1);
+    ckg_assert(ckg_str_equal(str1, "Hello-End"), "Test: ckg_cstr_insert failed at end s1: %s\n", str1);
 
     char str2[50] = "";
-    ckg_str_insert(str2, 50, "Inserted", 0);
-    ckg_assert(ckg_str_equal(str2, "Inserted"), "Test: ckg_str_insert failed in empty string\n");
+    ckg_cstr_insert(str2, 50, "Inserted", 0);
+    ckg_assert(ckg_str_equal(str2, "Inserted"), "Test: ckg_cstr_insert failed in empty string\n");
 
-    CKG_LOG_SUCCESS("Test ckg_str_insert passed.\n");
+    CKG_LOG_SUCCESS("Test ckg_cstr_insert passed.\n");
 }
 
-void test_ckg_str_append() {
+void test_ckg_cstr_append() {
     char str1[50] = {0};
-    ckg_str_copy(str1, 50, "Hello");
-    ckg_str_append(str1, 50, " World!");
-    ckg_assert(ckg_str_equal(str1, "Hello World!"), "Test: ckg_str_append failed\n");
+    ckg_cstr_copy(str1, 50, "Hello");
+    ckg_cstr_append(str1, 50, " World!");
+    ckg_assert(ckg_str_equal(str1, "Hello World!"), "Test: ckg_cstr_append failed\n");
 
     char str2[50] = "";
-    ckg_str_append(str2, 50, "Appended");
-    ckg_assert(ckg_str_equal(str2, "Appended"), "Test: ckg_str_append failed on empty string\n");
+    ckg_cstr_append(str2, 50, "Appended");
+    ckg_assert(ckg_str_equal(str2, "Appended"), "Test: ckg_cstr_append failed on empty string\n");
 
-    ckg_str_copy(str1, 50, "Hello");
-    ckg_str_append(str1, 50, "");
-    ckg_assert(ckg_str_equal(str1, "Hello"), "Test: ckg_str_append failed with empty append\n");
+    ckg_cstr_copy(str1, 50, "Hello");
+    ckg_cstr_append(str1, 50, "");
+    ckg_assert(ckg_str_equal(str1, "Hello"), "Test: ckg_cstr_append failed with empty append\n");
 
-    CKG_LOG_SUCCESS("Test ckg_str_append passed.\n");
+    CKG_LOG_SUCCESS("Test ckg_cstr_append passed.\n");
 }
 
-void test_ckg_str_append_char() {
+void test_ckg_cstr_append_char() {
     char str1[50] = {0};
-    ckg_str_copy(str1, 50, "Hello");
-    ckg_str_append_char(str1, 50, '!');
-    ckg_assert(ckg_str_equal(str1, "Hello!"), "Test: ckg_str_append_char failed\n");
+    ckg_cstr_copy(str1, 50, "Hello");
+    ckg_cstr_append_char(str1, 50, '!');
+    ckg_assert(ckg_str_equal(str1, "Hello!"), "Test: ckg_cstr_append_char failed\n");
 
     char str2[50] = "";
-    ckg_str_append_char(str2, 50, 'A');
-    ckg_assert(ckg_str_equal(str2, "A"), "Test: ckg_str_append_char failed on empty string\n");
+    ckg_cstr_append_char(str2, 50, 'A');
+    ckg_assert(ckg_str_equal(str2, "A"), "Test: ckg_cstr_append_char failed on empty string\n");
 
-    ckg_str_copy(str1, 50, "Hi");
-    ckg_str_append_char(str1, 50, ' ');
-    ckg_str_append_char(str1, 50, 'A');
-    ckg_str_append_char(str1, 50, '!');
-    ckg_assert(ckg_str_equal(str1, "Hi A!"), "Test: ckg_str_append_char failed on multiple appends\n");
+    ckg_cstr_copy(str1, 50, "Hi");
+    ckg_cstr_append_char(str1, 50, ' ');
+    ckg_cstr_append_char(str1, 50, 'A');
+    ckg_cstr_append_char(str1, 50, '!');
+    ckg_assert(ckg_str_equal(str1, "Hi A!"), "Test: ckg_cstr_append_char failed on multiple appends\n");
 
-    CKG_LOG_SUCCESS("Test ckg_str_append_char passed.\n");
+    CKG_LOG_SUCCESS("Test ckg_cstr_append_char passed.\n");
 }
 
 void test_ckg_str_clear() {
@@ -124,12 +124,12 @@ void test_ckg_str_clear() {
     CKG_LOG_SUCCESS("Test ckg_str_clear passed.\n");
 }
 
-void test_ckg_str_copy() {
+void test_ckg_cstr_copy() {
     char str1[50] = {0};
-    ckg_str_copy(str1, 50, "Hello!");
-    ckg_assert(ckg_str_equal(str1, "Hello!"), "Test: ckg_str_copy failed\n");
+    ckg_cstr_copy(str1, 50, "Hello!");
+    ckg_assert(ckg_str_equal(str1, "Hello!"), "Test: ckg_cstr_copy failed\n");
 
-    CKG_LOG_SUCCESS("Test ckg_str_copy passed.\n");
+    CKG_LOG_SUCCESS("Test ckg_cstr_copy passed.\n");
 }
 
 void test_ckg_str_contains() {
@@ -257,12 +257,12 @@ void test_ckg_str_index_of() {
 
 void test_ckg_string_assertions() {
     char str1[10] = "Overflow";
-    ckg_str_append(str1, 10, "ingTest");
-    ckg_assert(!ckg_str_equal(str1, "OverflowingTest"), "Test: ckg_str_append failed on overflow\n");
+    ckg_cstr_append(str1, 10, "ingTest");
+    ckg_assert(!ckg_str_equal(str1, "OverflowingTest"), "Test: ckg_cstr_append failed on overflow\n");
 
     char str2[6] = "Short";
-    ckg_str_append_char(str2, 6, 'X');
-    ckg_assert(!ckg_str_equal(str2, "ShortX"), "Test: ckg_str_append_char failed on overflow\n");
+    ckg_cstr_append_char(str2, 6, 'X');
+    ckg_assert(!ckg_str_equal(str2, "ShortX"), "Test: ckg_cstr_append_char failed on overflow\n");
 }
 
 void test_ckg_string_edgecases() {
@@ -274,23 +274,23 @@ void test_ckg_string_edgecases() {
     ckg_assert(!ckg_str_equal("Hello", NULL), "Test ckg_str_equal failed on comparing with null string\n");
     ckg_assert(!ckg_str_equal(NULL, "Hello"), "Test ckg_str_equal failed on comparing with null string\n");
 
-    // Test edge cases for ckg_str_insert_char
+    // Test edge cases for ckg_cstr_insert_char
     char str1[50] = "Hello";
-    ckg_str_insert_char(str1, 50, 'V', 10); // Insert at a position beyond the string length
-    ckg_assert(ckg_str_equal(str1, "HelloV"), "Test ckg_str_insert_char failed on inserting beyond length\n");
+    ckg_cstr_insert_char(str1, 50, 'V', 10); // Insert at a position beyond the string length
+    ckg_assert(ckg_str_equal(str1, "HelloV"), "Test ckg_cstr_insert_char failed on inserting beyond length\n");
 
     char str2[50] = "";
-    ckg_str_insert_char(str2, 50, 'Z', 0); // Insert into an empty string
-    ckg_assert(ckg_str_equal(str2, "Z"), "Test ckg_str_insert_char failed on inserting into empty string\n");
+    ckg_cstr_insert_char(str2, 50, 'Z', 0); // Insert into an empty string
+    ckg_assert(ckg_str_equal(str2, "Z"), "Test ckg_cstr_insert_char failed on inserting into empty string\n");
 
-    // Test edge cases for ckg_str_append
+    // Test edge cases for ckg_cstr_append
     char str3[50] = "Hello";
-    ckg_str_append(str3, 50, NULL); // Append a null string
-    ckg_assert(ckg_str_equal(str3, "Hello"), "Test ckg_str_append failed on appending null string\n");
+    ckg_cstr_append(str3, 50, NULL); // Append a null string
+    ckg_assert(ckg_str_equal(str3, "Hello"), "Test ckg_cstr_append failed on appending null string\n");
 
     char str4[50] = "";
-    ckg_str_append(str4, 50, "Appended"); // Append to an empty string
-    ckg_assert(ckg_str_equal(str4, "Appended"), "Test ckg_str_append failed on appending to empty string\n");
+    ckg_cstr_append(str4, 50, "Appended"); // Append to an empty string
+    ckg_assert(ckg_str_equal(str4, "Appended"), "Test ckg_cstr_append failed on appending to empty string\n");
 
     CKG_LOG_SUCCESS("Test ckg_string_edgecases passed.\n");
 
@@ -301,12 +301,12 @@ void test_ckg_str_operations() {
     CKG_LOG_DEBUG("======================= Testing String Functions =======================\n");
     test_ckg_cstr_length();
     test_ckg_string_equal();
-    test_ckg_str_insert_char();
-    test_ckg_str_insert();
-    test_ckg_str_append();
-    test_ckg_str_append_char();
+    test_ckg_cstr_insert_char();
+    test_ckg_cstr_insert();
+    test_ckg_cstr_append();
+    test_ckg_cstr_append_char();
     test_ckg_str_clear();
-    test_ckg_str_copy();
+    test_ckg_cstr_copy();
     test_ckg_str_contains();
     test_ckg_str_starts_with();
     test_ckg_str_ends_with();

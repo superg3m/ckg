@@ -14,7 +14,7 @@ u32 ckg_cstr_length(const char* cstring) {
 	return length;
 }
 
-char* ckg_str_allocate(const char* s1) {
+char* ckg_cstr_alloc(const char* s1) {
 	char* ret = NULLPTR;
 	ckg_assert(s1, "ckg_str_equal: first argument is not valid | null\n");
 
@@ -37,7 +37,7 @@ Boolean ckg_str_equal(const char* s1, const char* s2) {
 	return ckg_memory_compare(s1, s2, s1_length, s2_length);
 }
 
-void ckg_str_insert(char* string_buffer, size_t string_buffer_capacity, const char* to_insert, const u32 index) {
+void ckg_cstr_insert(char* string_buffer, size_t string_buffer_capacity, const char* to_insert, const u32 index) {
 	ckg_assert(string_buffer, "string_insert: string_buffer is not valid | null\n");
 	ckg_assert(to_insert, "string_insert: source is not valid | null\n");
 
@@ -57,7 +57,7 @@ void ckg_str_insert(char* string_buffer, size_t string_buffer_capacity, const ch
 	ckg_memory_copy(to_insert, copy_dest_ptr, to_insert_length, string_buffer_capacity);
 }
 
-void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, const char to_insert, const u32 index) {
+void ckg_cstr_insert_char(char* string_buffer, size_t string_buffer_capacity, const char to_insert, const u32 index) {
 	ckg_assert(string_buffer, "string_insert_char string_buffer is not valid | null\n");
 	ckg_assert(to_insert, "string_insert_char source is not valid | null\n");
 
@@ -66,7 +66,7 @@ void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, con
 
 	ckg_assert(index >= 0 && index <= string_buffer_length, "Index out of bounds\n");
 	Boolean expression = string_buffer_length + source_length < string_buffer_capacity;
-	ckg_assert(expression, "ckg_str_insert_char: string_buffer overflow new_capacity_required: %d >= current_capacity: %lld\n",  string_buffer_length + source_length, string_buffer_capacity);
+	ckg_assert(expression, "ckg_cstr_insert_char: string_buffer overflow new_capacity_required: %d >= current_capacity: %lld\n",  string_buffer_length + source_length, string_buffer_capacity);
 
 	char* source_ptr = string_buffer + index;
 	size_t data_payload_size = ckg_cstr_length(source_ptr);
@@ -75,14 +75,14 @@ void ckg_str_insert_char(char* string_buffer, size_t string_buffer_capacity, con
 	string_buffer[index] = to_insert;
 }
 
-void ckg_str_append(char* string_buffer, size_t string_buffer_capacity, const char* to_append) {
+void ckg_cstr_append(char* string_buffer, size_t string_buffer_capacity, const char* to_append) {
 	u32 string_buffer_length = ckg_cstr_length(string_buffer);
-	ckg_str_insert(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
+	ckg_cstr_insert(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
 }
 
-void ckg_str_append_char(char* string_buffer, size_t string_buffer_capacity, const char to_append) {
+void ckg_cstr_append_char(char* string_buffer, size_t string_buffer_capacity, const char to_append) {
 	u32 string_buffer_length = ckg_cstr_length(string_buffer);
-	ckg_str_insert_char(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
+	ckg_cstr_insert_char(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
 }
 
 void ckg_str_clear(char* string_buffer) {
@@ -92,7 +92,7 @@ void ckg_str_clear(char* string_buffer) {
 	ckg_memory_zero(string_buffer, string_buffer_length);
 }
 
-void ckg_str_copy(char* string_buffer, size_t string_buffer_capacity, const char* to_copy) {
+void ckg_cstr_copy(char* string_buffer, size_t string_buffer_capacity, const char* to_copy) {
 	ckg_assert(to_copy, "source is not valid | null\n");
 	ckg_assert(string_buffer, "dest is not valid | null\n");
 
@@ -102,7 +102,7 @@ void ckg_str_copy(char* string_buffer, size_t string_buffer_capacity, const char
 	ckg_memory_copy(to_copy, string_buffer, source_length + 1, string_buffer_capacity);
 }
 
-void string_random(char *dest, size_t length) {
+void ckg_cstr_random(char *dest, size_t length) {
     char charset[] = "0123456789"
                      "abcdefghijklmnopqrstuvwxyz"
                      "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -295,14 +295,14 @@ char** ckg_str_split(const char* string_buffer, const char* delimitor) {
 
 	u32 sub_string_counter = 0;
 	for (int i = 0; i < string_buffer_length; i++) {
-		ckg_str_append_char(temp_buffer, string_buffer_length + 1, string_buffer[i]);
+		ckg_cstr_append_char(temp_buffer, string_buffer_length + 1, string_buffer[i]);
 		char* temp_substring = ckg_substring(string_buffer, i, delmitor_length - 1);
 		if (temp_substring[i] != delimitor[0]) {
 			continue;
 		}
 
 		if (ckg_str_equal(temp_substring, delimitor)) {
-			ckg_str_copy(ret[sub_string_counter++], ckg_cstr_length(temp_buffer) + 1, temp_buffer);
+			ckg_cstr_copy(ret[sub_string_counter++], ckg_cstr_length(temp_buffer) + 1, temp_buffer);
 			ckg_str_clear(temp_buffer);
 		}
 		ckg_free(temp_substring);
@@ -312,7 +312,7 @@ char** ckg_str_split(const char* string_buffer, const char* delimitor) {
 
 	
 	char* temp_string = ckg_alloc(string_buffer_length);
-	char* current_string = ckg_str_allocate(temp_string);
+	char* current_string = ckg_cstr_alloc(temp_string);
 
 	return ret;
 }
@@ -377,7 +377,7 @@ char* ckg_str_reverse(const char* string_buffer) {
 	
 	char* ret_reversed_string = ckg_alloc(string_buffer_guarenteed_capacity);
 	for (int i = string_buffer_length - 1; i >= 0; i--) {
-		ckg_str_append_char(ret_reversed_string, string_buffer_guarenteed_capacity, string_buffer[i]);
+		ckg_cstr_append_char(ret_reversed_string, string_buffer_guarenteed_capacity, string_buffer[i]);
 	}
 
 	return ret_reversed_string;

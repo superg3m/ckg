@@ -34,7 +34,7 @@ void ckg_test_collisions() {
     s32 collisions = 0;
 
     for (s32 i = 0; i < NUM_TESTS; i++) {
-        string_random(test_string, STRING_LENGTH);
+        ckg_cstr_random(test_string, STRING_LENGTH);
         u64 h = ckg_hash(test_string);
 
         u32 hash_index = h % NUM_TESTS;

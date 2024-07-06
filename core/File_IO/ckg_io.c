@@ -37,7 +37,7 @@ char* ckg_file_get_next_line(CKG_FileSystem* file_system) {
 	do {
 		c = fgetc(file_system->handle);
 		if (c != '\n' && c != EOF) {
-		ckg_str_append_char(line, 2500, c);
+		ckg_cstr_append_char(line, 2500, c);
 		}
 		if (c == EOF) {
 		file_system->reachedEOF = TRUE;
