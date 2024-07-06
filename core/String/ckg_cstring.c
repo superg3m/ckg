@@ -3,7 +3,7 @@
 #include "../ckg_assert.h"
 
 //************************* Begin Functions *************************
-u32 ckg_cstr_length(const char* cstring) {
+u32 ckg_str_length(const char* cstring) {
 	ckg_assert(cstring, "cstring is null");
 
 	u32 length = 0;
@@ -18,7 +18,7 @@ char* ckg_cstr_alloc(const char* s1) {
 	char* ret = NULLPTR;
 	ckg_assert(s1, "ckg_str_equal: first argument is not valid | null\n");
 
-	u32 s1_length = ckg_cstr_length(s1);
+	u32 s1_length = ckg_str_length(s1);
 	u32 s1_capacity = s1_length + 1;
 
 	ret = ckg_alloc(s1_capacity);
@@ -31,8 +31,8 @@ Boolean ckg_str_equal(const char* s1, const char* s2) {
 	ckg_assert(s1, "ckg_str_equal: first argument is not valid | null\n");
 	ckg_assert(s2, "ckg_str_equal: second argument is not valid | null\n");
 
-	u32 s1_length = ckg_cstr_length(s1);
-	u32 s2_length = ckg_cstr_length(s2);
+	u32 s1_length = ckg_str_length(s1);
+	u32 s2_length = ckg_str_length(s2);
 
 	return ckg_memory_compare(s1, s2, s1_length, s2_length);
 }
@@ -41,8 +41,8 @@ void ckg_cstr_insert(char* string_buffer, size_t string_buffer_capacity, const c
 	ckg_assert(string_buffer, "string_insert: string_buffer is not valid | null\n");
 	ckg_assert(to_insert, "string_insert: source is not valid | null\n");
 
-	const u32 string_buffer_length = ckg_cstr_length(string_buffer);
-	const u32 to_insert_length = ckg_cstr_length(to_insert);
+	const u32 string_buffer_length = ckg_str_length(string_buffer);
+	const u32 to_insert_length = ckg_str_length(to_insert);
 
 	const u32 new_length = string_buffer_length + to_insert_length;
 
@@ -61,7 +61,7 @@ void ckg_cstr_insert_char(char* string_buffer, size_t string_buffer_capacity, co
 	ckg_assert(string_buffer, "string_insert_char string_buffer is not valid | null\n");
 	ckg_assert(to_insert, "string_insert_char source is not valid | null\n");
 
-	u32 string_buffer_length = ckg_cstr_length(string_buffer);
+	u32 string_buffer_length = ckg_str_length(string_buffer);
 	u32 source_length = 1;
 
 	ckg_assert(index >= 0 && index <= string_buffer_length, "Index out of bounds\n");
@@ -69,26 +69,26 @@ void ckg_cstr_insert_char(char* string_buffer, size_t string_buffer_capacity, co
 	ckg_assert(expression, "ckg_cstr_insert_char: string_buffer overflow new_capacity_required: %d >= current_capacity: %lld\n",  string_buffer_length + source_length, string_buffer_capacity);
 
 	char* source_ptr = string_buffer + index;
-	size_t data_payload_size = ckg_cstr_length(source_ptr);
+	size_t data_payload_size = ckg_str_length(source_ptr);
 
 	ckg_memory_move(source_ptr, source_ptr + 1, string_buffer_length - index);
 	string_buffer[index] = to_insert;
 }
 
 void ckg_cstr_append(char* string_buffer, size_t string_buffer_capacity, const char* to_append) {
-	u32 string_buffer_length = ckg_cstr_length(string_buffer);
+	u32 string_buffer_length = ckg_str_length(string_buffer);
 	ckg_cstr_insert(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
 }
 
 void ckg_cstr_append_char(char* string_buffer, size_t string_buffer_capacity, const char to_append) {
-	u32 string_buffer_length = ckg_cstr_length(string_buffer);
+	u32 string_buffer_length = ckg_str_length(string_buffer);
 	ckg_cstr_insert_char(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
 }
 
 void ckg_str_clear(char* string_buffer) {
 	ckg_assert(string_buffer, "ckg_str_clear: string_buffer is not valid | null\n");
 
-	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
+	size_t string_buffer_length = ckg_str_length(string_buffer); 
 	ckg_memory_zero(string_buffer, string_buffer_length);
 }
 
@@ -96,7 +96,7 @@ void ckg_cstr_copy(char* string_buffer, size_t string_buffer_capacity, const cha
 	ckg_assert(to_copy, "source is not valid | null\n");
 	ckg_assert(string_buffer, "dest is not valid | null\n");
 
-	u32 source_length = ckg_cstr_length(to_copy);
+	u32 source_length = ckg_str_length(to_copy);
 	ckg_str_clear(string_buffer);
 
 	ckg_memory_copy(to_copy, string_buffer, source_length + 1, string_buffer_capacity);
@@ -114,18 +114,9 @@ void ckg_cstr_random(char *dest, size_t length) {
     *dest = '\0';
 }
 
-/**
- * @brief Allocates memory that caller must free! Start and end is inclusive
- * 
- * @param string_buffer 
- * @param string_buffer_capacity 
- * @param start_range 
- * @param end_range 
- * @return char* 
- */
 char* ckg_substring(const char* string_buffer, u32 start, u32 end) {
 	ckg_assert(string_buffer, "ckg_substring: string_buffer is null!");
-	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
+	size_t string_buffer_length = ckg_str_length(string_buffer); 
 
 
 	Boolean start_check = start >= 0 && start <= string_buffer_length - 1;
@@ -156,8 +147,8 @@ Boolean ckg_str_contains(const char* string_buffer, const char* contains) {
 	ckg_assert(string_buffer, "ckg_str_contains: string_buffer is null!");
 	ckg_assert(contains, "ckg_str_contains: contains is null!");
 
-	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
-	size_t contains_length = ckg_cstr_length(contains);
+	size_t string_buffer_length = ckg_str_length(string_buffer); 
+	size_t contains_length = ckg_str_length(contains);
 
 	if (string_buffer_length == 0 && contains_length == 0) {
 		return TRUE;
@@ -200,8 +191,8 @@ u32 ckg_str_index_of(const char* string_buffer, const char* sub_string) {
 	ckg_assert(string_buffer, "string_buffer is null!");
 	ckg_assert(sub_string, "sub_string is null!");
 	
-	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
-	size_t contains_length = ckg_cstr_length(sub_string);
+	size_t string_buffer_length = ckg_str_length(string_buffer); 
+	size_t contains_length = ckg_str_length(sub_string);
 
 	if (string_buffer_length == 0 && contains_length == 0) {
 		return 0;
@@ -240,8 +231,8 @@ u32 ckg_str_last_index_of(const char* string_buffer, const char* sub_string) {
 	ckg_assert(string_buffer, "string_buffer is null!");
 	ckg_assert(sub_string, "sub_string is null!");
 	
-	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
-	size_t contains_length = ckg_cstr_length(sub_string);
+	size_t string_buffer_length = ckg_str_length(string_buffer); 
+	size_t contains_length = ckg_str_length(sub_string);
 
 	if (string_buffer_length == 0 && contains_length == 0) {
 		return 0;
@@ -282,8 +273,8 @@ char** ckg_str_split(const char* string_buffer, const char* delimitor) {
 	ckg_assert(string_buffer, "string_buffer is null!");
 	ckg_assert(delimitor, "delimitor is null!");
 
-	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
-	size_t delmitor_length = ckg_cstr_length(delimitor); 
+	size_t string_buffer_length = ckg_str_length(string_buffer); 
+	size_t delmitor_length = ckg_str_length(delimitor); 
 
 	if (delmitor_length <= 0) {
 		return NULLPTR;
@@ -302,7 +293,7 @@ char** ckg_str_split(const char* string_buffer, const char* delimitor) {
 		}
 
 		if (ckg_str_equal(temp_substring, delimitor)) {
-			ckg_cstr_copy(ret[sub_string_counter++], ckg_cstr_length(temp_buffer) + 1, temp_buffer);
+			ckg_cstr_copy(ret[sub_string_counter++], ckg_str_length(temp_buffer) + 1, temp_buffer);
 			ckg_str_clear(temp_buffer);
 		}
 		ckg_free(temp_substring);
@@ -322,8 +313,8 @@ Boolean ckg_str_starts_with(const char* string_buffer, const char* starts_with) 
 	ckg_assert(starts_with, "ckg_str_starts_with: starts_with is null!");
 
 	
-	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
-	size_t starts_with_length = ckg_cstr_length(starts_with);
+	size_t string_buffer_length = ckg_str_length(string_buffer); 
+	size_t starts_with_length = ckg_str_length(starts_with);
 
 	if (string_buffer_length == 0 && starts_with_length == 0) {
 		return TRUE;
@@ -345,8 +336,8 @@ Boolean ckg_str_ends_with(const char* string_buffer, const char* ends_with) {
 	ckg_assert(string_buffer, "ckg_str_ends_with: string_buffer is null!");
 	ckg_assert(ends_with, "ckg_str_ends_with: ends_with is null!");
 
-	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
-	size_t ends_with_length = ckg_cstr_length(ends_with);
+	size_t string_buffer_length = ckg_str_length(string_buffer); 
+	size_t ends_with_length = ckg_str_length(ends_with);
 
 	if (string_buffer_length == 0 && ends_with_length == 0 || ends_with_length == 0) {
 		return TRUE;
@@ -372,7 +363,7 @@ Boolean ckg_str_ends_with(const char* string_buffer, const char* ends_with) {
 char* ckg_str_reverse(const char* string_buffer) {
 	ckg_assert(string_buffer, "ckg_str_ends_with: string_buffer is null!");
 
-	u32 string_buffer_length = ckg_cstr_length(string_buffer);
+	u32 string_buffer_length = ckg_str_length(string_buffer);
 	u32 string_buffer_guarenteed_capacity = string_buffer_length + 1;
 	
 	char* ret_reversed_string = ckg_alloc(string_buffer_guarenteed_capacity);

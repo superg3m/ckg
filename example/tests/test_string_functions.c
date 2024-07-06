@@ -1,21 +1,21 @@
 #include "../../ckg.h"
 
-void test_ckg_cstr_length() {
+void test_ckg_str_length() {
     const int expected_size = 5;
     char str1[] = "Hello";
-    int actual_size = ckg_cstr_length(str1);
-    ckg_assert(actual_size == expected_size, "Test ckg_cstr_length failed: expected %d, got %d\n", expected_size, actual_size);
+    int actual_size = ckg_str_length(str1);
+    ckg_assert(actual_size == expected_size, "Test ckg_str_length failed: expected %d, got %d\n", expected_size, actual_size);
 
     char str2[] = "";
-    ckg_assert(ckg_cstr_length(str2) == 0, "Test ckg_cstr_length failed on empty string\n");
+    ckg_assert(ckg_str_length(str2) == 0, "Test ckg_str_length failed on empty string\n");
 
     char str3[] = "Hello World";
-    ckg_assert(ckg_cstr_length(str3) == 11, "Test ckg_cstr_length failed on string with spaces\n");
+    ckg_assert(ckg_str_length(str3) == 11, "Test ckg_str_length failed on string with spaces\n");
 
     char str4[] = "Hi!\n";
-    ckg_assert(ckg_cstr_length(str4) == 4, "Test ckg_cstr_length failed on string with special characters\n");
+    ckg_assert(ckg_str_length(str4) == 4, "Test ckg_str_length failed on string with special characters\n");
 
-    CKG_LOG_SUCCESS("Test ckg_cstr_length passed.\n");
+    CKG_LOG_SUCCESS("Test ckg_str_length passed.\n");
 }
 
 void test_ckg_string_equal() {
@@ -266,8 +266,8 @@ void test_ckg_string_assertions() {
 }
 
 void test_ckg_string_edgecases() {
-    ckg_assert(ckg_cstr_length("") == 0, "Test ckg_cstr_length failed on empty string\n");
-    ckg_assert(ckg_cstr_length(NULL), "Test ckg_cstr_length failed on null string\n");
+    ckg_assert(ckg_str_length("") == 0, "Test ckg_str_length failed on empty string\n");
+    ckg_assert(ckg_str_length(NULL), "Test ckg_str_length failed on null string\n");
 
     // Test edge cases for ckg_str_equal
     ckg_assert(ckg_str_equal(NULL, NULL), "Test ckg_str_equal failed on two null strings\n");
@@ -299,7 +299,7 @@ void test_ckg_string_edgecases() {
 void test_ckg_str_operations() { 
     CKG_LOG_PRINT("\n");
     CKG_LOG_DEBUG("======================= Testing String Functions =======================\n");
-    test_ckg_cstr_length();
+    test_ckg_str_length();
     test_ckg_string_equal();
     test_ckg_cstr_insert_char();
     test_ckg_cstr_insert();
