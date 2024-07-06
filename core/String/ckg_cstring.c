@@ -1,4 +1,4 @@
-#include "../ckg_string.h"
+#include "../ckg_cstring.h"
 #include "../ckg_memory.h"
 #include "../ckg_assert.h"
 

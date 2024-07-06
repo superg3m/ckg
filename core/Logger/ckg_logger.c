@@ -1,6 +1,6 @@
 #include "../ckg_logger.h"
 #include "../ckg_memory.h"
-#include "../ckg_string.h"
+#include "../ckg_cstring.h"
 #if (_WIN32)
     #include <windows.h>
 #endif
