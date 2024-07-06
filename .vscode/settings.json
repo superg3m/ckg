@@ -31,6 +31,7 @@
         "xtr1common": "c",
         "main.h": "c",
         "ckg_linked_list.h": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "ckg_cstring.h": "c"
     }
 }

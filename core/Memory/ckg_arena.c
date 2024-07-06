@@ -43,7 +43,7 @@ void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
         if ((arena->used + element_size > arena->capacity)) {
             arena->capacity += element_size;
             arena->capacity *= 2;
-            arena->base_address = ckg_reallocate(arena->base_address, arena->capacity, arena->capacity * 2);
+            arena->base_address = ckg_realloc(arena->base_address, arena->capacity, arena->capacity * 2);
         	ckg_assert(arena->base_address, "arean_push: invalid reallocation address given");
         }
     } else {

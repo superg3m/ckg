@@ -24,7 +24,7 @@ extern "C" {
     void ckg_bind_free_callback(CKG_MemoryFree* func_allocator);
 
     void* MACRO_ckg_alloc(size_t allocation_size);
-    void* ckg_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size);
+    void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);
     void* MACRO_ckg_free(void* data);
 
     /**

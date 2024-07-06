@@ -16,7 +16,7 @@ void* ckg_vector_grow(void* vector, size_t element_size) {
         u32 new_capactiy = capactiy * 2;
         size_t new_allocation_size = sizeof(CKG_VectorHeader) + (new_capactiy * element_size);
 
-        vector = ckg_reallocate(ckg_vector_header_base(vector), old_allocation_size, new_allocation_size);
+        vector = ckg_realloc(ckg_vector_header_base(vector), old_allocation_size, new_allocation_size);
         vector = (u8*)vector + sizeof(CKG_VectorHeader);
 
         ckg_vector_length(vector) = length;

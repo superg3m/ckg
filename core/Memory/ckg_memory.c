@@ -29,7 +29,7 @@ void* MACRO_ckg_alloc(size_t allocation_size) {
     return memory_allocate_callback(allocation_size);
 }
 
-void* ckg_reallocate(void* data, size_t old_allocation_size, size_t new_allocation_size) {
+void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size) {
     void* ret = MACRO_ckg_alloc(new_allocation_size);
     ckg_memory_copy(data, ret, old_allocation_size, new_allocation_size);
     ckg_free(data);
