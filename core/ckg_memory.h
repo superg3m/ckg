@@ -13,14 +13,13 @@ extern "C" {
 #endif
 
     /**
-     * @brief Note that these callbacks should zero out the memory allocation.
-     * Failing to bind the allocation callback will result in a default allocation callback
+     * @brief Note that the callback provided should zero out the memory allocation.
+     * Failing to bind the allocation callback will result in a default allocation callback.
      */
     void ckg_bind_alloc_callback(CKG_MemoryAllocator* func_allocator);
 
     /**
-     * @brief Note that these callbacks should zero out the memory allocation.
-     * Failing to bind the callback will result in a default free callback
+     * @brief Failing to bind the callback will result in a default free callback.
      */
     void ckg_bind_free_callback(CKG_MemoryFree* func_allocator);
 
