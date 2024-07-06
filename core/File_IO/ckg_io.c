@@ -20,7 +20,7 @@ internal u8* read_file_data(FILE* handle, size_t file_size) {
 
 void ckg_file_open(CKG_FileSystem* file_system) {
 	file_system->handle = fopen(file_system->file_name, "r");
-	assert_in_function(file_system->handle != NULLPTR, "FILE IS NULL, CHECK INITIAL FILE NAME\n");
+	ckg_assert(file_system->handle != NULLPTR, "FILE IS NULL, CHECK INITIAL FILE NAME\n");
 	fseek(file_system->handle, 0L, SEEK_END);
 	file_system->file_size = ftell(file_system->handle);
 	rewind(file_system->handle);
