@@ -40,4 +40,5 @@ extern "C" {
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
 #define ckg_linked_list_create(type) MACRO_ckg_linked_list_create(sizeof(type))
 #define ckg_node_create(data_t) MACRO_ckg_node_create(data_t, sizeof(data_t))
+#define ckg_node_free(node) node = MACRO_ckg_node_free(node)
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++

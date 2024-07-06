@@ -1,9 +1,12 @@
 #include "../ckg_linked_list.h"
 #include "../../core/ckg_memory.h" 
 
-CKG_LinkedList MACRO_ckg_linked_list_create(size_t element_size_in_bytes) {
-    CKG_LinkedList ret;
-    ckg_memory_zero(&ret, sizeof(CKG_LinkedList));
+CKG_LinkedList* MACRO_ckg_linked_list_create(size_t element_size_in_bytes) {
+    CKG_LinkedList* ret = ckg_alloc(sizeof(CKG_LinkedList));
+    ret->count = 0;
+    ret->element_size_in_bytes = element_size_in_bytes;
+    ret->head = NULLPTR;
+    ret->tail = NULLPTR;
     return ret;
 }
 
@@ -11,11 +14,27 @@ CKG_LinkedList MACRO_ckg_linked_list_create(size_t element_size_in_bytes) {
 // TODO(Jovanni): BADD THIS DOESN"T WORK
 CKG_Node* MACRO_ckg_node_create(void* data, size_t element_size_in_bytes) {
     CKG_Node* ret = ckg_alloc(sizeof(CKG_Node)); 
-    ret->data = data;
+    ret->data = ckg_alloc(element_size_in_bytes);
+    ckg_memory_copy(data, ret->data, element_size_in_bytes, element_size_in_bytes); 
     ret->element_size_in_bytes = element_size_in_bytes;
     ret->next = NULLPTR;
     ret->prev = NULLPTR;
     return ret;
+}
+
+/**
+ * @brief returns a null ptr
+ * 
+ * @param node 
+ * @return CKG_Node* 
+ */
+CKG_Node* MACRO_ckg_node_free(CKG_Node* node) {
+    ckg_free(node->data);
+    node->element_size_in_bytes = 0;
+    node->next = NULLPTR;
+    node->prev = NULLPTR;
+    ckg_free(node);
+    return node;
 }
 
 void ckg_node_get(CKG_Node* node, void* returned_value) {
