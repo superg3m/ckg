@@ -6,7 +6,7 @@ void test_ckg_arena_operations() {
   // Test arena_push
   int* int_ptr = ckg_arena_push(&arena, int);
   *int_ptr = 5;
-  ckg_assert(*int_ptr == 5, "Error: Arena push failed\n");
+  ckg_assert(*int_ptr == 5);
 
   // Test arena_push_array
   int* int_array = ckg_arena_push_array(&arena, int, 5);
@@ -14,12 +14,12 @@ void test_ckg_arena_operations() {
     int_array[i] = i;
   }
   for (int i = 0; i < 5; i++) {
-    ckg_assert(int_array[i] == i, "Error: Arena push array failed\n");
+    ckg_assert(int_array[i] == i);
   }
 
   // Test arena_clear
   ckg_arena_clear(&arena);
-  ckg_assert(arena.used == 0, "Error: Arena clear failed\n");
+  ckg_assert(arena.used == 0);
 
   // Test arena_free
   ckg_arena_free(&arena);
@@ -40,11 +40,11 @@ void test_ckg_arena_operations() {
     int* ptr = ckg_arena_push(&circular_arena, int);
     *ptr = i;
   }
-  ckg_assert(circular_arena.used == arena_size_common, "Error: Circular arena grew unexpectedly\n");
+  ckg_assert(circular_arena.used == arena_size_common);
   int* first_ptr = circular_arena.base_address;
   int* last_ptr = ckg_arena_push(&circular_arena, int);
   *last_ptr = 42;
-  ckg_assert(*first_ptr == 42, "Error: Circular arena did not overwrite correctly\n");
+  ckg_assert(*first_ptr == 42);
   ckg_arena_free(&circular_arena);
 
   // Test vector arena
@@ -53,7 +53,7 @@ void test_ckg_arena_operations() {
     int* ptr = ckg_arena_push(&vector_arena, int);
     *ptr = i;
   }
-  ckg_assert(vector_arena.used > arena_size_common, "Error: Vector arena did not grow\n");
+  ckg_assert(vector_arena.used > arena_size_common);
   ckg_arena_free(&vector_arena);
 
   CKG_LOG_SUCCESS("All arena tests passed!\n");

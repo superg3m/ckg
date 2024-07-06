@@ -19,7 +19,7 @@ typedef struct CKG_StringHeader {
 #define STR_MAGIC "MAGIC_APPLE"
 
 void ckg_str_check_magic(CKG_String str) {
-    ckg_assert(str && ckg_str_equal(ckg_str_header(str)->magic, STR_MAGIC), "String: %s contains the wrong magic: (%s) Likely not a CKG_String\n", str, ckg_str_header(str)->magic);
+    ckg_assert_msg(str && ckg_str_equal(ckg_str_header(str)->magic, STR_MAGIC), "String: %s contains the wrong magic: (%s) Likely not a CKG_String\n", str, ckg_str_header(str)->magic);
 }
 
 internal void ckg_string_insert_header(char** string, CKG_StringHeader header) {
@@ -39,6 +39,7 @@ CKG_String ckg_str_create_custom(const char* c_string, size_t capacity) {
   	CKG_StringHeader header;
   	header.length = c_str_length;
   	header.capacity = capacity != 0 ? capacity : sizeof(char) * (c_str_length + 1);
+    header.magic = STR_MAGIC;
 	
   	CKG_String ret = ckg_alloc(sizeof(header) + header.capacity);
     ckg_string_insert_header(&ret, header);

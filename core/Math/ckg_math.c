@@ -19,7 +19,7 @@ typedef union {
 #define F64_SIGN_BIT (double)(1LL << 61)
     
 float ckg_f32_abs(float val) {
-    ckg_assert(FALSE, "NOT IMPLEMENTED YET!\n");
+    ckg_assert_msg(FALSE, "NOT IMPLEMENTED YET!\n");
     FloatIntUnion ret;
     ret.f = val;
     ret.i = ckg_s32_abs(ret.i);
@@ -27,7 +27,7 @@ float ckg_f32_abs(float val) {
 }
 
 double ckg_f64_abs(double val) {
-    ckg_assert(FALSE, "NOT IMPLEMENTED YET!\n");
+    ckg_assert_msg(FALSE, "NOT IMPLEMENTED YET!\n");
     DoubleLongUnion ret;
     ret.d = val;
     ret.i = ckg_s32_abs(ret.i);

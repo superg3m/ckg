@@ -19,35 +19,35 @@ CKG_Arena MACRO_ckg_arena_create(u32 allocation_size, const char* name, CKG_Aren
 }
 
 void ckg_arena_free(CKG_Arena* arena) {
-    ckg_assert(arena && arena->base_address, "arena_free: arena is null\n");
+    ckg_assert(arena && arena->base_address);
     ckg_free(arena->base_address);
 }
 
 void ckg_arena_clear(CKG_Arena* arena) {
-    ckg_assert(arena && arena->base_address, "arena_free: arena is null\n");
+    ckg_assert(arena && arena->base_address);
     ckg_memory_zero(arena->base_address, arena->used);
     arena->used = 0;
 }
 
 void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
-    ckg_assert(arena && arena->base_address, "arena_push: arena is null\n");
+    ckg_assert(arena && arena->base_address);
 
     if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_DEFAULT)) {
-        ckg_assert((arena->used + element_size <= arena->capacity), "arena_push: (default arena) can't push element ran out of memory\n");
+        ckg_assert((arena->used + element_size <= arena->capacity));
     } else if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_CIRCULAR)) {
 		if ((arena->used + element_size > arena->capacity)) {
 			arena->used = 0;
-			ckg_assert((arena->used + element_size <= arena->capacity), "arena_push: can't push element ran out of memory, circular buffer\n");
+			ckg_assert((arena->used + element_size <= arena->capacity));
         }
     } else if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_VECTOR)) {
         if ((arena->used + element_size > arena->capacity)) {
             arena->capacity += element_size;
             arena->capacity *= 2;
             arena->base_address = ckg_realloc(arena->base_address, arena->capacity, arena->capacity * 2);
-        	ckg_assert(arena->base_address, "arean_push: invalid reallocation address given");
+        	ckg_assert(arena->base_address);
         }
     } else {
-        ckg_assert(FALSE, "arean_push: invalid arena flag set");
+        ckg_assert(FALSE);
     }
 
     u8* ret = ((u8*)arena->base_address) + arena->used;

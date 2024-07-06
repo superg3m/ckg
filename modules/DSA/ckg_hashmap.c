@@ -30,7 +30,7 @@ internal CKG_HashMapEntry hashmap_entry_create() {
 }
 
 internal void hashmap_assert_if_not_valid(CKG_HashMap hashmap) {
-    ckg_assert(hashmap.isValid, "hashmap is not valid");
+    ckg_assert(hashmap.isValid);
 }
 
 internal float hashmap_load_factor(CKG_HashMap hashmap) {

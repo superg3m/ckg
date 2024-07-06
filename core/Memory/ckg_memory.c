@@ -43,8 +43,8 @@ void* MACRO_ckg_free(void* data) {
 }
 
 Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 buffer_one_size, u32 buffer_two_size) {
-    ckg_assert(buffer_one, "ckg_memory_compare buffer_one IS NULL\n");
-    ckg_assert(buffer_two, "ckg_memory_compare buffer_two IS NULL\n");
+    ckg_assert(buffer_one);
+    ckg_assert(buffer_two);
 
     if (buffer_one_size != buffer_two_size) {
         return FALSE;
@@ -62,9 +62,9 @@ Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 b
 }
 
 void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_capacity) {
-    ckg_assert(source, "MEMORY COPY SOURCE IS NULL\n");
-    ckg_assert(destination, "MEMORY COPY SOURCE IS NULL\n");
-    ckg_assert((source_size <= destination_capacity), "MEMORY COPY SOURCE IS TOO BIG FOR DESTINATION\n");
+    ckg_assert(source);
+    ckg_assert(destination);
+    ckg_assert((source_size <= destination_capacity));
 
     for (int i = 0; i < source_size; i++) {
         u8 temp = ((u8*)source)[i];
@@ -73,8 +73,8 @@ void ckg_memory_copy(const void* source, void* destination, size_t source_size, 
 }
 
 void ckg_memory_move(const void* source, void* destination, size_t source_payload_size) {
-    ckg_assert(source, "MEMORY MOVE source is null\n");
-    ckg_assert(destination, "MEMORY MOVE destination IS NULL\n");
+    ckg_assert(source);
+    ckg_assert(destination);
 
     if (source_payload_size == 0) {
         return;
@@ -96,8 +96,8 @@ void ckg_memory_zero(void* data, size_t data_size_in_bytes) {
 }
 
 void MACRO_ckg_memory_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
-    ckg_assert(index < data_capacity, "index greater than capacity\n");
-    ckg_assert(index >= 0, "index is less than 0\n");
+    ckg_assert(index < data_capacity);
+    ckg_assert(index >= 0);
 
     u8* byte_data = (u8*)data;
 

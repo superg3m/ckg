@@ -8,7 +8,7 @@ void test_ckg_vector_operations() {
 	}
 
 	for (int i = 0; i < ckg_vector_length(int_vector); i++) {
-		ckg_assert(int_vector[i] == i, "VECTOR FAILED!\n");
+		ckg_assert(int_vector[i] == i);
 	}
 
 	ckg_vector_push(int_vector, 4);

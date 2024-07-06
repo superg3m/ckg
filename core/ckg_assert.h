@@ -22,8 +22,17 @@ extern "C" {
 //************************** End Functions **************************
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
-#if CKG_ASSERT_ENABLED == TRUE	    
-    #define ckg_assert(expression, message, ...)	    \
+#if CKG_ASSERT_ENABLED == TRUE	   
+    #define ckg_assert(expression)	\
+    do { 				                            \
+        if (!(expression)) {                        \
+            ckg_stack_trace_dump();                 \
+            CKG_LOG_FATAL("Func: %s, File: %s:%d\n", __func__, __FILE__, __LINE__);  \
+            CRASH;                                  \
+        }                                           \
+    } while (FALSE)
+
+    #define ckg_assert_msg(expression, message, ...)	\
         do { 				                            \
             if (!(expression)) {                        \
                 ckg_stack_trace_dump();                 \
