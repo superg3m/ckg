@@ -16,7 +16,7 @@ The point of the ckit granular (ckg) is building out everything at a granular le
 ## CORE
 - [x] ckg_types.c
 
-### Assert
+### Assert (Cross-Platform)
 - [x] ckg_assert.c
 	- [x] ckg_assert_msg(expression, msg, ...)
 	- [x] ckg_assert(expression)
@@ -53,6 +53,30 @@ The point of the ckit granular (ckg) is building out everything at a granular le
 
 ### Memory
 - [x] ckg_memory.c
+    - [x] ckg_bind_alloc_callback(func_allocator);
+    - [x] ckg_bind_free_callback(func_allocator);
+    - [x] ckg_bind_allocator_plugin_callback(allocator_plugin, context);
+    - [x] ckg_bind_free_plugin_callback(free_plugin, context);
+    - [x] ckg_alloc(allocation_size);
+    - [x] ckg_realloc(data, old_allocation_size, new_allocation_size);
+    - [x] ckg_free(data);
+    - [x] ckg_memory_compare(buffer_one, buffer_two, b1_allocation_size, b2_allocation_size);
+    - [x] ckg_memory_copy(source, destination, source_size, destination_capacity);
+    - [x] ckg_memory_move(source, destination, source_payload_size);
+    - [x] ckg_memory_zero(data, data_size_in_bytes);
+    - [x] ckg_memory_delete_index(data, data_capacity, element_size_in_bytes, index);
+
 - [x] ckg_arena.c
+	- [x] ckg_arena_create(allocation, name, flag);
+	- [x] ckg_arena_push(arena, type);	
+	- [x] ckg_arena_free(arena);
+	- [x] ckg_arena_clear(arena);
+	
 ### FileIO
 - [x] ckg_file_io.c // should revist this though not robust at all
+	- [x] ckg_file_system_create(file_name);
+	- [x] ckg_file_open(file_system);
+	- [x] ckg_file_close(file_system);
+	- [x] ckg_file_size(file_system);
+	- [x] ckg_file_get_next_line(file_system);
+	- [x] ckg_file_get_next_char(file_system);

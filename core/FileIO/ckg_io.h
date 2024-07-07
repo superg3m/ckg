@@ -5,7 +5,7 @@
  * Creator: Jovanni Djonaj
 ===========================================================*/
 #include <stdio.h>
-#include "../ckg_assert.h"
+#include "../Assert/ckg_assert.h"
 
 typedef struct CKG_FileSystem {
 	char* file_name;
