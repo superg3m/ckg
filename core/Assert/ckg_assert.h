@@ -34,7 +34,7 @@ extern "C" {
     } while (FALSE)
 
     #define ckg_assert_msg(expression, message, ...)	\
-        do { 				                            \
+        do {                                            \
             if (!(expression)) {                        \
                 ckg_stack_trace_dump();                 \
                 CKG_LOG_FATAL(message, ##__VA_ARGS__);  \
