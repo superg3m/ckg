@@ -1,8 +1,8 @@
 #include "../ckg_types.h"
-#include "../ckg_memory.h"
-#include "../ckg_assert.h"
-#include "../ckg_stack_trace.h"
-#include "../ckg_math.h"
+#include "../Memory/ckg_memory.h"
+#include "../Assert/ckg_assert.h"
+#include "../Assert/ckg_stack_trace.h"
+#include "../Math/ckg_math.h"
 
 void* ckg_memory_default_allocator(size_t allocation_size) {
     void* ret = malloc(allocation_size);
@@ -21,7 +21,6 @@ void ckg_memory_default_allocator_plugin(CKG_MemoryContext* ckg_context) {
 void ckg_memory_default_free_plugin(CKG_MemoryContext* ckg_context) {
     return;
 }
-
 
 internal CKG_MemoryAllocator* memory_allocate_callback = &ckg_memory_default_allocator;
 internal CKG_MemoryFree* memory_free_callback = &ckg_memory_default_free;

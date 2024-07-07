@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core/ckg_types.h"
+#include "../../core/ckg_types.h"
 //************************* Begin Functions *************************
 #ifdef __cplusplus
 extern "C" {

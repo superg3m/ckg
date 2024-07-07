@@ -1,9 +1,9 @@
 #pragma once
 
-#include "./ckg_types.h"
-#include "./ckg_memory.h"
-#include "./ckg_logger.h"
-#include "./ckg_stack_trace.h"
+#include "../ckg_types.h"
+#include "../Memory/ckg_memory.h"
+#include "../Logger/ckg_logger.h"
+#include "../Assert/ckg_stack_trace.h"
 
 //========================== Begin Types ==========================
 #define CKG_ASSERT_ENABLED TRUE

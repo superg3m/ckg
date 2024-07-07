@@ -1,6 +1,7 @@
-#include "../ckg_stack_trace.h"
-#include "../ckg_logger.h"
-#include "../ckg_memory.h"
+#include "./ckg_stack_trace.h"
+
+#include "../Logger/ckg_logger.h"
+#include "../Memory/ckg_memory.h"
 #include <stdarg.h>
 #include <windows.h>
 #include <DbgHelp.h>

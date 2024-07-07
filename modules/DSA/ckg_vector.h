@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../core/ckg_types.h"
+#include "../../core/ckg_types.h"
 
 //========================== Begin Types ==========================
 typedef struct CKG_VectorHeader {

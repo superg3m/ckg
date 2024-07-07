@@ -1,7 +1,8 @@
+#include "./ckg_hashing.h"
+
 #include "../../core/ckg_types.h"
-#include "../../core/ckg_memory.h"
-#include "../ckg_hashing.h"
-#include "../../core/ckg_cstring.h"
+#include "../../core/Memory/ckg_memory.h"
+#include "../../core/String/ckg_cstring.h"
 
 internal const u32 prime_numbers[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
 

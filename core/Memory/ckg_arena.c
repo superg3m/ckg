@@ -1,6 +1,7 @@
-#include "../ckg_arena.h"
-#include "../../core/ckg_memory.h"
-#include "../../core/ckg_assert.h"
+#include "./ckg_arena.h"
+#include "./ckg_memory.h"
+
+#include "../Assert/ckg_assert.h"
 
 #define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
 

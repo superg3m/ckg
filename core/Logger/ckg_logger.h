@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./ckg_types.h"
+#include "../ckg_types.h"
 //========================== Begin Types ==========================
 //Regular text
 #define CKG_BLACK "\033[0;30m"

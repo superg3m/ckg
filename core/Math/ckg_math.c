@@ -1,6 +1,6 @@
-#include "../ckg_math.h"
-#include "../ckg_logger.h"
-#include "../ckg_assert.h"
+#include "./ckg_math.h"
+#include "../Logger/ckg_logger.h"
+#include "../Assert/ckg_assert.h"
 
 typedef union {
     float f;
