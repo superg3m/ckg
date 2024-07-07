@@ -6,8 +6,6 @@
 ===========================================================*/
 #include <stdio.h>
 #include "../ckg_assert.h"
-#include "../ckg_string.h"
-
 
 typedef struct CKG_FileSystem {
 	char* file_name;

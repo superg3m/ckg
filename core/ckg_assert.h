@@ -41,6 +41,7 @@ extern "C" {
             }                                           \
         } while (FALSE)
 #else
-        #define ckg_assert(expression, message, ...)
+        #define ckg_assert(expression)
+        #define ckg_assert_msg(expression, message, ...)
 #endif
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++

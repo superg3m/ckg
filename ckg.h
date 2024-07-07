@@ -11,6 +11,4 @@
 
 #include "./modules/ckg_algorithm.h"
 #include "./modules/ckg_hashing.h"
-#include "./modules/ckg_hashmap.h"
-#include "./modules/ckg_linked_list.h"
 #include "./modules/ckg_vector.h"

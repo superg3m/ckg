@@ -14,8 +14,22 @@ void ckg_memory_default_free(void* data) {
     free(data);
 }
 
+void ckg_memory_default_allocator_plugin(CKG_MemoryContext* ckg_context) {
+    return;
+}
+
+void ckg_memory_default_free_plugin(CKG_MemoryContext* ckg_context) {
+    return;
+}
+
+
 internal CKG_MemoryAllocator* memory_allocate_callback = &ckg_memory_default_allocator;
 internal CKG_MemoryFree* memory_free_callback = &ckg_memory_default_free;
+internal CKG_MemoryPlugin* ckg_memory_allocator_plugin_callback = &ckg_memory_default_allocator_plugin;
+internal CKG_MemoryPlugin* ckg_memory_free_plugin_callback = &ckg_memory_default_free_plugin;
+
+internal CKG_MemoryContext* ckg_allocator_context;
+internal CKG_MemoryContext* ckg_free_context;
 
 void ckg_bind_alloc_callback(CKG_MemoryAllocator* allocator) {
     memory_allocate_callback = allocator;
@@ -25,7 +39,18 @@ void ckg_bind_free_callback(CKG_MemoryFree* free) {
     memory_free_callback = free;
 }
 
+void ckg_bind_allocator_plugin_callback(CKG_MemoryPlugin* allocator_plugin, CKG_MemoryContext* context) {
+    ckg_allocator_context = context;
+    ckg_memory_allocator_plugin_callback = allocator_plugin;
+}
+
+void ckg_bind_free_plugin_callback(CKG_MemoryPlugin* free_plugin, CKG_MemoryContext* context) {
+    ckg_free_context = context;
+    ckg_memory_free_plugin_callback = free_plugin;
+}
+
 void* MACRO_ckg_alloc(size_t allocation_size) {
+    ckg_memory_allocator_plugin_callback(ckg_allocator_context);
     return memory_allocate_callback(allocation_size);
 }
 
@@ -37,6 +62,7 @@ void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_
 }
 
 void* MACRO_ckg_free(void* data) {
+    ckg_memory_free_plugin_callback(ckg_free_context);
     memory_free_callback(data);
     data = NULLPTR;
     return data;
