@@ -37,11 +37,11 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 ### String
 - [x] ckg_cstring.h
 	- [x] ckg_cstr_alloc(str)
-	- [x] ckg_cstr_append(str, string_buffer_capacity, to_append)
-	- [x] ckg_cstr_append_char(str, string_buffer_capacity, char to_append)
-	- [x] ckg_cstr_insert(str, string_buffer_capacity, to_insert, index)
-	- [x] ckg_cstr_insert_char(str, string_buffer_capacity, char to_insert, index)
-	- [x] ckg_cstr_copy(str, string_buffer_capacity, to_copy)
+	- [x] ckg_cstr_append(str, str_capacity, to_append)
+	- [x] ckg_cstr_append_char(str, str_capacity, char to_append)
+	- [x] ckg_cstr_insert(str, str_capacity, to_insert, index)
+	- [x] ckg_cstr_insert_char(str, str_capacity, char to_insert, index)
+	- [x] ckg_cstr_copy(str, str_capacity, to_copy)
 	- [x] ckg_cstr_random(dest, length)
 	- [x] ckg_cstr_equal(s1, s2)
 	- [x] ckg_cstr_length(c_string)
