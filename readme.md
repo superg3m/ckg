@@ -7,9 +7,6 @@ The point of the ckit granular (ckg) is building out everything at a granular le
 2. ./run.ps1
 
 - Collection of tools, data structures, and algorithms that I find useful
-- If cl.exe is not defined in your terminal run vars.ps1
-- Compile with CUSTOM_PLATFORM_IMPL defined if you want to change how platform specific functions work.
-
 
 #### NOTE 
 I consider CKG almost done I would like to revist the FileIO section but other than that this is a solid granular library
