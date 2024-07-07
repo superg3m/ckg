@@ -23,8 +23,8 @@ extern "C" {
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
 #if CKG_ASSERT_ENABLED == TRUE	   
-    #define ckg_assert(expression)	                          \
-    do { 				                                      \
+    #define ckg_assert(expression)                            \
+    do {                                                      \
         if (!(expression)) {                                  \
             ckg_stack_trace_dump();                           \
             char msg[] = "Func: %s, File: %s:%d\n";           \
