@@ -4,7 +4,7 @@
 #include "../Assert/ckg_assert.h"
 
 //************************* Begin Functions *************************
-u32 ckg_str_length(const char* cstring) {
+u32 ckg_cstr_length(const char* cstring) {
 	ckg_assert(cstring);
 
 	u32 length = 0;
@@ -19,7 +19,7 @@ char* ckg_cstr_alloc(const char* s1) {
 	char* ret = NULLPTR;
 	ckg_assert(s1);
 
-	u32 s1_length = ckg_str_length(s1);
+	u32 s1_length = ckg_cstr_length(s1);
 	u32 s1_capacity = s1_length + 1;
 
 	ret = ckg_alloc(s1_capacity);
@@ -28,12 +28,12 @@ char* ckg_cstr_alloc(const char* s1) {
 	return ret;
 }
 
-Boolean ckg_str_equal(const char* s1, const char* s2) {
+Boolean ckg_cstr_equal(const char* s1, const char* s2) {
 	ckg_assert(s1);
 	ckg_assert(s2);
 
-	u32 s1_length = ckg_str_length(s1);
-	u32 s2_length = ckg_str_length(s2);
+	u32 s1_length = ckg_cstr_length(s1);
+	u32 s2_length = ckg_cstr_length(s2);
 
 	return ckg_memory_compare(s1, s2, s1_length, s2_length);
 }
@@ -42,8 +42,8 @@ void ckg_cstr_insert(char* string_buffer, size_t string_buffer_capacity, const c
 	ckg_assert(string_buffer);
 	ckg_assert(to_insert);
 
-	const u32 string_buffer_length = ckg_str_length(string_buffer);
-	const u32 to_insert_length = ckg_str_length(to_insert);
+	const u32 string_buffer_length = ckg_cstr_length(string_buffer);
+	const u32 to_insert_length = ckg_cstr_length(to_insert);
 
 	const u32 new_length = string_buffer_length + to_insert_length;
 
@@ -62,7 +62,7 @@ void ckg_cstr_insert_char(char* string_buffer, size_t string_buffer_capacity, co
 	ckg_assert(string_buffer);
 	ckg_assert(to_insert);
 
-	u32 string_buffer_length = ckg_str_length(string_buffer);
+	u32 string_buffer_length = ckg_cstr_length(string_buffer);
 	u32 source_length = 1;
 
 	ckg_assert(index >= 0 && index <= string_buffer_length);
@@ -70,26 +70,26 @@ void ckg_cstr_insert_char(char* string_buffer, size_t string_buffer_capacity, co
 	ckg_assert_msg(expression, "ckg_cstr_insert_char: string_buffer overflow new_capacity_required: %d >= current_capacity: %lld\n",  string_buffer_length + source_length, string_buffer_capacity);
 
 	char* source_ptr = string_buffer + index;
-	size_t data_payload_size = ckg_str_length(source_ptr);
+	size_t data_payload_size = ckg_cstr_length(source_ptr);
 
 	ckg_memory_move(source_ptr, source_ptr + 1, string_buffer_length - index);
 	string_buffer[index] = to_insert;
 }
 
 void ckg_cstr_append(char* string_buffer, size_t string_buffer_capacity, const char* to_append) {
-	u32 string_buffer_length = ckg_str_length(string_buffer);
+	u32 string_buffer_length = ckg_cstr_length(string_buffer);
 	ckg_cstr_insert(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
 }
 
 void ckg_cstr_append_char(char* string_buffer, size_t string_buffer_capacity, const char to_append) {
-	u32 string_buffer_length = ckg_str_length(string_buffer);
+	u32 string_buffer_length = ckg_cstr_length(string_buffer);
 	ckg_cstr_insert_char(string_buffer, string_buffer_capacity, to_append, string_buffer_length);
 }
 
-void ckg_str_clear(char* string_buffer) {
+void ckg_cstr_clear(char* string_buffer) {
 	ckg_assert(string_buffer);
 
-	size_t string_buffer_length = ckg_str_length(string_buffer); 
+	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
 	ckg_memory_zero(string_buffer, string_buffer_length);
 }
 
@@ -97,8 +97,8 @@ void ckg_cstr_copy(char* string_buffer, size_t string_buffer_capacity, const cha
 	ckg_assert(to_copy);
 	ckg_assert(string_buffer);
 
-	u32 source_length = ckg_str_length(to_copy);
-	ckg_str_clear(string_buffer);
+	u32 source_length = ckg_cstr_length(to_copy);
+	ckg_cstr_clear(string_buffer);
 
 	ckg_memory_copy(to_copy, string_buffer, source_length + 1, string_buffer_capacity);
 }
@@ -117,7 +117,7 @@ void ckg_cstr_random(char *dest, size_t length) {
 
 char* ckg_substring(const char* string_buffer, u32 start, u32 end) {
 	ckg_assert(string_buffer);
-	size_t string_buffer_length = ckg_str_length(string_buffer); 
+	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
 
 
 	Boolean start_check = start >= 0 && start <= string_buffer_length - 1;
@@ -144,12 +144,12 @@ char* ckg_substring(const char* string_buffer, u32 start, u32 end) {
 	return ret_sub_string;
 }
 
-Boolean ckg_str_contains(const char* string_buffer, const char* contains) {
+Boolean ckg_cstr_contains(const char* string_buffer, const char* contains) {
 	ckg_assert(string_buffer);
 	ckg_assert(contains);
 
-	size_t string_buffer_length = ckg_str_length(string_buffer); 
-	size_t contains_length = ckg_str_length(contains);
+	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
+	size_t contains_length = ckg_cstr_length(contains);
 
 	if (string_buffer_length == 0 && contains_length == 0) {
 		return TRUE;
@@ -179,7 +179,7 @@ Boolean ckg_str_contains(const char* string_buffer, const char* contains) {
 		}
 
 		char* temp_string = ckg_substring(string_buffer, i, end_index);
-		if (ckg_str_equal(temp_string, contains)) {
+		if (ckg_cstr_equal(temp_string, contains)) {
 			contains_substring = TRUE;
 		}
 		ckg_free(temp_string);
@@ -188,12 +188,12 @@ Boolean ckg_str_contains(const char* string_buffer, const char* contains) {
 	return contains_substring;
 }
 
-u32 ckg_str_index_of(const char* string_buffer, const char* sub_string) {
+u32 ckg_cstr_index_of(const char* string_buffer, const char* sub_string) {
 	ckg_assert(string_buffer);
 	ckg_assert(sub_string);
 	
-	size_t string_buffer_length = ckg_str_length(string_buffer); 
-	size_t contains_length = ckg_str_length(sub_string);
+	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
+	size_t contains_length = ckg_cstr_length(sub_string);
 
 	if (string_buffer_length == 0 && contains_length == 0) {
 		return 0;
@@ -219,7 +219,7 @@ u32 ckg_str_index_of(const char* string_buffer, const char* sub_string) {
 		}
 
 		char* temp_string = ckg_substring(string_buffer, i, end_index);
-		if (ckg_str_equal(temp_string, sub_string)) {
+		if (ckg_cstr_equal(temp_string, sub_string)) {
 			ret_index = i;
 		}
 		ckg_free(temp_string);
@@ -228,12 +228,12 @@ u32 ckg_str_index_of(const char* string_buffer, const char* sub_string) {
 	return ret_index;
 }
 
-u32 ckg_str_last_index_of(const char* string_buffer, const char* sub_string) {
+u32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string) {
 	ckg_assert(string_buffer);
 	ckg_assert(sub_string);
 	
-	size_t string_buffer_length = ckg_str_length(string_buffer); 
-	size_t contains_length = ckg_str_length(sub_string);
+	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
+	size_t contains_length = ckg_cstr_length(sub_string);
 
 	if (string_buffer_length == 0 && contains_length == 0) {
 		return 0;
@@ -259,7 +259,7 @@ u32 ckg_str_last_index_of(const char* string_buffer, const char* sub_string) {
 		}
 
 		char* temp_string = ckg_substring(string_buffer, i, end_index);
-		if (ckg_str_equal(temp_string, sub_string)) {
+		if (ckg_cstr_equal(temp_string, sub_string)) {
 			ret_index = i;
 		}
 		ckg_free(temp_string);
@@ -268,14 +268,14 @@ u32 ckg_str_last_index_of(const char* string_buffer, const char* sub_string) {
 	return ret_index;
 }
 
-char** ckg_str_split(const char* string_buffer, const char* delimitor) {
+char** ckg_cstr_split(const char* string_buffer, const char* delimitor) {
 	ckg_assert_msg(FALSE, "NOT IMPLMENTED YET");
 
 	ckg_assert(string_buffer);
 	ckg_assert(delimitor);
 
-	size_t string_buffer_length = ckg_str_length(string_buffer); 
-	size_t delmitor_length = ckg_str_length(delimitor); 
+	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
+	size_t delmitor_length = ckg_cstr_length(delimitor); 
 
 	if (delmitor_length <= 0) {
 		return NULLPTR;
@@ -293,9 +293,9 @@ char** ckg_str_split(const char* string_buffer, const char* delimitor) {
 			continue;
 		}
 
-		if (ckg_str_equal(temp_substring, delimitor)) {
-			ckg_cstr_copy(ret[sub_string_counter++], ckg_str_length(temp_buffer) + 1, temp_buffer);
-			ckg_str_clear(temp_buffer);
+		if (ckg_cstr_equal(temp_substring, delimitor)) {
+			ckg_cstr_copy(ret[sub_string_counter++], ckg_cstr_length(temp_buffer) + 1, temp_buffer);
+			ckg_cstr_clear(temp_buffer);
 		}
 		ckg_free(temp_substring);
 	}
@@ -309,13 +309,13 @@ char** ckg_str_split(const char* string_buffer, const char* delimitor) {
 	return ret;
 }
 
-Boolean ckg_str_starts_with(const char* string_buffer, const char* starts_with) {
+Boolean ckg_cstr_starts_with(const char* string_buffer, const char* starts_with) {
 	ckg_assert(string_buffer);
 	ckg_assert(starts_with);
 
 	
-	size_t string_buffer_length = ckg_str_length(string_buffer); 
-	size_t starts_with_length = ckg_str_length(starts_with);
+	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
+	size_t starts_with_length = ckg_cstr_length(starts_with);
 
 	if (string_buffer_length == 0 && starts_with_length == 0) {
 		return TRUE;
@@ -325,7 +325,7 @@ Boolean ckg_str_starts_with(const char* string_buffer, const char* starts_with) 
 
 	Boolean starts_with_substring = FALSE;
 	char* temp_string = ckg_substring(string_buffer, 0, starts_with_length - 1);
-	if (ckg_str_equal(temp_string, starts_with)) {
+	if (ckg_cstr_equal(temp_string, starts_with)) {
 		starts_with_substring = TRUE;
 	}
 	ckg_free(temp_string);
@@ -333,12 +333,12 @@ Boolean ckg_str_starts_with(const char* string_buffer, const char* starts_with) 
 	return starts_with_substring;
 }
 
-Boolean ckg_str_ends_with(const char* string_buffer, const char* ends_with) {
+Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with) {
 	ckg_assert(string_buffer);
 	ckg_assert(ends_with);
 
-	size_t string_buffer_length = ckg_str_length(string_buffer); 
-	size_t ends_with_length = ckg_str_length(ends_with);
+	size_t string_buffer_length = ckg_cstr_length(string_buffer); 
+	size_t ends_with_length = ckg_cstr_length(ends_with);
 
 	if (string_buffer_length == 0 && ends_with_length == 0 || ends_with_length == 0) {
 		return TRUE;
@@ -353,7 +353,7 @@ Boolean ckg_str_ends_with(const char* string_buffer, const char* ends_with) {
 
 	Boolean starts_with_substring = FALSE;
 	char* temp_string = ckg_substring(string_buffer, start_index, string_buffer_length - 1);
-	if (ckg_str_equal(temp_string, ends_with)) {
+	if (ckg_cstr_equal(temp_string, ends_with)) {
 		starts_with_substring = TRUE;
 	}
 	ckg_free(temp_string);
@@ -361,10 +361,10 @@ Boolean ckg_str_ends_with(const char* string_buffer, const char* ends_with) {
 	return starts_with_substring;
 }
 
-char* ckg_str_reverse(const char* string_buffer) {
+char* ckg_cstr_reverse(const char* string_buffer) {
 	ckg_assert(string_buffer);
 
-	u32 string_buffer_length = ckg_str_length(string_buffer);
+	u32 string_buffer_length = ckg_cstr_length(string_buffer);
 	u32 string_buffer_guarenteed_capacity = string_buffer_length + 1;
 	
 	char* ret_reversed_string = ckg_alloc(string_buffer_guarenteed_capacity);

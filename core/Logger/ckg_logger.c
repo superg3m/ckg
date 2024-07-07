@@ -40,7 +40,7 @@ void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
 
     sprintf(out_message2, "%s%s", log_level_strings[log_level], out_message);
 
-    int out_message2_length = ckg_str_length(out_message2);
+    int out_message2_length = ckg_cstr_length(out_message2);
 
     #if (_WIN32)
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);

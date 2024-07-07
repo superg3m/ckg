@@ -14,7 +14,7 @@ u64 ckg_hash(unsigned char *str) {
     u64 hash = 5381;
     int c;
 
-    u32 str_length = ckg_str_length(str);
+    u32 str_length = ckg_cstr_length(str);
 
     while (c = *str++) {
         hash = (((hash << 5) + hash) + c) + str_length;

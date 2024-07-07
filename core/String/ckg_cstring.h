@@ -56,15 +56,15 @@ extern "C" {
 	/**
 	 * @brief Tests each charater in the string for equaility
 	 * returns TRUE(1) if equal and FALSE(0) if not equal
-	 * => if (ckg_str_equal("hi", "hi"))
+	 * => if (ckg_cstr_equal("hi", "hi"))
 	 * 
 	 * 
 	 * @param s1 
 	 * @param s2 
 	 * @return Boolean 
 	 */
-	Boolean ckg_str_equal(const char* s1, const char* s2);
-	u32 ckg_str_length(const char* c_string);
+	Boolean ckg_cstr_equal(const char* s1, const char* s2);
+	u32 ckg_cstr_length(const char* c_string);
 
 	/**
 	 * @brief clears a string_buffer to zero
@@ -72,7 +72,7 @@ extern "C" {
 	 * @param string_buffer 
 	 * @param string_buffer_size 
 	 */
-	void ckg_str_clear(char* string_buffer);
+	void ckg_cstr_clear(char* string_buffer);
 
 	/**
 	 * @brief Allocates memory that caller must free! Start and end is inclusive
@@ -84,13 +84,13 @@ extern "C" {
 	 * @return char* 
 	 */
 	char* ckg_substring(const char* string_buffer, u32 start_range, u32 end_range);
-	Boolean ckg_str_contains(const char* string_buffer, const char* contains);
-	u32 ckg_str_index_of(const char* string_buffer, const char* sub_string);
-	u32 ckg_str_last_index_of(const char* string_buffer, const char* sub_string);
-	char** ckg_str_split(const char* string_buffer, const char* delimitor);
-	Boolean ckg_str_starts_with(const char* string_buffer, const char* starts_with);
-	Boolean ckg_str_ends_with(const char* string_buffer, const char* ends_with);
-	char* ckg_str_reverse(const char* string_buffer);
+	Boolean ckg_cstr_contains(const char* string_buffer, const char* contains);
+	u32 ckg_cstr_index_of(const char* string_buffer, const char* sub_string);
+	u32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string);
+	char** ckg_cstr_split(const char* string_buffer, const char* delimitor);
+	Boolean ckg_cstr_starts_with(const char* string_buffer, const char* starts_with);
+	Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with);
+	char* ckg_cstr_reverse(const char* string_buffer);
 	// ------------------------------------------------------------------------------------
 #ifdef __cplusplus
 }
