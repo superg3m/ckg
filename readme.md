@@ -14,37 +14,35 @@ The point of the ckit granular (ckg) is building out everything at a granular le
 # Goals
 
 ## CORE
+
 - [x] ckg_types.c
-- [x] ckg_memory.c
-- [x] ckg_cstring.c
+
+### Assert
 - [x] ckg_assert.c
+
+### Logger
 - [x] ckg_logger.c
+
+### String
+- [x] ckg_cstring.c
+
+### Memory
+- [x] ckg_memory.c
+
+### FileIO
+- [x] ckg_file_io.c // should revist this though
+	- [x] ckg_open_file()
+	- [x] ckg_read_entire_file() // Not great because it can overflow
+	- [x] ckg_close_file()
+
+
+
+
+
+
 - [ ] ckg_math.c
 	- [ ] Vector2, Vector3
 	- [ ] simd calculations
 	- [ ] ckg_abs() // sort of done for signed integers but make it better
 	- [ ] roundf, sin, cos, tan (use intrinsics)
 
-## MODULES
-- [ ] hashing
-- [ ] ckg_file_io.c
-	- [x] ckg_open_file()
-	- [ ] ckg_read_entire_file()
-		- [ ] Read all the bytes don't use strings
-	- [x] ckg_close_file()
-
-- [ ] ckg_networking.c
-	- [ ] udp/tcp
-	- [ ] udp hole punching
-	- [ ] host and client structs
-	- [ ] NAT
-
-- [ ] ckg_simd.c
-	- [ ] simple powerful intrinsics
-
-- [ ] threading.c
-	- [ ] semaphores
-	- [ ] job system
-	- [ ] memory fences (cpu)
-	- [ ] compiler fences
-	- [ ] volatile

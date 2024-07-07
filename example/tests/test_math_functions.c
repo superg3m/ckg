@@ -7,8 +7,8 @@ void test_ckg_math() {
     float at = -5.0;
     double bt = -6.13;
 
-    CKG_LOG_DEBUG("MATH TEST: %d\n", ckg_s32_abs(a));
-    CKG_LOG_DEBUG("MATH TEST: %lld\n", ckg_s64_abs(b));
+    CKG_LOG_DEBUG("MATH TEST: %d\n", abs(a));
+    CKG_LOG_DEBUG("MATH TEST: %lld\n", fabs(b));
 
     // CKG_LOG_DEBUG("MATH TEST: %f\n", ckg_f32_abs(at));
     // CKG_LOG_DEBUG("MATH TEST: %llf\n", ckg_f64_abs(bt));

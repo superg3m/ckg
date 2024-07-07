@@ -8,7 +8,4 @@
 #include "./core/String/ckg_cstring.h"
 #include "./core/Logger/ckg_logger.h"
 #include "./core/Math/ckg_math.h"
-
-#include "./modules/DSA/ckg_algorithm.h"
-#include "./modules/DSA/ckg_hashing.h"
-#include "./modules/DSA/ckg_vector.h"
+#include "./core/Vector/ckg_vector.h"

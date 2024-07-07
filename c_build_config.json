@@ -18,8 +18,7 @@
             "../core/Memory/*.c",
             "../core/String/*.c",
             "../core/Logger/*.c",
-            "../core/Math/*.c",
-            "../modules/DSA/*.c"
+            "../core/Vector/*.c"
         ],
 
         "additional_libs" : [
