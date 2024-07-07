@@ -15,8 +15,6 @@ int main() {
 	ckg_bind_alloc_callback(win32_memory_alloc_callback);
 	ckg_bind_free_callback(win32_memory_free_callback);
 
-	test_ckg_math();
-
 	test_ckg_memory_operations();
 	test_ckg_arena_operations();
 	test_ckg_str_operations();

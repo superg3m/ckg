@@ -11,18 +11,25 @@ The point of the ckit granular (ckg) is building out everything at a granular le
 - Compile with CUSTOM_PLATFORM_IMPL defined if you want to change how platform specific functions work.
 
 
+#### NOTE 
+I consider CKG almost done I would like to revist the FileIO section but other than that this is a solid granular library
+I have some tests but, i'm not confident in the validitiy of the string section.
+
 # Goals
 
 ## CORE
 - [x] ckg_types.c
 
-### Assert (Cross-Platform)
-- [x] ckg_assert.c
+### Assert (Not Cross-Platform)
+- [x] ckg_assert.h
 	- [x] ckg_assert_msg(expression, msg, ...)
 	- [x] ckg_assert(expression)
 
+- [] ckg_stack_trace.h (Only for windows plans are to use backtrace for gcc)
+	- [x] ckg_stack_trace_dump()
+
 ### Logger (Cross-Platform)
-- [x] ckg_logger.c
+- [x] ckg_logger.h
 	- [x] CKG_LOG_FATAL(msg, ...)
 	- [x] CKG_LOG_ERROR(msg, ...)
 	- [x] CKG_LOG_WARN(msg, ...)
@@ -31,7 +38,7 @@ The point of the ckit granular (ckg) is building out everything at a granular le
 	- [x] CKG_LOG_PRINT(msg, ...)
 
 ### String
-- [x] ckg_cstring.c
+- [x] ckg_cstring.h
 	- [x] ckg_cstr_alloc(s1);
 	- [x] ckg_cstr_append(string_buffer, string_buffer_capacity, to_append);
 	- [x] ckg_cstr_append_char(string_buffer, string_buffer_capacity, char to_append);
@@ -52,7 +59,7 @@ The point of the ckit granular (ckg) is building out everything at a granular le
 	- [x] ckg_cstr_reverse(string_buffer);
 
 ### Memory
-- [x] ckg_memory.c
+- [x] ckg_memory.h
     - [x] ckg_bind_alloc_callback(func_allocator);
     - [x] ckg_bind_free_callback(func_allocator);
     - [x] ckg_bind_allocator_plugin_callback(allocator_plugin, context);
@@ -66,17 +73,23 @@ The point of the ckit granular (ckg) is building out everything at a granular le
     - [x] ckg_memory_zero(data, data_size_in_bytes);
     - [x] ckg_memory_delete_index(data, data_capacity, element_size_in_bytes, index);
 
-- [x] ckg_arena.c
+- [x] ckg_arena.h
 	- [x] ckg_arena_create(allocation, name, flag);
 	- [x] ckg_arena_push(arena, type);	
 	- [x] ckg_arena_free(arena);
 	- [x] ckg_arena_clear(arena);
-	
+
 ### FileIO
-- [x] ckg_file_io.c // should revist this though not robust at all
+- [] ckg_file_io.h // should revist this though not robust at all
 	- [x] ckg_file_system_create(file_name);
 	- [x] ckg_file_open(file_system);
 	- [x] ckg_file_close(file_system);
 	- [x] ckg_file_size(file_system);
 	- [x] ckg_file_get_next_line(file_system);
 	- [x] ckg_file_get_next_char(file_system);
+
+## Tests
+- [x] test_memory_functions()
+- [x] test_arena_functions()
+- [x] test_vector_functions()
+- [] test_string_functions() // I don't trust that validity of these test not comprehensive enough I think
