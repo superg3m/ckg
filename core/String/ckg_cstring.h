@@ -48,7 +48,7 @@ extern "C" {
 	 * @param dest 
 	 * @param length 
 	 */
-	void ckg_cstr_random(char *dest, size_t length);
+	void ckg_cstr_random(char* dest, size_t length);
 	
 	// Date: July 06, 2024
 	// NOTE(Jovanni): These can be used for both ckg_cstring.h and ckg_string.h
