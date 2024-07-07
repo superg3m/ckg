@@ -29,10 +29,10 @@ void ckg_file_open(CKG_FileSystem* file_system) {
 }
 
 char* ckg_file_get_next_line(CKG_FileSystem* file_system) {
-    // Date: July 06, 2024
-    // TODO(Jovanni): this is temperary it needs to grow
+	// Date: July 06, 2024
+	// TODO(Jovanni): this is temperary it needs to grow
 	char line[2500]; 
-    ckg_memory_zero(line, 2500);
+	ckg_memory_zero(line, 2500);
 	char c;
 	do {
 		c = fgetc(file_system->handle);
@@ -47,9 +47,9 @@ char* ckg_file_get_next_line(CKG_FileSystem* file_system) {
 }
 
 char ckg_file_get_next_char(CKG_FileSystem* file_system) {
-    return fgetc(file_system->handle);
+	return fgetc(file_system->handle);
 }
 
 void ckg_file_close(CKG_FileSystem* file_system) { 
-    fclose(file_system->handle); 
+	fclose(file_system->handle); 
 }
