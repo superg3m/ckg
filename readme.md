@@ -25,7 +25,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- [x] ckg_assert_msg(expression, msg, ...)
 	- [x] ckg_assert(expression)
 
-- [] ckg_stack_trace.h (Only for windows plans are to use backtrace for gcc)
+- [ ] ckg_stack_trace.h (Only for windows plans are to use backtrace for gcc)
 	- [x] ckg_stack_trace_dump()
 
 ### Logger (Cross-Platform)
@@ -80,7 +80,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- [x] ckg_arena_clear(arena);
 
 ### FileIO
-- [] ckg_file_io.h // should revist this though not robust at all
+- [ ] ckg_file_io.h // should revist this though not robust at all
 	- [x] ckg_file_system_create(file_name);
 	- [x] ckg_file_open(file_system);
 	- [x] ckg_file_close(file_system);
@@ -92,4 +92,4 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 - [x] test_memory_functions()
 - [x] test_arena_functions()
 - [x] test_vector_functions()
-- [] test_string_functions() // I don't trust that validity of these test not comprehensive enough I think
+- [ ] test_string_functions() // I don't trust that validity of these test not comprehensive enough I think
