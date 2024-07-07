@@ -1,5 +1,5 @@
 #include "../ckg_io.h"
-#include "../ckg_string.h"
+#include "../ckg_cstring.h"
 
 CKG_FileSystem ckg_file_system_create(char* file_name) {
 	CKG_FileSystem file_system;
@@ -12,7 +12,7 @@ CKG_FileSystem ckg_file_system_create(char* file_name) {
 
 internal u8* read_file_data(FILE* handle, size_t file_size) {
 	u8* buffer = ckg_alloc(file_size);
-	ckg_assert(fread(buffer, file_size, 1 , handle) != file_size, "Error reading file");
+	ckg_assert_msg(fread(buffer, file_size, 1 , handle) != file_size, "Error reading file");
 	rewind(handle);
 	return buffer;
 }
@@ -20,7 +20,7 @@ internal u8* read_file_data(FILE* handle, size_t file_size) {
 
 void ckg_file_open(CKG_FileSystem* file_system) {
 	file_system->handle = fopen(file_system->file_name, "r");
-	ckg_assert(file_system->handle != NULLPTR, "FILE IS NULL, CHECK INITIAL FILE NAME\n");
+	ckg_assert_msg(file_system->handle != NULLPTR, "FILE IS NULL, CHECK INITIAL FILE NAME\n");
 	fseek(file_system->handle, 0L, SEEK_END);
 	file_system->file_size = ftell(file_system->handle);
 	rewind(file_system->handle);
@@ -37,10 +37,10 @@ char* ckg_file_get_next_line(CKG_FileSystem* file_system) {
 	do {
 		c = fgetc(file_system->handle);
 		if (c != '\n' && c != EOF) {
-		ckg_cstr_append_char(line, 2500, c);
+			ckg_cstr_append_char(line, 2500, c);
 		}
 		if (c == EOF) {
-		file_system->reachedEOF = TRUE;
+			file_system->reachedEOF = TRUE;
 		}
 	} while (c != '\n' && c != EOF);
 	return line;
