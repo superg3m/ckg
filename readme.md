@@ -1,24 +1,24 @@
-# CKG
-The point of the ckit granular (ckg) is building out everything at a granular level and then using these building block to build a good common use case version. so very few types and allocation is decided by the caller in most cases.
-
-# How to build
-1. ./bootstrap.ps1
-2. ./build.ps1 or ./build.ps1 -debug
-2. ./debug.ps1
-2. ./run.ps1
-
+# CKG's Core Thesis
+- The point of the ckit granular (ckg) is building out everything at a granular level.
+	- Valid Allocations are passed as parameters along with the capacity in most cases.
+	- Using this small library to build out [CKIT](https://github.com/superg3m/ckit) (A much more sophisticated C library build)
+- This library will be completly cross-platform
 - Collection of tools, data structures, and algorithms that I find useful
 
 #### NOTE 
 I consider CKG almost done I would like to revist the FileIO section but other than that this is a solid granular library
 I have some tests but, i'm not confident in the validitiy of the string section.
 
-# Goals
+# How to build using [c-build](https://github.com/superg3m/c-build)
+1. ./bootstrap.ps1
+2. ./build.ps1 or ./build.ps1 -debug
+2. ./debug.ps1
+2. ./run.ps1
 
-## CORE
+## CORE ( All Cross-Platform)
 - [x] ckg_types.c
 
-### Assert (Not Cross-Platform)
+### Assert
 - [x] ckg_assert.h
 	- [x] ckg_assert_msg(expression, msg, ...)
 	- [x] ckg_assert(expression)
@@ -26,7 +26,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 - [ ] ckg_stack_trace.h (Only for windows plans are to use backtrace for gcc)
 	- [x] ckg_stack_trace_dump()
 
-### Logger (Cross-Platform)
+### Logger
 - [x] ckg_logger.h
 	- [x] CKG_LOG_FATAL(msg, ...)
 	- [x] CKG_LOG_ERROR(msg, ...)

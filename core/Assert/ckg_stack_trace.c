@@ -3,10 +3,11 @@
 #include "../Logger/ckg_logger.h"
 #include "../Memory/ckg_memory.h"
 #include <stdarg.h>
+
+#if defined(_MSC_VER )
 #include <windows.h>
 #include <DbgHelp.h>
 #pragma comment(lib, "dbghelp")
-
 void ckg_stack_trace_dump() {
     CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
     // Date: July 02, 2024
@@ -43,3 +44,10 @@ void ckg_stack_trace_dump() {
     ckg_free(symbol);
     CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
 }
+#elif defined(__GNUC__)
+void ckg_stack_trace_dump() {
+    CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
+    // backtrace
+    CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+}
+#endif
