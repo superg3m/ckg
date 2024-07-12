@@ -5,7 +5,6 @@
 //========================== Begin Types ==========================
 typedef void* (CKG_MemoryAllocator)(size_t);
 typedef void (CKG_MemoryFree)(void*);
-typedef void (CKG_Plugin)();
 //=========================== End Types ===========================
 
 //************************* Begin Functions *************************
@@ -23,17 +22,6 @@ extern "C" {
      * @brief Failing to bind the callback will result in a default free callback.
      */
     void ckg_bind_free_callback(CKG_MemoryFree* func_allocator);
-
-    
-    /**
-     * @brief Allows for arbitrary code execution before allocator callback
-     * gives a small context for passing data
-     * 
-     * @param allocator_plugin 
-     * @param context 
-     */
-    void ckg_bind_allocator_plugin_callback(CKG_Plugin* plugin);
-    void ckg_bind_free_plugin_callback(CKG_Plugin* plugin);
 
     void* MACRO_ckg_alloc(size_t allocation_size);
     void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);

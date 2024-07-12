@@ -60,8 +60,6 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 - [x] ckg_memory.h
     - [x] ckg_bind_alloc_callback(func_allocator)
     - [x] ckg_bind_free_callback(func_allocator)
-    - [x] ckg_bind_allocator_plugin_callback(allocator_plugin, context)
-    - [x] ckg_bind_free_plugin_callback(free_plugin, context)
     - [x] ckg_alloc(allocation_size)
     - [x] ckg_realloc(data, old_allocation_size, new_allocation_size)
     - [x] ckg_free(data)
@@ -71,13 +69,13 @@ I have some tests but, i'm not confident in the validitiy of the string section.
     - [x] ckg_memory_zero(data, data_size_in_bytes)
     - [x] ckg_memory_delete_index(data, data_capacity, element_size_in_bytes, index)
 
-- [x] ckg_arena.h
+- [x] ckg_arena.h (REMOVE This, it should be a ckit thing only)
 	- [x] ckg_arena_create(allocation, name, flag)
 	- [x] ckg_arena_push(arena, type)	
 	- [x] ckg_arena_free(arena)
 	- [x] ckg_arena_clear(arena)
 
-### FileIO
+### FileIO (REMOVE This, it should be a ckit thing only)
 - [ ] ckg_file_io.h // should revist this though not robust at all
 	- [x] ckg_file_system_create(file_name)
 	- [x] ckg_file_open(file_system)
