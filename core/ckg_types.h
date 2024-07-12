@@ -35,7 +35,9 @@ typedef u8 Boolean;
 #define local_persist static
 #define internal static
 
-#define OFFSET_OF(type, member) ((u64)(&(((type*)(0))->member)))
+// Date: July 12, 2024
+// TODO(Jovanni): Test this to make sure its actually works but it makes sense to me
+#define OFFSET_OF(type, member) ((u64)(&(((type*)0)->member)))
 
 /**
  * @brief This only works on static arrays not buffers
