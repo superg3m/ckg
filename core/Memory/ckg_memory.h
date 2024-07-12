@@ -3,14 +3,9 @@
 #include "../ckg_types.h"
 
 //========================== Begin Types ==========================
-typedef union CKG_MemoryContext {
-    u64 i;
-    double d;
-    char cstr[8];
-} CKG_MemoryContext;
 typedef void* (CKG_MemoryAllocator)(size_t);
 typedef void (CKG_MemoryFree)(void*);
-typedef void (CKG_MemoryPlugin)(CKG_MemoryContext*);
+typedef void (CKG_Plugin)();
 //=========================== End Types ===========================
 
 //************************* Begin Functions *************************
@@ -37,8 +32,8 @@ extern "C" {
      * @param allocator_plugin 
      * @param context 
      */
-    void ckg_bind_allocator_plugin_callback(CKG_MemoryPlugin* allocator_plugin, CKG_MemoryContext* context);
-    void ckg_bind_free_plugin_callback(CKG_MemoryPlugin* free_plugin, CKG_MemoryContext* context);
+    void ckg_bind_allocator_plugin_callback(CKG_Plugin* plugin);
+    void ckg_bind_free_plugin_callback(CKG_Plugin* plugin);
 
     void* MACRO_ckg_alloc(size_t allocation_size);
     void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);
