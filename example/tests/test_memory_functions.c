@@ -53,21 +53,21 @@ void test_ckg_memory_operations() {
 	}
 	CKG_LOG_PRINT("]\n");
 
-	ckg_memory_delete_index(test_data, 8, 5);
+	ckg_memory_delete_index(test_data, 9, 5);
 	CKG_LOG_PRINT("[ ");
 	for (int i = 0; i < 7; i++) {
 		CKG_LOG_PRINT("%d ", test_data[i]);
 	}
 	CKG_LOG_PRINT("]\n");
 
-	ckg_memory_delete_index(test_data, 7, 2);
+	ckg_memory_delete_index(test_data, 9, 2);
 	CKG_LOG_PRINT("[ ");
 	for (int i = 0; i < 6; i++) {
 		CKG_LOG_PRINT("%d ", test_data[i]);
 	}
 	CKG_LOG_PRINT("]\n");
 
-	ckg_memory_delete_index(test_data, 6, 5);
+	ckg_memory_delete_index(test_data, 9, 5);
 	CKG_LOG_PRINT("[ ");
 	for (int i = 0; i < 5; i++) {
 		CKG_LOG_PRINT("%d ", test_data[i]);

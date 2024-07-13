@@ -36,58 +36,61 @@ void test_ckg_string_equal() {
 }
 
 void test_ckg_cstr_insert_char() {
-    char str1[50] = "Hello";
-    ckg_cstr_insert_char(str1, 50, 'V', 2);
+    #define STR_CAP1 7
+    char str1[STR_CAP1] = "Hello";
+    ckg_cstr_insert_char(str1, STR_CAP1, 'V', 2);
     ckg_assert_msg(ckg_cstr_equal(str1, "HeVllo"), "Test: ckg_cstr_insert_char failed -> got: %s | expected: %s\n", str1, "HeVllo");
 
-    ckg_cstr_copy(str1, 50, "Hello");
-    ckg_cstr_insert_char(str1, 50, 'X', 0);
+    ckg_cstr_copy(str1, STR_CAP1, "Hello");
+    ckg_cstr_insert_char(str1, STR_CAP1, 'X', 0);
     ckg_assert(ckg_cstr_equal(str1, "XHello"));
 
-    ckg_cstr_copy(str1, 50, "Hello");
-    ckg_cstr_insert_char(str1, 50, 'Y', 5);
+    ckg_cstr_copy(str1, STR_CAP1, "Hello");
+    ckg_cstr_insert_char(str1, STR_CAP1, 'Y', 5);
     ckg_assert(ckg_cstr_equal(str1, "HelloY"));
 
-    char str2[50] = "";
-    ckg_cstr_insert_char(str2, 50, 'Z', 0);
+    char str2[STR_CAP1] = "";
+    ckg_cstr_insert_char(str2, STR_CAP1, 'Z', 0);
     ckg_assert(ckg_cstr_equal(str2, "Z"));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_insert_char passed.\n");
 }
 
 void test_ckg_cstr_insert() {
-    char str1[50] = "Hello";
-    ckg_cstr_insert(str1, 50, "|TESTINGS|", 2);
+    #define STR_CAP2 16
+    char str1[STR_CAP2] = "Hello";
+    ckg_cstr_insert(str1, STR_CAP2, "|TESTINGS|", 2);
     ckg_assert(ckg_cstr_equal(str1, "He|TESTINGS|llo"));
 
-    ckg_cstr_copy(str1, 50, "Hello");
-    ckg_cstr_insert(str1, 50, "Start-", 0);
+    ckg_cstr_copy(str1, STR_CAP2, "Hello");
+    ckg_cstr_insert(str1, STR_CAP2, "Start-", 0);
     ckg_assert(ckg_cstr_equal(str1, "Start-Hello"));
 
-    ckg_cstr_copy(str1, 50, "Hello");
-    ckg_cstr_insert(str1, 50, "-End", 5);
+    ckg_cstr_copy(str1, STR_CAP2, "Hello");
+    ckg_cstr_insert(str1, STR_CAP2, "-End", 5);
 
     ckg_assert_msg(ckg_cstr_equal(str1, "Hello-End"), "Test: ckg_cstr_insert failed at end s1: %s\n", str1);
 
-    char str2[50] = "";
-    ckg_cstr_insert(str2, 50, "Inserted", 0);
+    char str2[STR_CAP2] = "";
+    ckg_cstr_insert(str2, STR_CAP2, "Inserted", 0);
     ckg_assert(ckg_cstr_equal(str2, "Inserted"));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_insert passed.\n");
 }
 
 void test_ckg_cstr_append() {
-    char str1[50] = {0};
-    ckg_cstr_copy(str1, 50, "Hello");
-    ckg_cstr_append(str1, 50, " World!");
+    #define STR_CAP3 13
+    char str1[STR_CAP3] = {0};
+    ckg_cstr_copy(str1, STR_CAP3, "Hello");
+    ckg_cstr_append(str1, STR_CAP3, " World!");
     ckg_assert(ckg_cstr_equal(str1, "Hello World!"));
 
-    char str2[50] = "";
-    ckg_cstr_append(str2, 50, "Appended");
+    char str2[STR_CAP3] = "";
+    ckg_cstr_append(str2, STR_CAP3, "Appended");
     ckg_assert(ckg_cstr_equal(str2, "Appended"));
 
-    ckg_cstr_copy(str1, 50, "Hello");
-    ckg_cstr_append(str1, 50, "");
+    ckg_cstr_copy(str1, STR_CAP3, "Hello");
+    ckg_cstr_append(str1, STR_CAP3, "");
     ckg_assert(ckg_cstr_equal(str1, "Hello"));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_append passed.\n");

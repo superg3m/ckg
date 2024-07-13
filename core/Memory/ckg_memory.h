@@ -38,7 +38,6 @@ extern "C" {
      */
     Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 b1_allocation_size, u32 b2_allocation_size);
     void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_capacity);
-    void ckg_memory_move(const void* source, void* destination, size_t source_payload_size);
     void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
     void MACRO_ckg_memory_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index);

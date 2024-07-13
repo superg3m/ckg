@@ -65,7 +65,8 @@ I have some tests but, i'm not confident in the validitiy of the string section.
     - [x] ckg_free(data)
     - [x] ckg_memory_compare(buffer_one, buffer_two, b1_allocation_size, b2_allocation_size)
     - [x] ckg_memory_copy(source, destination, source_size, destination_capacity)
-    - [x] ckg_memory_move(source, destination, source_payload_size)
+		- handle overlapping addresses
+		- This is done by copying so obviously its bad lmao
     - [x] ckg_memory_zero(data, data_size_in_bytes)
     - [x] ckg_memory_delete_index(data, data_capacity, element_size_in_bytes, index)
 

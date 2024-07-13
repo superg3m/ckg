@@ -19,11 +19,11 @@ extern "C" {
 #endif
 //************************** End Functions **************************
 
+
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
 	#define VECTOR_DEFAULT_CAPACITY 1
 
 	#define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
-
 	#define ckg_vector_length(vector) ckg_vector_header_base(vector)->length
 	#define ckg_vector_capacity(vector) ckg_vector_header_base(vector)->capacity
 	#define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_length(vector)++] = element

@@ -64,29 +64,22 @@ Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 b
 void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_capacity) {
     ckg_assert(source);
     ckg_assert(destination);
-    ckg_assert((source_size <= destination_capacity));
-
-    for (int i = 0; i < source_size; i++) {
-        u8 temp = ((u8*)source)[i];
-        ((u8*)destination)[i] = temp;
-    }
-}
-
-void ckg_memory_move(const void* source, void* destination, size_t source_payload_size) {
-    ckg_assert(source);
-    ckg_assert(destination);
-
-    if (source_payload_size == 0) {
+    ckg_assert(source_size <= destination_capacity);
+    if (source_size == 0) {
         return;
     }
 
-    u8* data_payload = ckg_alloc(source_payload_size);
-    ckg_memory_copy(source, data_payload, source_payload_size, source_payload_size);
-    for (int i = 0; i < source_payload_size; i++) {
-        ((u8*)destination)[i] = data_payload[i];
+    u8* temp_data_copy = ckg_alloc(source_size);
+    for (int i = 0; i < source_size; i++) {
+        u8 temp = ((u8*)source)[i];
+        temp_data_copy[i] = ((u8*)source)[i];
     }
 
-    ckg_free(data_payload);
+    for (int i = 0; i < source_size; i++) {
+        ((u8*)destination)[i] = temp_data_copy[i];
+    }
+
+    ckg_free(temp_data_copy);
 }
 
 void ckg_memory_zero(void* data, size_t data_size_in_bytes) {
@@ -101,10 +94,12 @@ void MACRO_ckg_memory_delete_index(void* data, u32 data_capacity, size_t element
 
     u8* byte_data = (u8*)data;
 
+
+
     size_t total_size = element_size_in_bytes * data_capacity;
     size_t source_offset = (index + 1) * element_size_in_bytes;
     size_t dest_offset =  index * element_size_in_bytes;
 
     size_t payload_source_size = total_size - source_offset;
-    ckg_memory_move(byte_data + source_offset, byte_data + dest_offset, payload_source_size);
+    ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, (data_capacity - (index + 1)) * element_size_in_bytes);
 }
