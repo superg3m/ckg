@@ -15,18 +15,7 @@ u32 ckg_cstr_length(const char* cstring) {
 	return length;
 }
 
-char* ckg_cstr_alloc(const char* s1) {
-	char* ret = NULLPTR;
-	ckg_assert(s1);
 
-	u32 s1_length = ckg_cstr_length(s1);
-	u32 s1_capacity = s1_length + 1;
-
-	ret = ckg_alloc(s1_capacity);
-	ckg_memory_copy(s1, ret, s1_capacity, s1_capacity);
-	
-	return ret;
-}
 
 Boolean ckg_cstr_equal(const char* s1, const char* s2) {
 	ckg_assert(s1);

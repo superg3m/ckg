@@ -38,7 +38,6 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 
 ### String
 - [x] ckg_cstring.h
-	- [x] ckg_cstr_alloc(str)
 	- [x] ckg_cstr_append(str, str_capacity, to_append)
 	- [x] ckg_cstr_append_char(str, str_capacity, char to_append)
 	- [x] ckg_cstr_insert(str, str_capacity, to_insert, index)
