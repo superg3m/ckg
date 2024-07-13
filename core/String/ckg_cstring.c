@@ -115,10 +115,10 @@ void ckg_cstr_random(char *dest, size_t length) {
     *dest = '\0';
 }
 
-char* ckg_substring(const char* str, u32 start, u32 end) {
+void ckg_substring(const char* str, char* returned_buffer, u32 start, u32 end) {
 	ckg_assert(str);
+	ckg_assert(returned_buffer);
 	size_t str_length = ckg_cstr_length(str); 
-
 
 	Boolean start_check = start >= 0 && start <= str_length - 1;
 	Boolean end_check = end >= 0 && end <= str_length - 1;
@@ -134,14 +134,11 @@ char* ckg_substring(const char* str, u32 start, u32 end) {
 	//1 - 4 = ello\0 = 5
 
 	size_t allocation_size = (end - start) + 2;
-	char* ret_sub_string = ckg_alloc(allocation_size);
 
 	u32 counter = 0;
 	for (int i = start; i <= end; i++) {
-		ret_sub_string[counter++] = str[i];
+		returned_buffer[counter++] = str[i];
 	}
-
-	return ret_sub_string;
 }
 
 Boolean ckg_cstr_contains(const char* str, const char* contains) {
@@ -178,7 +175,8 @@ Boolean ckg_cstr_contains(const char* str, const char* contains) {
 			break;
 		}
 
-		char* temp_string = ckg_substring(str, i, end_index);
+		char* temp_string = ckg_alloc((end_index - i) + 1);
+		ckg_substring(str, temp_string, i, end_index);
 		if (ckg_cstr_equal(temp_string, contains)) {
 			contains_substring = TRUE;
 		}
@@ -218,7 +216,8 @@ u32 ckg_cstr_index_of(const char* str, const char* sub_string) {
 			break;
 		}
 
-		char* temp_string = ckg_substring(str, i, end_index);
+		char* temp_string = ckg_alloc((end_index - i) + 1);
+		ckg_substring(str, temp_string, i, end_index);
 		if (ckg_cstr_equal(temp_string, sub_string)) {
 			ret_index = i;
 		}
@@ -258,7 +257,8 @@ u32 ckg_cstr_last_index_of(const char* str, const char* sub_string) {
 			break;
 		}
 
-		char* temp_string = ckg_substring(str, i, end_index);
+		char* temp_string = ckg_alloc((end_index - i) + 1);
+		ckg_substring(str, temp_string, i, end_index);
 		if (ckg_cstr_equal(temp_string, sub_string)) {
 			ret_index = i;
 		}
@@ -288,7 +288,8 @@ char** ckg_cstr_split(const char* str, const char* delimitor) {
 	u32 sub_string_counter = 0;
 	for (int i = 0; i < str_length; i++) {
 		ckg_cstr_append_char(temp_buffer, str_length + 1, str[i]);
-		char* temp_substring = ckg_substring(str, i, delmitor_length - 1);
+		char* temp_substring = ckg_alloc(((delmitor_length - 1) - i) + 1);
+		ckg_substring(str, temp_substring, i, delmitor_length - 1);
 		if (temp_substring[i] != delimitor[0]) {
 			continue;
 		}
@@ -324,7 +325,8 @@ Boolean ckg_cstr_starts_with(const char* str, const char* starts_with) {
 	}
 
 	Boolean starts_with_substring = FALSE;
-	char* temp_string = ckg_substring(str, 0, starts_with_length - 1);
+	char* temp_string = ckg_alloc(starts_with_length);
+	ckg_substring(str, temp_string, 0, starts_with_length - 1);
 	if (ckg_cstr_equal(temp_string, starts_with)) {
 		starts_with_substring = TRUE;
 	}
@@ -352,7 +354,8 @@ Boolean ckg_cstr_ends_with(const char* str, const char* ends_with) {
 	}
 
 	Boolean starts_with_substring = FALSE;
-	char* temp_string = ckg_substring(str, start_index, str_length - 1);
+	char* temp_string = ckg_alloc(str_length - start_index);
+	ckg_substring(str, temp_string, start_index, str_length - 1);
 	if (ckg_cstr_equal(temp_string, ends_with)) {
 		starts_with_substring = TRUE;
 	}

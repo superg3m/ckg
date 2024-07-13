@@ -5,6 +5,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+	// Modifies String Buffer
+
+	// Does not modify String Buffer
+
 	/**
 	 * @brief returns a string buffer with nullterm
 	 * must free with ckg_free()
@@ -50,9 +54,6 @@ extern "C" {
 	 */
 	void ckg_cstr_random(char* dest, size_t length);
 	
-	// Date: July 06, 2024
-	// NOTE(Jovanni): These can be used for both ckg_cstring.h and ckg_string.h
-	// ------------------------------------------------------------------------------------
 	/**
 	 * @brief Tests each charater in the string for equaility
 	 * returns TRUE(1) if equal and FALSE(0) if not equal
@@ -65,29 +66,12 @@ extern "C" {
 	 */
 	Boolean ckg_cstr_equal(const char* s1, const char* s2);
 	u32 ckg_cstr_length(const char* c_string);
-
-	/**
-	 * @brief clears a string_buffer to zero
-	 * takes advantage of the face that we know the length
-	 * @param string_buffer 
-	 * @param string_buffer_size 
-	 */
 	void ckg_cstr_clear(char* string_buffer);
-
-	/**
-	 * @brief Allocates memory that caller must free! Start and end is inclusive
-	 * 
-	 * @param string_buffer 
-	 * @param string_buffer_capacity 
-	 * @param start_range 
-	 * @param end_range 
-	 * @return char* 
-	 */
-	char* ckg_substring(const char* string_buffer, u32 start_range, u32 end_range);
+	// Inclusive start and end STR: SHOW | 0, 0 is: S | 0, 1 is: SH
+	void ckg_substring(const char* string_buffer, char* returned_buffer, u32 start_range, u32 end_range);
 	Boolean ckg_cstr_contains(const char* string_buffer, const char* contains);
 	u32 ckg_cstr_index_of(const char* string_buffer, const char* sub_string);
 	u32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string);
-	char** ckg_cstr_split(const char* string_buffer, const char* delimitor);
 	Boolean ckg_cstr_starts_with(const char* string_buffer, const char* starts_with);
 	Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with);
 	char* ckg_cstr_reverse(const char* string_buffer);

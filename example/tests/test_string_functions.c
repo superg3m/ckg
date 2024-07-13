@@ -137,7 +137,8 @@ void test_ckg_cstr_copy() {
 
 void test_ckg_cstr_contains() {
     char* t1 = "hello";
-    char* sub_str = ckg_substring(t1, 0, 1);
+    char* sub_str = ckg_alloc(1);
+    ckg_substring(t1, sub_str, 0, 1);
     ckg_assert(ckg_cstr_contains(sub_str, "he"));
     ckg_free(sub_str);
 
@@ -154,7 +155,8 @@ void test_ckg_cstr_contains() {
 
 void test_ckg_cstr_starts_with() {
     char* t1 = "hello";
-	char* sub_str = ckg_substring(t1, 0, 1);
+	char* sub_str = ckg_alloc(1);
+    ckg_substring(t1, sub_str, 0, 1);
 	ckg_assert(ckg_cstr_starts_with(sub_str, "he"));
 	ckg_free(sub_str);
 
@@ -177,7 +179,9 @@ void test_ckg_cstr_starts_with() {
 
 void test_ckg_cstr_ends_with() {
     char* t1 = "hello";
-	char* sub_str = ckg_substring(t1, 0, 1);
+	char* sub_str = ckg_alloc(1);
+    ckg_substring(t1, sub_str, 0, 1);
+	ckg_assert(ckg_cstr_ends_with(sub_str, "he"));
 	ckg_assert(!ckg_cstr_ends_with(sub_str, "llo"));
 	ckg_free(sub_str);
 
@@ -199,7 +203,8 @@ void test_ckg_cstr_ends_with() {
 
 void test_ckg_cstr_reverse() {
     char* t1 = "hello";
-	char* sub_str = ckg_substring(t1, 0, 1);
+	char* sub_str = ckg_alloc(1);
+    ckg_substring(t1, sub_str, 0, 1);
     char* reversed_string = ckg_cstr_reverse(sub_str);
 	ckg_assert(ckg_cstr_equal(reversed_string, "eh"));
 	ckg_free(sub_str);
@@ -234,7 +239,8 @@ void test_ckg_cstr_reverse() {
 
 void test_ckg_cstr_index_of() {
     char* t1 = "hello";
-	char* sub_str = ckg_substring(t1, 0, 1);
+	char* sub_str = ckg_alloc(1);
+    ckg_substring(t1, sub_str, 0, 1);
 
 	ckg_assert(ckg_cstr_index_of(sub_str, "he") == 0);
 	ckg_free(sub_str);

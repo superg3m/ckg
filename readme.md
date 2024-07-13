@@ -4,6 +4,7 @@
 	- Using this small library to build out [CKIT](https://github.com/superg3m/ckit) (A much more sophisticated C library build)
 - This library will be completly cross-platform
 - Collection of tools, data structures, and algorithms that I find useful
+- ckg can't allocate in string functions or any other functions on its own because if it did the ckit memory tracker would not work
 
 #### NOTE 
 I consider CKG almost done I would like to revist the FileIO section but other than that this is a solid granular library
