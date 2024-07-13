@@ -61,21 +61,21 @@ Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 b
     return TRUE;
 }
 
-void ckg_memory_copy(const void* source, void* destination, size_t source_size, size_t destination_capacity) {
+void ckg_memory_copy(const void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes) {
     ckg_assert(source);
     ckg_assert(destination);
-    ckg_assert(source_size <= destination_capacity);
-    if (source_size == 0) {
+    ckg_assert(source_size_in_bytes <= destination_size_in_bytes);
+    if (source_size_in_bytes == 0) {
         return;
     }
 
-    u8* temp_data_copy = ckg_alloc(source_size);
-    for (int i = 0; i < source_size; i++) {
+    u8* temp_data_copy = ckg_alloc(source_size_in_bytes);
+    for (int i = 0; i < source_size_in_bytes; i++) {
         u8 temp = ((u8*)source)[i];
         temp_data_copy[i] = ((u8*)source)[i];
     }
 
-    for (int i = 0; i < source_size; i++) {
+    for (int i = 0; i < source_size_in_bytes; i++) {
         ((u8*)destination)[i] = temp_data_copy[i];
     }
 
