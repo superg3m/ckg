@@ -257,48 +257,6 @@ u32 ckg_cstr_last_index_of(const char* str, const char* sub_string) {
 	return ret_index;
 }
 
-char** ckg_cstr_split(const char* str, const char* delimitor) {
-	ckg_assert_msg(FALSE, "NOT IMPLMENTED YET");
-
-	ckg_assert(str);
-	ckg_assert(delimitor);
-
-	size_t str_length = ckg_cstr_length(str); 
-	size_t delmitor_length = ckg_cstr_length(delimitor); 
-
-	if (delmitor_length <= 0) {
-		return NULLPTR;
-	}
-
-	char** ret = ckg_alloc(sizeof(char*) * 100);
-
-	char* temp_buffer = ckg_alloc(str_length + 1);
-
-	u32 sub_string_counter = 0;
-	for (int i = 0; i < str_length; i++) {
-		ckg_cstr_append_char(temp_buffer, str_length + 1, str[i]);
-		char* temp_substring = ckg_alloc(((delmitor_length - 1) - i) + 1);
-		ckg_substring(str, temp_substring, i, delmitor_length - 1);
-		if (temp_substring[i] != delimitor[0]) {
-			continue;
-		}
-
-		if (ckg_cstr_equal(temp_substring, delimitor)) {
-			ckg_cstr_copy(ret[sub_string_counter++], ckg_cstr_length(temp_buffer) + 1, temp_buffer);
-			ckg_cstr_clear(temp_buffer);
-		}
-		ckg_free(temp_substring);
-	}
-	ckg_free(temp_buffer);
-
-
-	
-	char* temp_string = ckg_alloc(str_length);
-	char* current_string = ckg_cstr_alloc(temp_string);
-
-	return ret;
-}
-
 Boolean ckg_cstr_starts_with(const char* str, const char* starts_with) {
 	ckg_assert(str);
 	ckg_assert(starts_with);
