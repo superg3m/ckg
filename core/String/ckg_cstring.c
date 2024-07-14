@@ -311,17 +311,15 @@ Boolean ckg_cstr_ends_with(const char* str, const char* ends_with) {
 	return starts_with_substring;
 }
 
-char* ckg_cstr_reverse(const char* str) {
+void ckg_cstr_reverse(const char* str, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity) {
 	ckg_assert(str);
 
 	u32 str_length = ckg_cstr_length(str);
+	ckg_assert(reversed_buffer_capacity > str_length);
 	u32 str_guarenteed_capacity = str_length + 1;
-	
-	char* ret_reversed_string = ckg_alloc(str_guarenteed_capacity);
-	for (int i = str_length - 1; i >= 0; i--) {
-		ckg_cstr_append_char(ret_reversed_string, str_guarenteed_capacity, str[i]);
-	}
 
-	return ret_reversed_string;
+	for (int i = str_length - 1; i >= 0; i--) {
+		ckg_cstr_append_char(returned_reversed_string_buffer, str_guarenteed_capacity, str[i]);
+	}
 }
 //************************** End Functions **************************

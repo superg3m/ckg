@@ -33,7 +33,8 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 
 - [ ] ckg_stack_trace.h
 	- [ ] ckg_stack_trace_dump()
-		- [x] Using MSVC StackWalker()
+		- [/] Using MSVC StackWalker() (WORKS BUT NOT ACCURATE, its + or - 1 line)
+			- [ ] [raddbg impl](https://github.com/EpicGamesExt/raddebugger/blob/aed9a285f57869df995d9b63a44bf83208d4f5ab/src/os/core/win32/os_core_win32.c#L1649-L1819)
 		- [ ] Using GCC BackTrace()
 
 ### Logger
@@ -62,7 +63,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- [x] ckg_cstr_last_index_of(str, sub_string)
 	- [x] ckg_cstr_starts_with(str, starts_with)
 	- [x] ckg_cstr_ends_with(str, ends_with)
-	- [x] ckg_cstr_reverse(str)
+	- [x] ckg_cstr_reverse(str, reversed_string_buffer, reversed_string_buffer_capacity)
 
 ### Memory
 - [x] ckg_memory.h

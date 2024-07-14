@@ -205,14 +205,18 @@ void test_ckg_cstr_reverse() {
     char* t1 = "hello";
 	char* sub_str = ckg_alloc(1);
     ckg_substring(t1, sub_str, 0, 1);
-    char* reversed_string = ckg_cstr_reverse(sub_str);
+    char* reversed_string = ckg_alloc(ckg_cstr_length(sub_str) + 1);
+    ckg_cstr_reverse(sub_str, reversed_string, ckg_cstr_length(sub_str) + 1);
 	ckg_assert(ckg_cstr_equal(reversed_string, "eh"));
 	ckg_free(sub_str);
 	ckg_free(reversed_string);
 
-    char* reversed_string2 = ckg_cstr_reverse("Chicken");
-    char* reversed_string3 = ckg_cstr_reverse("Roast");
-    char* reversed_string4 = ckg_cstr_reverse("Soup");
+    char* reversed_string2 = ckg_alloc(ckg_cstr_length("Chicken") + 1);
+    ckg_cstr_reverse("Chicken", reversed_string2, ckg_cstr_length("Chicken") + 1);
+    char* reversed_string3 = ckg_alloc(ckg_cstr_length("Roast") + 1);
+    ckg_cstr_reverse("Roast", reversed_string3, ckg_cstr_length("Chicken") + 1);
+    char* reversed_string4 = ckg_alloc(ckg_cstr_length("Soup") + 1);
+    ckg_cstr_reverse("Soup", reversed_string4, ckg_cstr_length("Chicken") + 1);
 
 	ckg_assert_msg(ckg_cstr_equal(reversed_string2, "nekcihC"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "nekcihC", reversed_string2);
 	ckg_assert_msg(ckg_cstr_equal(reversed_string3, "tsaoR"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "tsaoR", reversed_string3);
@@ -224,12 +228,14 @@ void test_ckg_cstr_reverse() {
 
 
 	char* t2 = "";
-    char* reversed_t2 = ckg_cstr_reverse(t2);
+    char* reversed_t2 = ckg_alloc(ckg_cstr_length(t2) + 1);
+    ckg_cstr_reverse(t2, reversed_t2, ckg_cstr_length(t2)+ 1);
 	ckg_assert_msg(ckg_cstr_equal(reversed_t2, ""), "test_ckg_cstr_reverse failed expected: %s | got: %s", "", reversed_t2);
     ckg_free(reversed_t2);
 
 	t2 = "f";
-    reversed_t2 = ckg_cstr_reverse(t2);
+    reversed_t2 = ckg_alloc(ckg_cstr_length(t2) + 1);
+    ckg_cstr_reverse(t2, reversed_t2, ckg_cstr_length(t2) + 1);
 	ckg_assert_msg(ckg_cstr_equal(reversed_t2, "f"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
 	ckg_assert_msg(!ckg_cstr_equal(reversed_t2, "g"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
     ckg_free(reversed_t2);

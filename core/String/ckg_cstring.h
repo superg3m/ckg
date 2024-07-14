@@ -74,7 +74,7 @@ extern "C" {
 	u32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string);
 	Boolean ckg_cstr_starts_with(const char* string_buffer, const char* starts_with);
 	Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with);
-	char* ckg_cstr_reverse(const char* string_buffer);
+	void ckg_cstr_reverse(const char* str, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
 	// ------------------------------------------------------------------------------------
 #ifdef __cplusplus
 }
