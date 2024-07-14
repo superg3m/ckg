@@ -19,6 +19,11 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 ## CORE (All Cross-Platform)
 - [x] ckg_types.c
 
+### key
+- '[x]': Finished
+- '[/]': Started working on it
+- '[ ]': Haven't started working on it
+
 ### Assert
 - [x] ckg_assert.h
 	- [x] ckg_assert_msg(expression, msg, ...)
