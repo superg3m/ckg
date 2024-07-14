@@ -16,7 +16,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 2. ./debug.ps1
 2. ./run.ps1
 
-## CORE ( All Cross-Platform)
+## CORE (All Cross-Platform)
 - [x] ckg_types.c
 
 ### Assert
@@ -24,8 +24,10 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- [x] ckg_assert_msg(expression, msg, ...)
 	- [x] ckg_assert(expression)
 
-- [ ] ckg_stack_trace.h (Only for windows plans are to use backtrace for gcc)
-	- [x] ckg_stack_trace_dump()
+- [ ] ckg_stack_trace.h
+	- [ ] ckg_stack_trace_dump()
+		- [x] Using MSVC StackWalker()
+		- [ ] Using GCC BackTrace()
 
 ### Logger
 - [x] ckg_logger.h
@@ -47,11 +49,10 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- [x] ckg_cstr_equal(s1, s2)
 	- [x] ckg_cstr_length(c_string)
 	- [x] ckg_cstr_clear(str)
-	- [x] ckg_substring(str, start_range, end_range)
+	- [x] ckg_substring(str, retured_substring, start_range, end_range)
 	- [x] ckg_cstr_contains(str, contains)
 	- [x] ckg_cstr_index_of(str, sub_string)
 	- [x] ckg_cstr_last_index_of(str, sub_string)
-	- [x] ckg_cstr_split(str, delimitor)
 	- [x] ckg_cstr_starts_with(str, starts_with)
 	- [x] ckg_cstr_ends_with(str, ends_with)
 	- [x] ckg_cstr_reverse(str)
@@ -65,8 +66,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
     - [x] ckg_free(data)
     - [x] ckg_memory_compare(buffer_one, buffer_two, b1_allocation_size, b2_allocation_size)
     - [x] ckg_memory_copy(source, destination, source_size, destination_capacity)
-		- handle overlapping addresses
-		- This is done by copying so obviously its bad lmao
+		- [x] handle overlapping addresses (copies data to do it so its bad)
     - [x] ckg_memory_zero(data, data_size_in_bytes)
     - [x] ckg_memory_delete_index(data, data_capacity, element_size_in_bytes, index)
 
@@ -76,8 +76,8 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- [x] ckg_arena_free(arena)
 	- [x] ckg_arena_clear(arena)
 
-### FileIO (REMOVE This, it should be a ckit thing only)
-- [ ] ckg_file_io.h // should revist this though not robust at all
+### FileIO
+- [x] ckg_file_io.h // should revist this though not robust at all
 	- [x] ckg_file_system_create(file_name)
 	- [x] ckg_file_open(file_system)
 	- [x] ckg_file_close(file_system)
@@ -89,4 +89,4 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 - [x] test_memory_functions()
 - [x] test_arena_functions()
 - [x] test_vector_functions()
-- [ ] test_string_functions() // I don't trust that validity of these test not comprehensive enough I think
+- [x] test_string_functions() // I don't trust that validity of these test not comprehensive enough I think
