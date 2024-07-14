@@ -16,12 +16,14 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 2. ./debug.ps1
 2. ./run.ps1
 
-## CORE (All Cross-Platform)
+# Goals
+
 #### key
 - '[x]': Finished
 - '[/]': Started working on it
 - '[ ]': Haven't started working on it
 
+## CORE (All Cross-Platform)
 - [x] ckg_types.c
 
 ### Assert
