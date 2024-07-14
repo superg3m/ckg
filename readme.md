@@ -17,12 +17,12 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 2. ./run.ps1
 
 ## CORE (All Cross-Platform)
-- [x] ckg_types.c
-
-### key
+#### key
 - '[x]': Finished
 - '[/]': Started working on it
 - '[ ]': Haven't started working on it
+
+- [x] ckg_types.c
 
 ### Assert
 - [x] ckg_assert.h
