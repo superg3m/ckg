@@ -32,7 +32,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 
 - [ ] ckg_stack_trace.h
 	- [ ] ckg_stack_trace_dump()
-		- [/] Using MSVC StackWalker() (WORKS BUT NOT ACCURATE, its + or - 1 line)
+		- [/] Using MSVC StackWalker() (WORKS BUT NOT ACCURATE, its (+ or -) 1 line)
 			- [ ] [raddbg impl](https://github.com/EpicGamesExt/raddebugger/blob/aed9a285f57869df995d9b63a44bf83208d4f5ab/src/os/core/win32/os_core_win32.c#L1649-L1819)
 		- [ ] Using GCC BackTrace()
 
