@@ -70,8 +70,8 @@ extern "C" {
 	// Inclusive start and end STR: SHOW | 0, 0 is: S | 0, 1 is: SH
 	void ckg_substring(const char* string_buffer, char* returned_buffer, u32 start_range, u32 end_range);
 	Boolean ckg_cstr_contains(const char* string_buffer, const char* contains);
-	u32 ckg_cstr_index_of(const char* string_buffer, const char* sub_string);
-	u32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string);
+	s32 ckg_cstr_index_of(const char* string_buffer, const char* sub_string);
+	s32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string);
 	Boolean ckg_cstr_starts_with(const char* string_buffer, const char* starts_with);
 	Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with);
 	void ckg_cstr_reverse(const char* str, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
