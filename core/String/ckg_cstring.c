@@ -175,7 +175,7 @@ Boolean ckg_cstr_contains(const char* str, const char* contains) {
 	return contains_substring;
 }
 
-u32 ckg_cstr_index_of(const char* str, const char* sub_string) {
+s32 ckg_cstr_index_of(const char* str, const char* sub_string) {
 	ckg_assert(str);
 	ckg_assert(sub_string);
 	
@@ -194,13 +194,13 @@ u32 ckg_cstr_index_of(const char* str, const char* sub_string) {
 		return -1;
 	}
 	
-	u32 ret_index = -1;
+	s32 ret_index = -1;
 	for (int i = 0; (ret_index == -1) && (i <= str_length - contains_length); i++) {
 		if (str[i] != sub_string[0]) {
 			continue;
 		}
 
-		u32 end_index = (i + (contains_length - 1));
+		s32 end_index = (i + (contains_length - 1));
 		if (end_index > str_length) {
 			break;
 		}
@@ -216,7 +216,7 @@ u32 ckg_cstr_index_of(const char* str, const char* sub_string) {
 	return ret_index;
 }
 
-u32 ckg_cstr_last_index_of(const char* str, const char* sub_string) {
+s32 ckg_cstr_last_index_of(const char* str, const char* sub_string) {
 	ckg_assert(str);
 	ckg_assert(sub_string);
 	
@@ -235,13 +235,13 @@ u32 ckg_cstr_last_index_of(const char* str, const char* sub_string) {
 		return -1;
 	}
 	
-	u32 ret_index = -1;
+	s32 ret_index = -1;
 	for (int i = 0; i <= str_length - contains_length; i++) {
 		if (str[i] != sub_string[0]) {
 			continue;
 		}
 
-		u32 end_index = (i + (contains_length - 1));
+		s32 end_index = (i + (contains_length - 1));
 		if (end_index > str_length) {
 			break;
 		}
