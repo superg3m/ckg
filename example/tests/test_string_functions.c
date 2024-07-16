@@ -244,7 +244,7 @@ void test_ckg_cstr_reverse() {
 }
 
 void test_ckg_cstr_index_of() {
-    char* t1 = "hello";
+    char* t1 = "hello ";
 	char* sub_str = ckg_alloc(1);
     ckg_substring(t1, sub_str, 0, 1);
 
@@ -258,6 +258,8 @@ void test_ckg_cstr_index_of() {
 	ckg_assert(ckg_cstr_index_of(t1, "7") == -1);
 	ckg_assert(ckg_cstr_index_of(t1, "hello") == 0);
 	ckg_assert(ckg_cstr_index_of(t1, "hllo") == -1);
+
+	ckg_assert(ckg_cstr_index_of(t1, " ") == 5);
 
 	char* t2 = "";
 	ckg_assert(ckg_cstr_index_of(t2, "") == 0);

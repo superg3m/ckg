@@ -195,7 +195,11 @@ s32 ckg_cstr_index_of(const char* str, const char* sub_string) {
 	}
 	
 	s32 ret_index = -1;
-	for (int i = 0; (ret_index == -1) && (i <= str_length - contains_length); i++) {
+	for (int i = 0; i <= str_length - contains_length; i++) {
+		if (ret_index != -1) {
+			break;
+		}
+		
 		if (str[i] != sub_string[0]) {
 			continue;
 		}
