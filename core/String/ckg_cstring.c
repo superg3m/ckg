@@ -128,6 +128,7 @@ void ckg_substring(const char* str, char* returned_buffer, u32 start, u32 end) {
 	for (int i = start; i <= end; i++) {
 		returned_buffer[counter++] = str[i];
 	}
+	returned_buffer[counter] = '\0'; 
 }
 
 Boolean ckg_cstr_contains(const char* str, const char* contains) {
