@@ -12,8 +12,8 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 # How to build using [c-build](https://github.com/superg3m/c-build)
 1. ./bootstrap.ps1
 2. ./build.ps1 or ./build.ps1 -debug
-2. ./debug.ps1
-2. ./run.ps1
+3. ./debug.ps1
+4. ./run.ps1
 
 # Goals
 
