@@ -101,5 +101,19 @@ void MACRO_ckg_memory_delete_index(void* data, u32 data_capacity, size_t element
     size_t dest_offset =  index * element_size_in_bytes;
 
     size_t payload_source_size = total_size - source_offset;
-    ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, (data_capacity - (index + 1)) * element_size_in_bytes);
+    ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
+}
+
+void MACRO_ckg_memory_insert_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
+    ckg_assert(index < data_capacity);
+    ckg_assert(index >= 0);
+
+    u8* byte_data = (u8*)data;
+
+    size_t total_size = element_size_in_bytes * data_capacity;
+    size_t source_offset = index * element_size_in_bytes;
+    size_t dest_offset =  (index + 1) * element_size_in_bytes;
+
+    size_t payload_source_size = total_size - source_offset;
+    ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
 }

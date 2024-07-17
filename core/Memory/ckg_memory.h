@@ -41,6 +41,7 @@ extern "C" {
     void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
     void MACRO_ckg_memory_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index);
+    void MACRO_ckg_memory_insert_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index);
 #ifdef __cplusplus
 }
 #endif
@@ -57,8 +58,10 @@ extern "C" {
     #define ckg_alloc(allocation_size) (decltype(data))MACRO_ckg_alloc(allocation_size)
     #define ckg_free(data) data = (decltype(data))MACRO_ckg_free(data)
     #define ckg_memory_delete_index(data, data_capacity, index) MACRO_ckg_memory_delete_index(data, data_capacity, sizeof(data[0]), index)
+    #define ckg_memory_insert_index(data, data_capacity, index, element) MACRO_ckg_memory_insert_index(data, data_capacity,  element, sizeof(data[0]), index)
 #else
     #define ckg_alloc(allocation_size) MACRO_ckg_alloc(allocation_size)
     #define ckg_free(data) data = MACRO_ckg_free(data)
     #define ckg_memory_delete_index(data, data_capacity, index) MACRO_ckg_memory_delete_index(data, data_capacity, sizeof(data[0]), index)
+    #define ckg_memory_insert_index(data, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, data_capacity, sizeof(data[0]), index); data[index] = element;
 #endif

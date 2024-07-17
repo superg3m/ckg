@@ -74,6 +74,20 @@ void test_ckg_memory_operations() {
 	}
 	CKG_LOG_PRINT("]\n");
 
+	ckg_memory_insert_index(test_data, 9, 15161, 0);
+	CKG_LOG_PRINT("[ ");
+	for (int i = 0; i < 6; i++) {
+		CKG_LOG_PRINT("%d ", test_data[i]);
+	}
+	CKG_LOG_PRINT("]\n");
+
+	ckg_memory_insert_index(test_data, 9, 51212, 6);
+	CKG_LOG_PRINT("[ ");
+	for (int i = 0; i < 7; i++) {
+		CKG_LOG_PRINT("%d ", test_data[i]);
+	}
+	CKG_LOG_PRINT("]\n");
+
 	CKG_LOG_SUCCESS("All memory tests passed!\n");
 	return;
 }

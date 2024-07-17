@@ -75,7 +75,8 @@ I have some tests but, i'm not confident in the validitiy of the string section.
     - [x] ckg_memory_copy(source, destination, source_size, destination_capacity)
 		- [x] handle overlapping addresses (copies data to do it so its bad)
     - [x] ckg_memory_zero(data, data_size_in_bytes)
-    - [x] ckg_memory_delete_index(data, data_capacity, element_size_in_bytes, index)
+    - [x] ckg_memory_delete_index(data, data_capacity, index)
+    - [x] ckg_memory_insert_index(data, data_capacity, element, index)
 
 - [x] ckg_arena.h (REMOVE This, it should be a ckit thing only)
 	- [x] ckg_arena_create(allocation, name, flag)
