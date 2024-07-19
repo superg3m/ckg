@@ -44,4 +44,18 @@ typedef u8 Boolean;
  * 
  */
 #define ArrayCount(array) (sizeof(array) / sizeof(array[0]))
+
+#ifdef _WIN32
+    #define PLATFORM_WINDOWS
+    #define OS_DELIMITER '\\'
+#elif defined(__linux__)
+    #define PLATFORM_LINUX
+    #define OS_DELIMITER '/'
+#elif defined(__APPLE__) && defined(__MACH__)
+    #define PLATFORM_MACOS
+    #define OS_DELIMITER '/'
+#else
+    #define PLATFORM_UNKNOWN
+    #define OS_DELIMITER '/'
+#endif
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
