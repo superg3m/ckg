@@ -70,7 +70,6 @@ internal CKG_Node* MACRO_ckg_node_data_free(CKG_LinkedList* linked_list, CKG_Nod
 CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u32 index, void* data) {
     ckg_assert(linked_list);
     ckg_assert(data);
-    ckg_assert(index <= linked_list->count);
     ckg_assert(index >= 0);
 
     u32 old_count = linked_list->count++;
@@ -82,6 +81,7 @@ CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u32 index, void* d
         return linked_list->head;
     }
 
+    ckg_assert(index < old_count);
     CKG_Node* new_node_to_insert = ckg_node_create(linked_list, data);
 
     if (index == 0) { // insert at head
@@ -155,7 +155,6 @@ CKG_Node ckg_linked_list_pop(CKG_LinkedList* linked_list) {
 CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u32 index) {
     ckg_assert(linked_list); 
     ckg_assert(linked_list->count > 0); 
-    ckg_assert(index <= linked_list->count);
     ckg_assert(index >= 0);
 
     u32 old_count = linked_list->count--;
@@ -169,6 +168,7 @@ CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u32 index) {
         return ret;
     }
 
+    ckg_assert(index < old_count);
     if (index == (old_count - 1)) { // remove tail
         CKG_Node* cached_tail = linked_list->tail;
         linked_list->tail = linked_list->tail->prev;
