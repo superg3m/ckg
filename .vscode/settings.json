@@ -35,6 +35,7 @@
         "ckg_cstring.h": "c",
         "windows.h": "c",
         "dbghelp.h": "c",
-        "ckg_char.h": "c"
+        "ckg_char.h": "c",
+        "ckg_vector.h": "c"
     }
 }

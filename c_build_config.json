@@ -18,7 +18,8 @@
             "../core/Memory/*.c",
             "../core/String/*.c",
             "../core/Logger/*.c",
-            "../core/Vector/*.c"
+            "../core/Vector/*.c",
+            "../core/LinkedList/*.c"
         ],
 
         "additional_libs" : [
