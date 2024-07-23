@@ -17,7 +17,7 @@ CKG_Node* MACRO_ckg_node_create(CKG_LinkedList* linked_list, void* data) {
     if (linked_list->is_pointer_type) {
         ret->data = data;
     } else {
-        ret->data = ckg_alloc(linked_list->element_size_in_bytes);
+        ret->data = ckg_alloc(linked_list->element_size_in_bytes); // user has to free
         ckg_memory_copy(data, ret->data, linked_list->element_size_in_bytes, linked_list->element_size_in_bytes); 
     }
 
@@ -41,6 +41,7 @@ internal CKG_Node* MACRO_ckg_node_free(CKG_LinkedList* linked_list, CKG_Node* no
     node->next = NULLPTR;
     node->prev = NULLPTR;
     ckg_free(node);
+
     return node;
 }
 #define ckg_node_free(linked_list, node) node = MACRO_ckg_node_free(linked_list, node)
@@ -63,6 +64,7 @@ internal CKG_Node* MACRO_ckg_node_data_free(CKG_LinkedList* linked_list, CKG_Nod
         ckg_free(node->data);
     }
     ckg_free(node);
+
     return node;
 }
 #define ckg_node_data_free(linked_list, node) node = MACRO_ckg_node_data_free(linked_list, node)
@@ -81,7 +83,7 @@ CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u32 index, void* d
         return linked_list->head;
     }
 
-    ckg_assert(index < old_count);
+    ckg_assert(index <= old_count);
     CKG_Node* new_node_to_insert = ckg_node_create(linked_list, data);
 
     if (index == 0) { // insert at head
@@ -92,7 +94,7 @@ CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u32 index, void* d
         return new_node_to_insert;
     }
 
-    if (index == (old_count - 1)) { // insert at tail
+    if (index == old_count) { // insert at tail
         linked_list->tail->next = new_node_to_insert;
         new_node_to_insert->prev = linked_list->tail;
         linked_list->tail = new_node_to_insert;
@@ -132,19 +134,16 @@ void* ckg_linked_list_get(CKG_LinkedList* linked_list, u32 index) {
 }
 
 CKG_Node* ckg_linked_list_push(CKG_LinkedList* linked_list, void* data) {
-    return ckg_linked_list_insert(linked_list, linked_list->count - 1, data);
+    return ckg_linked_list_insert(linked_list, linked_list->count, data);
 }
 
 u32 ckg_linked_list_node_to_index(CKG_LinkedList* linked_list, CKG_Node* address) {
     CKG_Node* current_node = linked_list->head; 
-    if (current_node == address) {
-        return 0;
-    }
-    for (int i = 1; i < linked_list->count; i++) {
-        current_node = current_node->next;
+    for (int i = 0; i < linked_list->count + 1; i++) {
         if (current_node == address) {
             return i;
         }
+        current_node = current_node->next;
     }
 
     ckg_assert(FALSE); // couldn't match a node to an address
