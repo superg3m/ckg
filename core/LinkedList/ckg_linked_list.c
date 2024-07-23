@@ -160,6 +160,13 @@ CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u32 index) {
     ckg_assert(index >= 0);
 
     u32 old_count = linked_list->count--;
+    if (index == 0 && old_count == 1) { // removing the head fully
+        CKG_Node ret = *linked_list->head;
+        ckg_node_free(linked_list, linked_list->head);
+        linked_list->head = NULLPTR;
+
+        return ret;
+    }
 
     if (index == 0) { // remove head
         CKG_Node* cached_head = linked_list->head;
