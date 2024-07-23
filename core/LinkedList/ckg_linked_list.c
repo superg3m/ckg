@@ -191,8 +191,6 @@ CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u32 index) {
     CKG_Node ret = *current_node; 
     ckg_node_free(linked_list, current_node);
 
-    linked_list->count--;
-
     return ret;
 }
 
