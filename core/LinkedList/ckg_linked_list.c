@@ -137,11 +137,14 @@ CKG_Node* ckg_linked_list_push(CKG_LinkedList* linked_list, void* data) {
 
 u32 ckg_linked_list_node_to_index(CKG_LinkedList* linked_list, CKG_Node* address) {
     CKG_Node* current_node = linked_list->head; 
-    for (int i = 0; i < linked_list->count; i++) {
+    if (current_node == address) {
+        return 0;
+    }
+    for (int i = 1; i < linked_list->count; i++) {
+        current_node = current_node->next;
         if (current_node == address) {
             return i;
         }
-        current_node = current_node->next;
     }
 
     ckg_assert(FALSE); // couldn't match a node to an address
