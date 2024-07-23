@@ -48,11 +48,12 @@ void linked_list_operations() {
 	ckg_linked_list_push(linked_list_int, &value1[2]);
 	ckg_linked_list_push(linked_list_int, &value1[3]);
 	ckg_linked_list_push(linked_list_int, &value1[4]);
-	u32* test_u32 = ckg_linked_list_pop(linked_list_int).data;
+
+	u32* test_u32 = ckg_linked_list_remove(linked_list_int, 4).data;
 	CKG_LOG_DEBUG("list value: %d\n", *test_u32);
 	ckg_free(test_u32);
 
-	test_u32 = ckg_linked_list_remove(linked_list_int, 2).data;
+	test_u32 = ckg_linked_list_pop(linked_list_int).data;
 	CKG_LOG_DEBUG("list value: %d\n", *test_u32);
 	ckg_free(test_u32);
 

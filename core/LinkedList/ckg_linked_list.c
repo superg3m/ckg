@@ -69,20 +69,21 @@ internal CKG_Node* MACRO_ckg_node_data_free(CKG_LinkedList* linked_list, CKG_Nod
 
 CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u32 index, void* data) {
     ckg_assert(linked_list);
-    ckg_assert(data);   
+    ckg_assert(data);
+    ckg_assert(index <= linked_list->count);
+    ckg_assert(index >= 0);
+
+    u32 old_count = linked_list->count++;
     if (linked_list->head == NULLPTR) { // there is not head and by definition no tail
         CKG_Node* new_node_to_insert = ckg_node_create(linked_list, data);
         linked_list->head = new_node_to_insert;
         linked_list->tail = new_node_to_insert;
-        linked_list->count++;
+
         return linked_list->head;
     }
 
-    ckg_assert(index <= linked_list->count);
-    ckg_assert(index >= 0);
-
     CKG_Node* new_node_to_insert = ckg_node_create(linked_list, data);
-    linked_list->count++;
+
     if (index == 0) { // insert at head
         linked_list->head->prev = new_node_to_insert;
         new_node_to_insert->next = linked_list->head;
@@ -91,7 +92,7 @@ CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u32 index, void* d
         return new_node_to_insert;
     }
 
-    if (index == linked_list->count - 1) { // insert at tail
+    if (index == (old_count - 1)) { // insert at tail
         linked_list->tail->next = new_node_to_insert;
         new_node_to_insert->prev = linked_list->tail;
         linked_list->tail = new_node_to_insert;
@@ -131,7 +132,7 @@ void* ckg_linked_list_get(CKG_LinkedList* linked_list, u32 index) {
 }
 
 CKG_Node* ckg_linked_list_push(CKG_LinkedList* linked_list, void* data) {
-    return ckg_linked_list_insert(linked_list, linked_list->count, data);
+    return ckg_linked_list_insert(linked_list, linked_list->count - 1, data);
 }
 
 u32 ckg_linked_list_node_to_index(CKG_LinkedList* linked_list, CKG_Node* address) {
@@ -148,31 +149,31 @@ u32 ckg_linked_list_node_to_index(CKG_LinkedList* linked_list, CKG_Node* address
 }
 
 CKG_Node ckg_linked_list_pop(CKG_LinkedList* linked_list) {
-    return ckg_linked_list_remove(linked_list, linked_list->count);
+    return ckg_linked_list_remove(linked_list, linked_list->count - 1);
 }
 
 CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u32 index) {
     ckg_assert(linked_list); 
-    ckg_assert(linked_list->count != 0); 
+    ckg_assert(linked_list->count > 0); 
     ckg_assert(index <= linked_list->count);
     ckg_assert(index >= 0);
+
+    u32 old_count = linked_list->count--;
 
     if (index == 0) { // remove head
         CKG_Node* cached_head = linked_list->head;
         linked_list->head = linked_list->head->next;
         CKG_Node ret = *cached_head; 
         ckg_node_free(linked_list, cached_head);
-        linked_list->count--;
 
         return ret;
     }
 
-    if (index == linked_list->count) { // remove tail
+    if (index == (old_count - 1)) { // remove tail
         CKG_Node* cached_tail = linked_list->tail;
         linked_list->tail = linked_list->tail->prev;
         CKG_Node ret = *cached_tail; 
         ckg_node_free(linked_list, cached_tail);
-        linked_list->count--;
 
         return ret;
     }
