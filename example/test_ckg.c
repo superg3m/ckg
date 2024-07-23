@@ -20,5 +20,7 @@ int main() {
 	test_ckg_str_operations();
 	test_ckg_vector_operations();
 
+	CKG_LOG_DEBUG("THIS WORKS ALL THE WAY I THINK!");
+
 	return 0;
 }
