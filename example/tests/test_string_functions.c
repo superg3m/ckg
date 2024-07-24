@@ -329,6 +329,12 @@ void test_ckg_str_operations() {
     test_ckg_cstr_ends_with();
     test_ckg_cstr_reverse();
     test_ckg_cstr_index_of();
+
+    int test_int_to_cstr = 5112512;
+    char* string_buffer = ckg_alloc(9);
+    ckg_cstr_int_to_cstr(string_buffer, 9, test_int_to_cstr);
+    CKG_LOG_SUCCESS("INT TO STRING: %s\n", string_buffer);
+
     // test_ckg_string_edgecases();
     // test_ckg_string_assertions();
     CKG_LOG_DEBUG("======================= String Functions All Passed =======================\n");

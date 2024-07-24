@@ -75,6 +75,7 @@ extern "C" {
 	Boolean ckg_cstr_starts_with(const char* string_buffer, const char* starts_with);
 	Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with);
 	void ckg_cstr_reverse(const char* str, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
+	void ckg_cstr_int_to_cstr(char* string_buffer, size_t string_buffer_capacity, int number);
 	// ------------------------------------------------------------------------------------
 #ifdef __cplusplus
 }

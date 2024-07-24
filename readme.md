@@ -63,6 +63,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- [x] ckg_cstr_starts_with(str, starts_with)
 	- [x] ckg_cstr_ends_with(str, ends_with)
 	- [x] ckg_cstr_reverse(str, reversed_string_buffer, reversed_string_buffer_capacity)
+	- [x] ckg_cstr_int_to_cstr(string_buffer, string_buffer_capacity, number)
 
 ### Memory
 - [x] ckg_memory.h

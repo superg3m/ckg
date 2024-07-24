@@ -327,4 +327,12 @@ void ckg_cstr_reverse(const char* str, char* returned_reversed_string_buffer, si
 		ckg_cstr_append_char(returned_reversed_string_buffer, str_guarenteed_capacity, str[i]);
 	}
 }
+
+void ckg_cstr_int_to_cstr(char* string_buffer, size_t string_buffer_capacity, int number) {
+	while (number != 0) {
+		char c = '0' + (number % 10);
+		ckg_cstr_insert_char(string_buffer, string_buffer_capacity, c, 0);
+		number /= (int)10;
+	}
+}
 //************************** End Functions **************************
