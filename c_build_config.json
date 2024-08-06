@@ -2,7 +2,7 @@
     "c_build_version": "0.9",
     "project_name": "ckg",
     "github_root": "https://github.com/superg3m",
-    "compiler_type": "cl",
+    "compiler_type": "gcc",
     "std_version": "c11",
     "compiler_warning_level": "all",
 
@@ -17,7 +17,7 @@
 
     "./build_cl": {
         "output_name": "ckg.lib",
-        "compile_time_defines": [],
+        "compile_time_defines": [""],
         "include_paths": [""],
         "source_files": [
             "../core/Assert/*.c",
