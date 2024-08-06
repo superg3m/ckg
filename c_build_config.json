@@ -1,19 +1,25 @@
 {
-    "c_build_version" : "0.8",
+    "c_build_version": "0.9",
+    "project_name": "ckg",
+    "github_root": "https://github.com/superg3m",
+    "compiler_type": "cl",
+    "std_version": "c11",
+    "compiler_warning_level": "all",
 
-    "project_name" : "CKG",
-    "compiler_type" : "cl",
+    "compiler_disable_warnings": false,
+    "debug_with_visual_studio": false,
+    "should_rebuild_project_dependencies": false,
+    "compiler_treat_warnings_as_errors": true,
 
-    "debug_with_visual_studio" : false,
-    "should_rebuild_project_dependencies" : true,
-    "std_version" : "c11",
-    "project_dependencies" : [""],
+    "project_dependencies": [""],
+    "disable_specific_warnings": [""],
+    "inject_as_argument": [""],
 
-    "./build_cl" : {
-        "output_name" : "ckg.lib",
-        "compile_time_defines" : [""],
-        "include_paths" : "",
-        "source_paths" : [
+    "./build_cl": {
+        "output_name": "ckg.lib",
+        "compile_time_defines": [],
+        "include_paths": [""],
+        "source_files": [
             "../core/Assert/*.c",
             "../core/Memory/*.c",
             "../core/String/*.c",
@@ -21,17 +27,14 @@
             "../core/Vector/*.c",
             "../core/LinkedList/*.c"
         ],
-
-        "additional_libs" : [
-            ""
-        ]
+        "additional_libs": [""]
     },
 
     "./example/cl" : {
         "output_name" : "test_ckg.exe",
         "compile_time_defines" : [""],
-        "include_paths" : "",
-        "source_paths" : [
+        "include_paths" : [""],
+        "source_files" : [
             "../*.c"
         ],
 
@@ -40,5 +43,5 @@
         ]
     },
 
-    "execute" : "test_ckg.exe"
+    "execute": ["test_ckg.exe"]
 }
