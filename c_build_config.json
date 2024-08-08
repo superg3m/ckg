@@ -2,7 +2,7 @@
     "c_build_version": "0.9",
     "project_name": "ckg",
     "github_root": "https://github.com/superg3m",
-    "compiler_type": "cl",
+    "compiler_type": "gcc",
     "std_version": "c11",
     "compiler_warning_level": "all",
 
@@ -15,8 +15,8 @@
     "disable_specific_warnings": [""],
     "inject_as_argument": [""],
 
-    "./build_cl": {
-        "output_name": "ckg.lib",
+    "./build_$compiler_type": {
+        "output_name": "ckg.a",
         "compile_time_defines": [""],
         "include_paths": [""],
         "source_files": [
@@ -30,7 +30,7 @@
         "additional_libs": [""]
     },
 
-    "./example/cl" : {
+    "./example/$compiler_type" : {
         "output_name" : "test_ckg.exe",
         "compile_time_defines" : [""],
         "include_paths" : [""],
@@ -39,7 +39,7 @@
         ],
 
         "additional_libs" : [
-            "../../build_cl/ckg.lib"
+            "../../build_$compiler_type/ckg.a"
         ]
     },
 
