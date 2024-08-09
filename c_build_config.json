@@ -16,7 +16,7 @@
     "inject_as_argument": [""],
 
     "./build_$compiler_type": {
-        "output_name": "ckg.a",
+        "output_name": "ckg.lib",
         "compile_time_defines": [""],
         "include_paths": [""],
         "source_files": [
@@ -39,7 +39,7 @@
         ],
 
         "additional_libs" : [
-            "../../build_$compiler_type/ckg.a"
+            "../../build_$compiler_type/ckg.lib"
         ]
     },
 
