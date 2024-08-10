@@ -10,16 +10,6 @@
 
 //=========================== End Types ===========================
 
-//************************* Begin Functions *************************
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-//************************** End Functions **************************
-
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
 #if CKG_ASSERT_ENABLED == TRUE	   
     #define ckg_assert(expression)                            \

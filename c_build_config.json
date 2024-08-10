@@ -20,12 +20,7 @@
         "compile_time_defines": [""],
         "include_paths": [""],
         "source_files": [
-            "../core/Assert/*.c",
-            "../core/Memory/*.c",
-            "../core/String/*.c",
-            "../core/Logger/*.c",
-            "../core/Vector/*.c",
-            "../core/LinkedList/*.c"
+            "../ckg.c"
         ],
         "additional_libs": [""]
     },
