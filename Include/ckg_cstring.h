@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ckg_types.h"
+#include "ckg_types.h"
 //************************* Begin Functions *************************
 #ifdef __cplusplus
 extern "C" {
@@ -83,8 +83,8 @@ extern "C" {
 //************************** End Functions **************************
 
 #if defined(CKG_IMPL)
-	#include "../Memory/ckg_memory.h"
-	#include "../Assert/ckg_assert.h"
+	#include "ckg_memory.h"
+	#include "ckg_assert.h"
 
 	u32 ckg_cstr_length(const char* cstring) {
 		ckg_assert(cstring);

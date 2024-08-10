@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../core/ckg_types.h"
+#include "ckg_types.h"
 
 //========================== Begin Types ==========================
 typedef struct CKG_VectorHeader {
@@ -31,8 +31,8 @@ extern "C" {
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 
 #if defined(CKG_IMPL)
-	#include "./ckg_vector.h"
-	#include "../../core/Memory/ckg_memory.h"
+	#include "ckg_vector.h"
+	#include "ckg_memory.h"
 
 	void* ckg_vector_grow(void* vector, size_t element_size) {
 		if (vector == NULLPTR) {

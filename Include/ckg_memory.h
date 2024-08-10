@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ckg_types.h"
+#include "ckg_types.h"
 
 //========================== Begin Types ==========================
 typedef void* (CKG_MemoryAllocator)(size_t);
@@ -68,10 +68,10 @@ extern "C" {
 
 
 #if defined(CKG_IMPL)
-    #include "../ckg_types.h"
-    #include "../Assert/ckg_assert.h"
-    #include "../Assert/ckg_stack_trace.h"
-    #include "../Math/ckg_math.h"
+    #include "ckg_types.h"
+    #include "ckg_assert.h"
+    #include "ckg_stack_trace.h"
+    #include "ckg_math.h"
 
     void* ckg_memory_default_allocator(size_t allocation_size) {
         void* ret = malloc(allocation_size);

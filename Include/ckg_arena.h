@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ckg_types.h"
+#include "ckg_types.h"
 
 //========================== Begin Types ==========================
 typedef struct CKG_Arena {
@@ -42,8 +42,8 @@ extern "C" {
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 
 #if defined(CKG_IMPL)
-	#include "./ckg_memory.h"
-	#include "../Assert/ckg_assert.h"
+	#include "ckg_memory.h"
+	#include "ckg_assert.h"
 
 	#define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
 

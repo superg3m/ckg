@@ -2,7 +2,7 @@
     "c_build_version": "0.9",
     "project_name": "ckg",
     "github_root": "https://github.com/superg3m",
-    "compiler_type": "gcc",
+    "compiler_type": "cl",
     "std_version": "c11",
     "compiler_warning_level": "all",
 
@@ -18,7 +18,7 @@
     "./build_$compiler_type": {
         "output_name": "ckg.lib",
         "compile_time_defines": [""],
-        "include_paths": [""],
+        "include_paths": ["../core"],
         "source_files": [
             "../ckg.c"
         ],

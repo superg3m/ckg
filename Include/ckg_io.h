@@ -5,7 +5,7 @@
  * Creator: Jovanni Djonaj
 ===========================================================*/
 #include <stdio.h>
-#include "../Assert/ckg_assert.h"
+#include "ckg_assert.h"
 
 typedef struct CKG_FileSystem {
 	char* file_name;
@@ -30,7 +30,7 @@ extern "C" {
 #endif
 //************************** End Functions **************************
 #if defined(CKG_IMPL)
-	#include "../String/ckg_cstring.h"
+	#include "ckg_cstring.h"
 
 	CKG_FileSystem ckg_file_system_create(char* file_name) {
 		CKG_FileSystem file_system;
@@ -62,7 +62,7 @@ extern "C" {
 	char* ckg_file_get_next_line(CKG_FileSystem* file_system) {
 		// Date: July 06, 2024
 		// TODO(Jovanni): this is temperary it needs to grow
-		char line[2500]; 
+		char* line = ckg_alloc(2500); 
 		ckg_memory_zero(line, 2500);
 		char c;
 		do {
