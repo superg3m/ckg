@@ -149,7 +149,7 @@ extern "C" {
         // TODO(Jovanni): check if index is closer to count or not then reverse the loop if approaching from the tail end.
         // as opposed to the head end.
         CKG_Node* current_node = linked_list->head; 
-        for (int i = 0; i < index; i++) {
+        for (u32 i = 0; i < index; i++) {
             current_node = current_node->next;
         }
 
@@ -165,7 +165,7 @@ extern "C" {
     CKG_Node* ckg_linked_list_get_node(CKG_LinkedList* linked_list, u32 index) {
         ckg_assert(linked_list);
         CKG_Node* current_node = linked_list->head; 
-        for (int i = 0; i < index; i++) {
+        for (u32 i = 0; i < index; i++) {
             current_node = current_node->next;
         }
 
@@ -182,7 +182,7 @@ extern "C" {
 
     u32 ckg_linked_list_node_to_index(CKG_LinkedList* linked_list, CKG_Node* address) {
         CKG_Node* current_node = linked_list->head; 
-        for (int i = 0; i < linked_list->count + 1; i++) {
+        for (u32 i = 0; i < linked_list->count + 1; i++) {
             if (current_node == address) {
                 return i;
             }
@@ -231,7 +231,7 @@ extern "C" {
         }
 
         CKG_Node* current_node = linked_list->head; 
-        for (int i = 0; i < index; i++) {
+        for (u32 i = 0; i < index; i++) {
             current_node = current_node->next;
         }
 
@@ -247,7 +247,7 @@ extern "C" {
         ckg_assert(linked_list); 
         CKG_Node* current_node = linked_list->head; 
         CKG_Node* next_node = NULLPTR; 
-        for (int i = 0; i < linked_list->count; i++) {
+        for (u32 i = 0; i < linked_list->count; i++) {
             next_node = current_node->next;
             ckg_node_data_free(linked_list, current_node);
             current_node = next_node;

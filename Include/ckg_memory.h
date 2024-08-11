@@ -49,7 +49,7 @@ extern "C" {
 
 #define ckg_memory_fill(buffer, buffer_count, fill_element) \
 {														\
-    for (int i = 0; i < buffer_count; i++) { 			\
+    for (u32 i = 0; i < buffer_count; i++) { 			\
         buffer[i] = fill_element;                       \
     }                                                  	\
 }
@@ -121,7 +121,7 @@ extern "C" {
 
         u8* buffer_one_data = (u8*)buffer_one;
         u8* buffer_two_data = (u8*)buffer_two;
-        for (int i = 0; i < buffer_one_size; i++) {
+        for (u32 i = 0; i < buffer_one_size; i++) {
             if (buffer_one_data[i] != buffer_two_data[i]) {
                 return FALSE;
             }
@@ -139,12 +139,11 @@ extern "C" {
         }
 
         u8* temp_data_copy = ckg_alloc(source_size_in_bytes);
-        for (int i = 0; i < source_size_in_bytes; i++) {
-            u8 temp = ((u8*)source)[i];
+        for (u32 i = 0; i < source_size_in_bytes; i++) {
             temp_data_copy[i] = ((u8*)source)[i];
         }
 
-        for (int i = 0; i < source_size_in_bytes; i++) {
+        for (u32 i = 0; i < source_size_in_bytes; i++) {
             ((u8*)destination)[i] = temp_data_copy[i];
         }
 
@@ -152,7 +151,7 @@ extern "C" {
     }
 
     void ckg_memory_zero(void* data, size_t data_size_in_bytes) {
-        for (int i = 0; i < data_size_in_bytes; i++) {
+        for (u32 i = 0; i < data_size_in_bytes; i++) {
             ((u8*)data)[i] = 0;
         }
     }
@@ -162,8 +161,6 @@ extern "C" {
         ckg_assert(index >= 0);
 
         u8* byte_data = (u8*)data;
-
-
 
         size_t total_size = element_size_in_bytes * data_capacity;
         size_t source_offset = (index + 1) * element_size_in_bytes;

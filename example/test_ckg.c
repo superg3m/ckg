@@ -12,7 +12,7 @@ void win32_memory_free_callback(void* data) {
 }
 
 void linked_list_operations() {
-	for (int i = 0; i < 25; i++) {
+	for (u32 i = 0; i < 25; i++) {
 		CKG_LOG_PRINT("\n");
 	}
 

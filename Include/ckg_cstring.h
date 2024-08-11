@@ -207,7 +207,7 @@ extern "C" {
 		size_t allocation_size = (end - start) + 2;
 
 		u32 counter = 0;
-		for (int i = start; i <= end; i++) {
+		for (u32 i = start; i <= end; i++) {
 			returned_buffer[counter++] = str[i];
 		}
 		returned_buffer[counter] = '\0'; 
@@ -237,12 +237,12 @@ extern "C" {
 		// "fss\0" = 2
 		
 		Boolean contains_substring = FALSE;
-		for (int i = 0; !contains_substring && (i <= str_length - contains_length); i++) {
+		for (u32 i = 0; !contains_substring && (i <= str_length - contains_length); i++) {
 			if (str[i] != contains[0]) {
 				continue;
 			}
 
-			u32 end_index = (i + (contains_length - 1));
+			u32 end_index = (u32)(i + (contains_length - 1));
 			if (end_index > str_length) {
 				break;
 			}
@@ -278,7 +278,7 @@ extern "C" {
 		}
 		
 		s32 ret_index = -1;
-		for (int i = 0; i <= str_length - contains_length; i++) {
+		for (u32 i = 0; i <= str_length - contains_length; i++) {
 			if (ret_index != -1) {
 				break;
 			}
@@ -287,7 +287,7 @@ extern "C" {
 				continue;
 			}
 
-			s32 end_index = (i + (contains_length - 1));
+			s32 end_index = (u32)(i + (contains_length - 1));
 			if (end_index > str_length) {
 				break;
 			}
@@ -323,12 +323,12 @@ extern "C" {
 		}
 		
 		s32 ret_index = -1;
-		for (int i = 0; i <= str_length - contains_length; i++) {
+		for (u32 i = 0; i <= str_length - contains_length; i++) {
 			if (str[i] != sub_string[0]) {
 				continue;
 			}
 
-			s32 end_index = (i + (contains_length - 1));
+			s32 end_index = (u32)(i + (contains_length - 1));
 			if (end_index > str_length) {
 				break;
 			}
@@ -349,8 +349,8 @@ extern "C" {
 		ckg_assert(starts_with);
 
 		
-		size_t str_length = ckg_cstr_length(str); 
-		size_t starts_with_length = ckg_cstr_length(starts_with);
+		u32 str_length = ckg_cstr_length(str); 
+		u32 starts_with_length = ckg_cstr_length(starts_with);
 
 		if (str_length == 0 && starts_with_length == 0) {
 			return TRUE;
@@ -360,7 +360,7 @@ extern "C" {
 
 		Boolean starts_with_substring = FALSE;
 		char* temp_string = ckg_alloc(starts_with_length);
-		ckg_substring(str, temp_string, 0, starts_with_length - 1);
+		ckg_substring(str, temp_string, (u32)0, starts_with_length - 1);
 		if (ckg_cstr_equal(temp_string, starts_with)) {
 			starts_with_substring = TRUE;
 		}
@@ -373,8 +373,8 @@ extern "C" {
 		ckg_assert(str);
 		ckg_assert(ends_with);
 
-		size_t str_length = ckg_cstr_length(str); 
-		size_t ends_with_length = ckg_cstr_length(ends_with);
+		u32 str_length = ckg_cstr_length(str); 
+		u32 ends_with_length = ckg_cstr_length(ends_with);
 
 		if (str_length == 0 && ends_with_length == 0 || ends_with_length == 0) {
 			return TRUE;

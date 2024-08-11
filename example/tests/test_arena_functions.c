@@ -10,10 +10,10 @@ void test_ckg_arena_operations() {
 
   // Test arena_push_array
   int* int_array = ckg_arena_push_array(&arena, int, 5);
-  for (int i = 0; i < 5; i++) {
+  for (u32 i = 0; i < 5; i++) {
     int_array[i] = i;
   }
-  for (int i = 0; i < 5; i++) {
+  for (u32 i = 0; i < 5; i++) {
     ckg_assert(int_array[i] == i);
   }
 
@@ -28,7 +28,7 @@ void test_ckg_arena_operations() {
 
     // Test default arena
   CKG_Arena default_arena = ckg_arena_create(arena_size_common, "Default Arena");
-  for (int i = 0; i < 16; i++) {
+  for (u32 i = 0; i < 16; i++) {
     int* ptr = ckg_arena_push(&default_arena, int);
     *ptr = i;
   }
@@ -36,7 +36,7 @@ void test_ckg_arena_operations() {
 
   // Test circular arena
   CKG_Arena circular_arena = ckg_arena_create_custom(arena_size_common, "Circular Arena", CKG_ARENA_FLAG_CIRCULAR);
-  for (int i = 0; i < 32; i++) {
+  for (u32 i = 0; i < 32; i++) {
     int* ptr = ckg_arena_push(&circular_arena, int);
     *ptr = i;
   }
@@ -49,7 +49,7 @@ void test_ckg_arena_operations() {
 
   // Test vector arena
   CKG_Arena vector_arena = ckg_arena_create_custom(arena_size_common, "Vector Arena", CKG_ARENA_FLAG_VECTOR);
-  for (int i = 0; i < 32; i++) {
+  for (u32 i = 0; i < 32; i++) {
     int* ptr = ckg_arena_push(&vector_arena, int);
     *ptr = i;
   }
