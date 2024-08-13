@@ -53,16 +53,28 @@ typedef u8 Boolean;
 
 #define PLATFORM_MAX_PATH 256
 #if defined(_WIN32)
-    #define PLATFORM_WINDOWS
-    #define OS_DELIMITER '\\'
+
 #elif defined(__linux__)
     #define PLATFORM_LINUX
     #define OS_DELIMITER '/'
 #elif defined(__APPLE__) && defined(__MACH__)
-    #define PLATFORM_MACOS
+
+#else
+
+#endif
+
+#if defined(_WIN32)
+    #define PLATFORM_WINDOWS
+    #define OS_DELIMITER '\\'
+#elif defined(__APPLE__)
+    #define PLATFORM_APPLE
+    #define OS_DELIMITER '/'
+#elif defined(__linux__) || defined(__unix__) || defined(__POSIX__)
+    #define PLATFORM_LINUX
     #define OS_DELIMITER '/'
 #else
     #define PLATFORM_UNKNOWN
     #define OS_DELIMITER '/'
 #endif
+
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
