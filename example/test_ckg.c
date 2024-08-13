@@ -1,15 +1,19 @@
 #include "../ckg.h"
 #include "./tests/test_functions.c"
-#include <windows.h>
+#if defined(PLATFORM_WINDOWS)
+	#include <windows.h>
 
-void* win32_memory_alloc_callback(size_t allocation_size) {
-	void* ret = VirtualAlloc(0, allocation_size, MEM_COMMIT, PAGE_READWRITE);
-	return ret;
-}
+	void* win32_memory_alloc_callback(size_t allocation_size) {
+		void* ret = VirtualAlloc(0, allocation_size, MEM_COMMIT, PAGE_READWRITE);
+		return ret;
+	}
 
-void win32_memory_free_callback(void* data) {
-	VirtualFree(data, 0, MEM_RELEASE);
-}
+	void win32_memory_free_callback(void* data) {
+		VirtualFree(data, 0, MEM_RELEASE);
+	}
+#endif
+
+
 
 void linked_list_operations() {
 	for (u32 i = 0; i < 25; i++) {
@@ -72,8 +76,10 @@ void linked_list_operations() {
 }
 
 int main() {
+	#if defined(PLATFORM_WINDOWS)
 	ckg_bind_alloc_callback(win32_memory_alloc_callback);
 	ckg_bind_free_callback(win32_memory_free_callback);
+	#endif
 
 	test_ckg_memory_operations();
 	test_ckg_arena_operations();
