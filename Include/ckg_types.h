@@ -52,7 +52,7 @@ typedef u8 Boolean;
 #define ArrayCount(array) (sizeof(array) / sizeof(array[0]))
 
 #define PLATFORM_MAX_PATH 256
-#ifdef _WIN32
+#if defined(_WIN32)
     #define PLATFORM_WINDOWS
     #define OS_DELIMITER '\\'
 #elif defined(__linux__)

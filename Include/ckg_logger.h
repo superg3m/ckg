@@ -60,7 +60,7 @@ extern "C" {
     #include "ckg_memory.h"
     #include "ckg_cstring.h"
 
-    #if (PLATFORM_WINDOWS)
+    #if defined(PLATFORM_WINDOWS)
         #include <windows.h>
     #endif
 
