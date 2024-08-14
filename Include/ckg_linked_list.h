@@ -26,6 +26,8 @@ extern "C" {
     CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u32 index, void* data);
     CKG_Node* ckg_linked_list_get_node(CKG_LinkedList* linked_list, u32 index);
     void* ckg_linked_list_get(CKG_LinkedList* linked_list, u32 index);
+    void* ckg_linked_list_peek_head(CKG_LinkedList* linked_list);
+    void* ckg_linked_list_peek_tail(CKG_LinkedList* linked_list);
     CKG_Node* ckg_linked_list_push(CKG_LinkedList* linked_list, void* data);
     CKG_Node ckg_linked_list_pop(CKG_LinkedList* linked_list);
     CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u32 index);
@@ -174,6 +176,14 @@ extern "C" {
 
     void* ckg_linked_list_get(CKG_LinkedList* linked_list, u32 index) {
         return ckg_linked_list_get_node(linked_list, index)->data;
+    }
+
+    void* ckg_linked_list_peek_head(CKG_LinkedList* linked_list) {
+        return ckg_linked_list_get_node(linked_list, 0)->data;
+    }
+
+    void* ckg_linked_list_peek_tail(CKG_LinkedList* linked_list) {
+        return ckg_linked_list_get_node(linked_list, linked_list->count - 1)->data;
     }
 
     CKG_Node* ckg_linked_list_push(CKG_LinkedList* linked_list, void* data) {
