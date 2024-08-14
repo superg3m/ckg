@@ -68,7 +68,6 @@ extern "C" {
 	}
 
 	CKG_Arena* MACRO_ckg_arena_create(u32 allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment) {
-		ckg_assert_msg((alignment & 1) == 0, "Arena alignment is not a power of two\n");
 		CKG_Arena* arena = ckg_alloc(sizeof(CKG_Arena));
 		arena->alignment = alignment == 0 ? 8 : alignment;
 		arena->name = name;
