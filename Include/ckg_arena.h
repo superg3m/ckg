@@ -89,6 +89,7 @@ extern "C" {
 			ckg_free(page->base_address);
 			ckg_free(page);
 		}
+		ckg_linked_list_free(arena->pages);
 		ckg_free(arena);
 
 		return arena;
