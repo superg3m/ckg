@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ckg_types.h"
+#include "./ckg_types.h"
 //========================== Begin Types ==========================
 typedef struct CKG_Node {
     struct CKG_Node* next;
@@ -44,8 +44,8 @@ extern "C" {
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 
 #if defined(CKG_IMPL)
-    #include "ckg_memory.h" 
-    #include "ckg_assert.h"
+    #include "./ckg_memory.h" 
+    #include "./ckg_assert.h"
 
     CKG_LinkedList* MACRO_ckg_linked_list_create(size_t element_size_in_bytes, Boolean is_pointer_type) {
         CKG_LinkedList* ret = ckg_alloc(sizeof(CKG_LinkedList));

@@ -5,7 +5,7 @@
  * Creator: Jovanni Djonaj
 ===========================================================*/
 #include <stdio.h>
-#include "ckg_assert.h"
+#include "./ckg_types.h"
 
 typedef struct CKG_FileSystem {
 	char* file_name;
@@ -30,7 +30,8 @@ extern "C" {
 #endif
 //************************** End Functions **************************
 #if defined(CKG_IMPL)
-	#include "ckg_cstring.h"
+	#include "./ckg_cstring.h"
+	#include "./ckg_assert.h"
 
 	CKG_FileSystem ckg_file_system_create(char* file_name) {
 		CKG_FileSystem file_system;

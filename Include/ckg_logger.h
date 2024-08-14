@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ckg_types.h"
+#include "./ckg_types.h"
 //========================== Begin Types ==========================
 //Regular text
 #define CKG_BLACK "\033[0;30m"
@@ -57,8 +57,8 @@ extern "C" {
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 
 #if defined(CKG_IMPL)
-    #include "ckg_memory.h"
-    #include "ckg_cstring.h"
+    #include "./ckg_memory.h"
+    #include "./ckg_cstring.h"
 
     #if defined(PLATFORM_WINDOWS)
         #include <windows.h>

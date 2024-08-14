@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ckg_types.h"
-#include "ckg_linked_list.h"
+#include "./ckg_types.h"
+#include "./ckg_linked_list.h"
 //========================== Begin Types ==========================
 typedef struct CKG_ArenaPage {
 	void* base_address;
@@ -49,8 +49,8 @@ extern "C" {
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 
 #if defined(CKG_IMPL)
-	#include "ckg_memory.h"
-	#include "ckg_assert.h"
+	#include "./ckg_memory.h"
+	#include "./ckg_assert.h"
 
 	#define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
 

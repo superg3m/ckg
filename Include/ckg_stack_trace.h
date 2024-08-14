@@ -12,9 +12,9 @@ extern "C" {
 //************************** End Functions **************************
 
 #if defined(CKG_IMPL)
-    #include "ckg_types.h"
-    #include "ckg_logger.h"
-    #include "ckg_memory.h"
+    #include "./ckg_types.h"
+    #include "./ckg_logger.h"
+    #include "./ckg_memory.h"
     
     #if defined(_MSC_VER )
         #include <windows.h>
