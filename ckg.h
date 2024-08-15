@@ -1,8 +1,6 @@
 #pragma once
 
 #include "./Include/ckg_types.h"
-
-
 #include "./Include/ckg_stack_trace.h"
 #include "./Include/ckg_assert.h"
 #include "./Include/ckg_arena.h"
