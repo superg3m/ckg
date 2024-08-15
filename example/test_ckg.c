@@ -88,14 +88,22 @@ int main() {
 
 	linked_list_operations();
 
-	u32 number_to_endian_swap = 12;
+	u32 number_to_endian_swap = 2;
 	U32_EndianSwap(&number_to_endian_swap);
 	CKG_LOG_SUCCESS("EndianSwap: %d\n", number_to_endian_swap);
-	
+
 	U32_EndianSwap(&number_to_endian_swap);
 	CKG_LOG_SUCCESS("EndianSwap: %d\n", number_to_endian_swap);
+
+	CKG_LOG_SUCCESS("Before first bit set: %d\n", number_to_endian_swap);
+	SET_BIT(number_to_endian_swap, 0);
+	CKG_LOG_SUCCESS("After first bit set: %d\n", number_to_endian_swap);
+
+	SET_BIT(number_to_endian_swap, 2);
+	CKG_LOG_SUCCESS("After third bit set: %d\n", number_to_endian_swap);
+
+	ckg_assert(GET_BIT(number_to_endian_swap, 0));
 
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
-
 	return 0;
 }

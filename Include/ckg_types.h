@@ -47,8 +47,8 @@ typedef u8 Boolean;
 
 void U32_EndianSwap(u32* number_to_endian_swap);
 void U64_EndianSwap(u64* number_to_endian_swap);
-#define GET_BIT(number, bit_to_check) (number & (1 << bit_to_check));
-#define SET_BIT(number, bit_to_set) number |= (1 << bit_to_unset);
+#define GET_BIT(number, bit_to_check) ((number & (1 << bit_to_check)) >> bit_to_check)
+#define SET_BIT(number, bit_to_set) number |= (1 << bit_to_set);
 #define UNSET_BIT(number, bit_to_unset) number &= (~(1 << bit_to_unset));
 
 /**
