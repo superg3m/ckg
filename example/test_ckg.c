@@ -102,6 +102,9 @@ int main() {
 	SET_BIT(number_to_endian_swap, 2);
 	CKG_LOG_SUCCESS("After third bit set: %d\n", number_to_endian_swap);
 
+	UNSET_BIT(number_to_endian_swap, 2);
+	CKG_LOG_SUCCESS("After third bit set: %d\n", number_to_endian_swap);
+
 	ckg_assert(GET_BIT(number_to_endian_swap, 0));
 
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
