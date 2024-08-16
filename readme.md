@@ -17,6 +17,8 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 
 # Goals
 
+I HAVE AND IDEA I'M GOING TO AUTO GENERATE THE ckg.h FILE
+
 ### key
 - '[x]': Finished
 - '[/]': Started working on it
