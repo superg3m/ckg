@@ -32,8 +32,8 @@ typedef u8 Boolean;
 #define MegaBytes(value) ((u64)KiloBytes(value) * 1024L)
 #define GigaBytes(value) ((u64)MegaBytes(value) * 1024L)
 
-#define MIN(value, min_value) (value > min_value ? value : min_value)
-#define MAX(value, max_value) (value < max_value ? value : max_value)
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #define CLAMP(value, min_value, max_value) (MIN(MAX(value, min_value), max_value))
 
 #define local_persist static
