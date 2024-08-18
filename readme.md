@@ -1,3 +1,6 @@
+# builds uisng c-build with cl/gcc and on ubuntu(wsl)
+- If you are on linux all you need to do is change the compiler_type to "gcc" from "cl" in the c_build_config.json
+
 # CKG's Core Thesis
 - The point of the ckit granular (ckg) is building out everything at a granular level.
 	- Using this small library to build out [CKIT](https://github.com/superg3m/ckit) (A much more sophisticated C library build)
@@ -5,7 +8,7 @@
 - Collection of tools, data structures, and algorithms that I find useful
 - (CONSTRAINT) ckg can't allocate in string functions or any other functions on its own because if it did the ckit memory tracker would not work
 
-#### NOTE 
+#### NOTES 
 I consider CKG almost done I would like to revist the FileIO section but other than that this is a solid granular library
 I have some tests but, i'm not confident in the validitiy of the string section.
 

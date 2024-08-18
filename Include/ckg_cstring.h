@@ -97,8 +97,6 @@ extern "C" {
 		return length;
 	}
 
-
-
 	Boolean ckg_cstr_equal(const char* s1, const char* s2) {
 		ckg_assert(s1);
 		ckg_assert(s2);
