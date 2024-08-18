@@ -13,8 +13,6 @@
 	}
 #endif
 
-
-
 void linked_list_operations() {
 	CKG_LinkedList* linked_list = ckg_linked_list_create(char*, TRUE);
 	CKG_Node* address = ckg_linked_list_insert(linked_list, 0, "hello");
