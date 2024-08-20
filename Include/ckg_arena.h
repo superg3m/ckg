@@ -28,8 +28,8 @@ typedef enum CKG_ArenaFlag {
 #ifdef __cplusplus
 extern "C" {
 #endif
-	CKG_Arena* MACRO_ckg_arena_create(u32 allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment);
-	void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size);	
+	CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment);
+	void* MACRO_ckg_arena_push(CKG_Arena* arena, size_t element_size);	
 	
 	CKG_Arena* MACRO_ckg_arena_free(CKG_Arena* arena);
 	void ckg_arena_clear(CKG_Arena* arena);
@@ -58,7 +58,7 @@ extern "C" {
 		return arena->flag == flag;
 	}
 
-	internal CKG_ArenaPage* ckg_arena_page_create(u32 allocation_size) {
+	internal CKG_ArenaPage* ckg_arena_page_create(size_t allocation_size) {
 		CKG_ArenaPage* ret = ckg_alloc(sizeof(CKG_ArenaPage));
 		ret->used = 0;
 		ret->capacity = allocation_size;
@@ -67,7 +67,7 @@ extern "C" {
 		return ret;
 	}
 
-	CKG_Arena* MACRO_ckg_arena_create(u32 allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment) {
+	CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment) {
 		CKG_Arena* arena = ckg_alloc(sizeof(CKG_Arena));
 		arena->alignment = alignment == 0 ? 8 : alignment;
 		arena->name = name;
@@ -82,7 +82,7 @@ extern "C" {
 	CKG_Arena* MACRO_ckg_arena_free(CKG_Arena* arena) {
 		ckg_assert(arena);
 
-		for (int i = 0; i < arena->pages->count; i++) {
+		for (u32 i = 0; i < arena->pages->count; i++) {
 			CKG_ArenaPage* page = ckg_linked_list_remove(arena->pages, 0).data;
 			ckg_assert(page->base_address);
 			ckg_free(page->base_address);
@@ -97,7 +97,7 @@ extern "C" {
 	void ckg_arena_clear(CKG_Arena* arena) {
 		ckg_assert(arena);
 
-		for (int i = 0; i < arena->pages->count; i++) {
+		for (u32 i = 0; i < arena->pages->count; i++) {
 			CKG_ArenaPage* page = ckg_linked_list_get(arena->pages, i);
 			ckg_assert(page->base_address);
 			ckg_memory_zero(page->base_address, page->used);
@@ -105,7 +105,7 @@ extern "C" {
 		}
 	}
 
-	void* MACRO_ckg_arena_push(CKG_Arena* arena, u32 element_size) {
+	void* MACRO_ckg_arena_push(CKG_Arena* arena, size_t element_size) {
 		ckg_assert(arena);
 
 		CKG_ArenaPage* last_page = ckg_linked_list_peek_tail(arena->pages);
