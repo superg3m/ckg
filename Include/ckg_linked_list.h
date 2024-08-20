@@ -200,7 +200,7 @@ extern "C" {
         }
 
         ckg_assert(FALSE); // couldn't match a node to an address
-        return -1; // should never get here
+        return 0; // should never get here
     }
 
     CKG_Node ckg_linked_list_pop(CKG_LinkedList* linked_list) {

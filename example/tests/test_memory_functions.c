@@ -11,10 +11,10 @@ void test_ckg_memory_operations() {
 	// Test ckg_memory_callocate
 	int* ptr2 = ckg_alloc(10 * sizeof(int));
 	ckg_assert(ptr2 != NULLPTR);
-	for (u32 i = 0; i < 10; i++) {
+	for (int i = 0; i < 10; i++) {
 		ptr2[i] = i;
 	}
-	for (u32 i = 0; i < 10; i++) {
+	for (int i = 0; i < 10; i++) {
 		ckg_assert(ptr2[i] == i);
 	}
 	ckg_free(ptr2);

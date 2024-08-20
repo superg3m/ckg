@@ -67,7 +67,7 @@ extern "C" {
 		ckg_memory_zero(line, 2500);
 		char c;
 		do {
-			c = fgetc(file_system->handle);
+			c = (char)fgetc(file_system->handle);
 			if (c != '\n' && c != EOF) {
 				ckg_cstr_append_char(line, 2500, c);
 			}
@@ -79,7 +79,7 @@ extern "C" {
 	}
 
 	char ckg_file_get_next_char(CKG_FileSystem* file_system) {
-		return fgetc(file_system->handle);
+		return (char)fgetc(file_system->handle);
 	}
 
 	void ckg_file_close(CKG_FileSystem* file_system) { 

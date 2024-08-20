@@ -139,7 +139,6 @@ extern "C" {
 		ckg_assert_msg(expression, "ckg_cstr_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  str_length + source_length, str_capacity);
 
 		char* source_ptr = str + index;
-		u32 data_payload_size = ckg_cstr_length(source_ptr);
 
 		ckg_memory_copy(source_ptr, source_ptr + 1, str_length - index, str_capacity - (index + 1));
 		str[index] = to_insert;
@@ -201,8 +200,6 @@ extern "C" {
 		//0 - 0 = h\0 = 2
 		//0 - 1 = he\0 = 3
 		//1 - 4 = ello\0 = 5
-
-		size_t allocation_size = (end - start) + 2;
 
 		u32 counter = 0;
 		for (u32 i = start; i <= end; i++) {

@@ -10,10 +10,10 @@ void test_ckg_arena_operations() {
 
   // Test arena_push_array
   int* int_array = ckg_arena_push_array(arena, int, 5);
-  for (u32 i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++) {
     int_array[i] = i;
   }
-  for (u32 i = 0; i < 5; i++) {
+  for (int i = 0; i < 5; i++) {
     ckg_assert(int_array[i] == i);
   }
 

@@ -83,8 +83,6 @@ extern "C" {
             CKG_COLOR_RESET,
         };
 
-        Boolean is_fatal = (log_level == 0);
-
         char out_message[CKG_PLATFORM_CHARACTER_LIMIT];
         ckg_memory_zero(out_message, sizeof(out_message));
 
