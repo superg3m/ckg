@@ -41,7 +41,7 @@ typedef u8 Boolean;
 
 // Date: July 12, 2024
 // TODO(Jovanni): Test this to make sure its actually works but it makes sense to me
-#define OFFSET_OF(type, member) ((u64)(&(((type*)0)->member)))
+#define OFFSET_OF(type, member) sizeof((u64)(&(((type*)0)->member)))
 
 #define FIRST_DIGIT(number) ((int)number % 10);
 
