@@ -24,6 +24,7 @@ typedef u8 Boolean;
 #define FALSE 0
 #define TRUE 1
 #define NULLPTR 0
+#define PI 3.14159265359
 
 #define stringify(entry) #entry
 #define glue(a, b) a##b
