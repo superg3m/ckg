@@ -71,8 +71,8 @@ void linked_list_operations() {
 
 int main() {
 	#if defined(PLATFORM_WINDOWS)
-	ckg_bind_alloc_callback(win32_memory_alloc_callback);
-	ckg_bind_free_callback(win32_memory_free_callback);
+		ckg_bind_alloc_callback(win32_memory_alloc_callback);
+		ckg_bind_free_callback(win32_memory_free_callback);
 	#endif
 
 	test_ckg_memory_operations();
