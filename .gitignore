@@ -42,3 +42,4 @@ compilation_errors.txt
 c-build/
 build_cl/
 example/cl/
+!c_build.py
