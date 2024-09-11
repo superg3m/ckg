@@ -40,3 +40,5 @@ ckg_test_procedure.set_additional_libs([f"../../build_{COMPILER}/ckg.lib"])
 # -------------------------------------------------------------------------------------
 #project.set_executables_to_run(["test_ckg.exe"])
 project.build()
+
+# JUST SO WE ARE CLEAR THIS IS A BREAKING CHANGE
