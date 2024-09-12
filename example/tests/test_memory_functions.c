@@ -21,7 +21,7 @@ void test_ckg_memory_operations() {
 
 	// Test ckg_realloc
 	int* ptr3 = ckg_alloc(sizeof(int));
-	int* ptr4 = ckg_realloc(ptr3, 2 * sizeof(int), 4 * sizeof(int));
+	int* ptr4 = ckg_realloc(ptr3, sizeof(int), 4 * sizeof(int));
 	ckg_assert(ptr4 != NULLPTR);
 	*ptr4 = 5;
 	ckg_assert(*ptr4 == 5);
