@@ -86,7 +86,7 @@ extern "C" {
         char out_message[CKG_PLATFORM_CHARACTER_LIMIT];
         ckg_memory_zero(out_message, sizeof(out_message));
 
-        char out_message2[CKG_PLATFORM_CHARACTER_LIMIT];
+        char out_message2[CKG_PLATFORM_CHARACTER_LIMIT + CKG_LOG_LEVEL_CHARACTER_LIMIT];
         ckg_memory_zero(out_message2, sizeof(out_message2));  
         
         va_list args_list;
