@@ -33,19 +33,43 @@ project.set_rebuild_project_dependencies(True)
 
 project.set_project_dependencies([""])
 # -------------------------------------------------------------------------------------
-ckg_lib_procedure = project.add_procedure(f"./build_{COMPILER}")
-ckg_lib_procedure.set_output_name("ckg.lib")
-ckg_lib_procedure.set_compile_time_defines([""])
-ckg_lib_procedure.set_include_paths([""])
-ckg_lib_procedure.set_source_files(["../ckg.c"])
-ckg_lib_procedure.set_additional_libs([""])
-# -------------------------------------------------------------------------------------
-ckg_test_procedure = project.add_procedure(f"./example/{COMPILER}")
-ckg_test_procedure.set_output_name("test_ckg.exe")
-ckg_test_procedure.set_compile_time_defines([""])
-ckg_test_procedure.set_include_paths([""])
-ckg_test_procedure.set_source_files(["../*.c"])
-ckg_test_procedure.set_additional_libs([f"../../build_{COMPILER}/ckg.lib"])
+
+procedures = {
+    "ckit_lib": {
+        "build_directory": f"./build_{COMPILER}",
+        "output_name": "ckg.lib" if COMPILER == "cl" else "libckg.a",
+        "source_files": ["../ckg/ckg.c"],
+        "additional_libs": [] if COMPILER == "cl" else ["-lUser32", "-lGDI32"],
+        "compile_time_defines": [],
+        "include_paths": [],
+    },
+    "ckit_test": {
+        "build_directory": f"./Tests/CoreTest/build_{COMPILER}",
+        "output_name": "ckit_test.exe" if COMPILER == "cl" else "ckit_test",
+        "source_files": ["../*.c"],
+        "additional_libs": [f"../../../build_{COMPILER}/ckit.lib" if COMPILER == "cl" else f"../../../build_{COMPILER}/libckit.a"],
+        "compile_time_defines": [],
+        "include_paths": [],
+    },
+	"test_ckg": {
+        "build_directory": f"./example/{COMPILER}",
+        "output_name": "test_ckg.exe" if COMPILER == "cl" else "test_ckg",
+        "source_files": ["../*.c"],
+        "additional_libs": [f"../../build_{COMPILER}/ckg.lib" if COMPILER == "cl" else f"../../build_{COMPILER}/libckg.a"],
+        "compile_time_defines": [],
+        "include_paths": [],
+    },
+}
+
+for procedure_name, procedure_data in procedures.items():
+	procedure = project.add_procedure(procedure_data["build_directory"])
+	procedure.set_output_name(procedure_data["output_name"])
+	procedure.set_source_files(procedure_data["source_files"])
+	procedure.set_include_paths(procedure_data["include_paths"])
+	procedure.set_compile_time_defines(procedure_data["compile_time_defines"])
+	procedure.set_additional_libs(procedure_data["additional_libs"])
+
 # -------------------------------------------------------------------------------------
 project.set_executables_to_run(["test_ckg.exe"])
+
 project.build(build_type)
