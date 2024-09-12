@@ -39,7 +39,7 @@
 *.ps1
 !bootstrap.ps1
 compilation_errors.txt
-c-build/
+c_build/
 build_cl/
 example/cl/
 !c_build.py
