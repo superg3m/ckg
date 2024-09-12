@@ -15,7 +15,7 @@ if args.level:
 	SET_LEVEL(args.level)
 # --------------------------------------------------------------------------------------
 
-COMPILER = args.compiler or "cl"
+COMPILER = args.compiler or "gcc"
 project = Project("ckg", COMPILER, is_dependency = args.is_dependency)
 
 # Do different things depending on the platform
@@ -38,22 +38,14 @@ procedures = {
     "ckit_lib": {
         "build_directory": f"./build_{COMPILER}",
         "output_name": "ckg.lib" if COMPILER == "cl" else "libckg.a",
-        "source_files": ["../ckg/ckg.c"],
+        "source_files": ["../ckg.c"],
         "additional_libs": [] if COMPILER == "cl" else ["-lUser32", "-lGDI32"],
-        "compile_time_defines": [],
-        "include_paths": [],
-    },
-    "ckit_test": {
-        "build_directory": f"./Tests/CoreTest/build_{COMPILER}",
-        "output_name": "ckit_test.exe" if COMPILER == "cl" else "ckit_test",
-        "source_files": ["../*.c"],
-        "additional_libs": [f"../../../build_{COMPILER}/ckit.lib" if COMPILER == "cl" else f"../../../build_{COMPILER}/libckit.a"],
         "compile_time_defines": [],
         "include_paths": [],
     },
 	"test_ckg": {
         "build_directory": f"./example/{COMPILER}",
-        "output_name": "test_ckg.exe" if COMPILER == "cl" else "test_ckg",
+        "output_name": "test_ckg.exe",
         "source_files": ["../*.c"],
         "additional_libs": [f"../../build_{COMPILER}/ckg.lib" if COMPILER == "cl" else f"../../build_{COMPILER}/libckg.a"],
         "compile_time_defines": [],
