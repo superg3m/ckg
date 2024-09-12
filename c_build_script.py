@@ -10,7 +10,9 @@ args = parser.parse_args()
 build_type = args.build_type
 
 if 'level' in os.environ:
-    level = int(os.environ["level"])
+	level = int(os.environ["level"])
+	print(level)
+
 # --------------------------------------------------------------------------------------
 
 COMPILER = args.compiler or "cl"
