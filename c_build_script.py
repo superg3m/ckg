@@ -23,7 +23,7 @@ if COMPILER == "cl":
 	project.set_compiler_warning_level("2")
 	project.disable_specific_warnings(["5105", "4668", "4820"])
 elif COMPILER in ["gcc", "cc", "clang"]:
-	project.set_compiler_warning_level("")
+	project.set_compiler_warning_level("0")
 
 project.set_treat_warnings_as_errors(True)
 project.set_debug_with_visual_studio(True)
