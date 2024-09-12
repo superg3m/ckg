@@ -188,8 +188,8 @@ extern "C" {
 		ckg_assert(returned_buffer);
 		size_t str_length = ckg_cstr_length(str); 
 
-		Boolean start_check = start >= 0 && start <= str_length - 1;
-		Boolean end_check = end >= 0 && end <= str_length - 1;
+		Boolean start_check = (start >= 0) && (start <= str_length - 1);
+		Boolean end_check = (end >= 0) && (end <= str_length - 1);
 
 		ckg_assert_msg(start_check, "ckg_substring: Start range is outside expected range: [%d - %lld] got: %d", 0, str_length - 1, start);
 		ckg_assert_msg(end_check, "ckg_substring: End range is outside expected range: [%d - %lld] got: %d", 0, str_length - 1, end);
@@ -371,7 +371,7 @@ extern "C" {
 		u32 str_length = ckg_cstr_length(str); 
 		u32 ends_with_length = ckg_cstr_length(ends_with);
 
-		if (str_length == 0 && ends_with_length == 0 || ends_with_length == 0) {
+		if ((str_length == 0) && (ends_with_length == 0)) {
 			return TRUE;
 		} else if (str_length < ends_with_length) {
 			return FALSE;
