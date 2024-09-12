@@ -42,4 +42,6 @@ compilation_errors.txt
 c_build/
 build_cl/
 example/cl/
+build_gcc/
+example/gcc/
 !c_build.py
