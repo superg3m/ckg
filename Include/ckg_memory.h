@@ -40,8 +40,8 @@ extern "C" {
     void ckg_memory_copy(const void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes);
     void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
-    void MACRO_ckg_memory_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index);
-    void MACRO_ckg_memory_insert_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index);
+    void MACRO_ckg_memory_delete_index(void* data, u32 number_of_elements, u32 data_capacity, size_t element_size_in_bytes, u32 index);
+    void MACRO_ckg_memory_insert_index(void* data, u32 number_of_elements, u32 data_capacity, size_t element_size_in_bytes, u32 index);
 #ifdef __cplusplus
 }
 #endif
@@ -57,13 +57,13 @@ extern "C" {
 #ifdef __cplusplus
     #define ckg_alloc(allocation_size) (decltype(data))MACRO_ckg_alloc(allocation_size)
     #define ckg_free(data) data = (decltype(data))MACRO_ckg_free(data)
-    #define ckg_memory_delete_index(data, data_capacity, index) MACRO_ckg_memory_delete_index(data, data_capacity, sizeof(data[0]), index)
-    #define ckg_memory_insert_index(data, data_capacity, index, element) MACRO_ckg_memory_insert_index(data, data_capacity,  element, sizeof(data[0]), index)
+    #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
+    #define ckg_memory_insert_index(data, number_of_elements, data_capacity, index, element) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity,  element, sizeof(data[0]), index)
 #else
     #define ckg_alloc(allocation_size) MACRO_ckg_alloc(allocation_size)
     #define ckg_free(data) data = MACRO_ckg_free(data)
-    #define ckg_memory_delete_index(data, data_capacity, index) MACRO_ckg_memory_delete_index(data, data_capacity, sizeof(data[0]), index)
-    #define ckg_memory_insert_index(data, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, data_capacity, sizeof(data[0]), index); data[index] = element;
+    #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
+    #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
 #endif
 
 
@@ -155,7 +155,8 @@ extern "C" {
         }
     }
 
-    void MACRO_ckg_memory_delete_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
+    void MACRO_ckg_memory_delete_index(void* data, u32 number_of_elements, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
+        ckg_assert((s32)number_of_elements - 1 >= 0);
         ckg_assert(index < data_capacity);
         ckg_assert(index >= 0);
 
@@ -165,21 +166,22 @@ extern "C" {
         size_t source_offset = (index + 1) * element_size_in_bytes;
         size_t dest_offset =  index * element_size_in_bytes;
 
-        size_t payload_source_size = total_size - source_offset;
+        size_t payload_source_size = (number_of_elements * element_size_in_bytes) - source_offset;
         ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
     }
 
-    void MACRO_ckg_memory_insert_index(void* data, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
-        ckg_assert(index < data_capacity);
+    void MACRO_ckg_memory_insert_index(void* data, u32 number_of_elements, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
+        ckg_assert((number_of_elements + 1) < data_capacity);
+        ckg_assert(index < data_capacity - 1);
         ckg_assert(index >= 0);
 
         u8* byte_data = (u8*)data;
 
         size_t total_size = element_size_in_bytes * data_capacity;
         size_t source_offset = index * element_size_in_bytes;
-        size_t dest_offset =  (index + 1) * element_size_in_bytes;
+        size_t dest_offset = (index + 1) * element_size_in_bytes;
 
-        size_t payload_source_size = total_size - source_offset;
+        size_t payload_source_size = (number_of_elements * element_size_in_bytes) - source_offset;
         ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
     }
 #endif // CKG_IMPL
