@@ -59,29 +59,21 @@ void U64_EndianSwap(u64* number_to_endian_swap);
 #define ArrayCount(array) (sizeof(array) / sizeof(array[0]))
 
 #define PLATFORM_MAX_PATH 256
-#if defined(_WIN32)
-
-#elif defined(__linux__)
-    #define PLATFORM_LINUX
-    #define OS_DELIMITER '/'
-#elif defined(__APPLE__) && defined(__MACH__)
-
-#else
-
-#endif
 
 #if defined(_WIN32)
     #define PLATFORM_WINDOWS
     #define OS_DELIMITER '\\'
+    #define CRASH *((int *)0) = 0
 #elif defined(__APPLE__)
     #define PLATFORM_APPLE
     #define OS_DELIMITER '/'
+    #define CRASH __builtin_trap()
 #elif defined(__linux__) || defined(__unix__) || defined(__POSIX__)
     #define PLATFORM_LINUX
     #define OS_DELIMITER '/'
+    #define CRASH __builtin_trap()
 #else
-    #define PLATFORM_UNKNOWN
-    #define OS_DELIMITER '/'
+    #error "Unknown Platform???"
 #endif
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
 
