@@ -15,7 +15,7 @@ if args.level:
 	SET_LEVEL(args.level)
 # --------------------------------------------------------------------------------------
 
-COMPILER = args.compiler or "gcc"
+COMPILER = args.compiler or "cl"
 project = Project("ckg", COMPILER, is_dependency = args.is_dependency)
 
 # Do different things depending on the platform

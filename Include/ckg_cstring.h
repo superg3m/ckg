@@ -371,13 +371,13 @@ extern "C" {
 		u32 str_length = ckg_cstr_length(str); 
 		u32 ends_with_length = ckg_cstr_length(ends_with);
 
-		if ((str_length == 0) && (ends_with_length == 0)) {
+		if ((str_length == 0) || (ends_with_length == 0)) {
 			return TRUE;
 		} else if (str_length < ends_with_length) {
 			return FALSE;
 		}
 
-		u32 start_index = (str_length - 1) - (ends_with_length - 1);
+		u32 start_index = MAX((s32)str_length - 1, 0) - MAX((s32)ends_with_length - 1, 0);
 		if (str[start_index] != ends_with[0]) {
 			return FALSE;
 		}

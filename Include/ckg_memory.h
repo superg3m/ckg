@@ -139,7 +139,6 @@ extern "C" {
 
         u8* temp_data_copy = ckg_alloc(source_size_in_bytes);
         for (u32 i = 0; i < source_size_in_bytes; i++) {
-            CKG_LOG_SUCCESS("==================== TEST ==================== \n");
             temp_data_copy[i] = ((u8*)source)[i];
         }
 
