@@ -39,7 +39,7 @@ procedures = {
         "build_directory": f"./build_{COMPILER}",
         "output_name": "ckg.lib" if COMPILER == "cl" else "libckg.a",
         "source_files": ["../ckg.c"],
-        "additional_libs": [] if COMPILER == "cl" else ["-lUser32", "-lGDI32"],
+        "additional_libs": [],
         "compile_time_defines": [],
         "include_paths": [],
     },
