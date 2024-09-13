@@ -137,9 +137,8 @@ void test_ckg_cstr_copy() {
 
 void test_ckg_cstr_contains() {
     char* t1 = "hello";
-    char* sub_str = ckg_alloc(1);
+    char* sub_str = ckg_alloc(3);
     ckg_substring(t1, sub_str, 0, 1);
-    CKG_LOG_DEBUG("%s\n", sub_str);
     ckg_assert(ckg_cstr_contains(sub_str, "he"));
     ckg_free(sub_str);
 
