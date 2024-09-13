@@ -12,11 +12,14 @@
 I consider CKG almost done I would like to revist the FileIO section but other than that this is a solid granular library
 I have some tests but, i'm not confident in the validitiy of the string section.
 
+
 # How to build using [c-build](https://github.com/superg3m/c-build)
 1. ./bootstrap.ps1
 2. ./build.ps1 or ./build.ps1 -debug
 3. ./debug.ps1
 4. ./run.ps1
+
+- cls ; pwsh ./build.ps1 ; cd .\example\cl ; .\test_ckg.exe ; cd ../.. 
 
 # Goals
 
