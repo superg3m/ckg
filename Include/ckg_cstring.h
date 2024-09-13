@@ -217,9 +217,7 @@ extern "C" {
 
 		if (str_length == 0 && contains_length == 0) {
 			return TRUE;
-		} else if (contains_length == 0) {
-			return FALSE;
-		} else if (str_length == 0) {
+		} else if ((contains_length == 0) || (str_length == 0)) {
 			return FALSE;
 		}
 
@@ -242,7 +240,7 @@ extern "C" {
 				break;
 			}
 
-			char* temp_string = ckg_alloc((end_index - i) + 1);
+			char* temp_string = ckg_alloc(contains_length + 1);
 			ckg_substring(str, temp_string, i, end_index);
 			if (ckg_cstr_equal(temp_string, contains)) {
 				contains_substring = TRUE;
