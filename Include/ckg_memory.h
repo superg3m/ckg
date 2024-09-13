@@ -94,10 +94,14 @@ extern "C" {
     }
 
     void* MACRO_ckg_alloc(size_t allocation_size) {
+        ckg_assert(allocation_size != 0);
         return memory_allocate_callback(allocation_size);
     }
 
     void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size) {
+        ckg_assert(old_allocation_size != 0);
+        ckg_assert(new_allocation_size != 0);
+
         void* ret = MACRO_ckg_alloc(new_allocation_size);
         ckg_memory_copy(data, ret, old_allocation_size, new_allocation_size);
         ckg_free(data);
