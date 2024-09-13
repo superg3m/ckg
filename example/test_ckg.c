@@ -101,6 +101,8 @@ int main() {
 
 	ckg_assert(GET_BIT(number_to_endian_swap, 0));
 
+	ckg_assert(FALSE);
+
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 	return 0;
 }

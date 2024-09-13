@@ -107,3 +107,5 @@ I HAVE AND IDEA I'M GOING TO AUTO GENERATE THE ckg.h FILE
 - [x] test_arena_functions()
 - [x] test_vector_functions()
 - [x] test_string_functions() // I don't trust that validity of these test not comprehensive enough I think
+
+Write a bunch more tests!

@@ -63,7 +63,7 @@ void U64_EndianSwap(u64* number_to_endian_swap);
 #if defined(_WIN32)
     #define PLATFORM_WINDOWS
     #define OS_DELIMITER '\\'
-    #define CRASH *((int *)0) = 0
+    #define CRASH __debugbreak()
 #elif defined(__APPLE__)
     #define PLATFORM_APPLE
     #define OS_DELIMITER '/'
