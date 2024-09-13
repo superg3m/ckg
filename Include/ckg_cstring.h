@@ -381,7 +381,7 @@ extern "C" {
 		}
 
 		Boolean starts_with_substring = FALSE;
-		char* temp_string = ckg_alloc(str_length - start_index);
+		char* temp_string = ckg_alloc(str_length - start_index + 1);
 		ckg_substring(str, temp_string, start_index, str_length - 1);
 		if (ckg_cstr_equal(temp_string, ends_with)) {
 			starts_with_substring = TRUE;
