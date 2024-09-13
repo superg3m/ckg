@@ -285,7 +285,7 @@ extern "C" {
 				break;
 			}
 
-			char* temp_string = ckg_alloc((end_index - i) + 1);
+			char* temp_string = ckg_alloc((end_index - i) + 2);
 			ckg_substring(str, temp_string, i, end_index);
 			if (ckg_cstr_equal(temp_string, sub_string)) {
 				ret_index = i;
