@@ -155,6 +155,8 @@ extern "C" {
         }
     }
 
+    // Date: September 12, 2024
+    // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
     void MACRO_ckg_memory_delete_index(void* data, u32 number_of_elements, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
         ckg_assert((s32)number_of_elements - 1 >= 0);
         ckg_assert(index < data_capacity);
@@ -170,6 +172,8 @@ extern "C" {
         ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
     }
 
+    // Date: September 12, 2024
+    // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
     void MACRO_ckg_memory_insert_index(void* data, u32 number_of_elements, u32 data_capacity, size_t element_size_in_bytes, u32 index) {
         ckg_assert((number_of_elements + 1) < data_capacity);
         ckg_assert(index < data_capacity - 1);

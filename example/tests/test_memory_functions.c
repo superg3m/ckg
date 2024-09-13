@@ -46,6 +46,12 @@ void test_ckg_memory_operations() {
 	ckg_assert(!ckg_memory_compare(arr4, arr6, 3 * sizeof(int), 3 * sizeof(int)));
 
 	int test_data[] = {1, 2, 3, 12, 22, 23, 41, 52, 73};
+	CKG_LOG_PRINT("[ ");
+	for (u32 i = 0; i < 9; i++) {
+		CKG_LOG_PRINT("%d ", test_data[i]);
+	}
+	CKG_LOG_PRINT("]\n");
+
 	ckg_memory_delete_index(test_data, 9, 9, 0);
 	CKG_LOG_PRINT("[ ");
 	for (u32 i = 0; i < 8; i++) {
@@ -87,6 +93,12 @@ void test_ckg_memory_operations() {
 		CKG_LOG_PRINT("%d ", test_data[i]);
 	}
 	CKG_LOG_PRINT("]\n");
+
+	u32 final_array[] = {15161, 2, 3, 22, 23, 52, 51212};
+
+	for (int i = 0; i < ArrayCount(final_array); i++) {
+		ckg_assert(test_data[i] == final_array[i]);
+	}
 
 	CKG_LOG_SUCCESS("All memory tests passed!\n");
 	return;
