@@ -1,2 +1,10 @@
-#define CKG_IMPL
-#include "./ckg.h"
+#include "./Source/ckg_types.c"
+#include "./Source/ckg_stack_trace.c"
+#include "./Source/ckg_arena.c"
+#include "./Source/ckg_memory.c"
+#include "./Source/ckg_cstring.c"
+#include "./Source/ckg_char.c"
+#include "./Source/ckg_logger.c"
+#include "./Source/ckg_vector.c"
+#include "./Source/ckg_linked_list.c"
+#include "./Source/ckg_io.c"
