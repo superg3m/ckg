@@ -22,7 +22,7 @@ extern "C" {
      */
     void ckg_bind_free_callback(CKG_MemoryFree* func_allocator);
 
-    void* MACRO_ckg_alloc(size_t allocation_size);
+    void* ckg_alloc(size_t allocation_size);
     void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);
     void* MACRO_ckg_free(void* data);
 
@@ -53,14 +53,8 @@ extern "C" {
     }                                                  	\
 }
 
-#ifdef __cplusplus
-    #define ckg_alloc(allocation_size) (decltype(data))MACRO_ckg_alloc(allocation_size)
-    #define ckg_free(data) data = (decltype(data))MACRO_ckg_free(data)
-    #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
-    #define ckg_memory_insert_index(data, number_of_elements, data_capacity, index, element) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity,  element, sizeof(data[0]), index)
-#else
-    #define ckg_alloc(allocation_size) MACRO_ckg_alloc(allocation_size)
-    #define ckg_free(data) data = MACRO_ckg_free(data)
-    #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
-    #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
-#endif
+//+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
+#define ckg_free(data) data = MACRO_ckg_free(data)
+#define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
+#define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
+//++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
