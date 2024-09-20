@@ -17,7 +17,7 @@ if COMPILER == "cl":
 	project.set_compiler_warning_level("2")
 	project.disable_specific_warnings(["5105", "4668", "4820"])
 elif COMPILER in ["gcc", "cc", "clang"]:
-	project.disable_specific_warnings(["deprecated-declarations", "stringop-overread"])
+	project.disable_specific_warnings(["deprecated-declarations"])
 
 project.set_treat_warnings_as_errors(True)
 project.set_debug_with_visual_studio(True)
