@@ -19,9 +19,6 @@ if COMPILER == "cl":
 elif COMPILER in ["gcc", "cc", "clang"]:
 	project.disable_specific_warnings(["deprecated-declarations"])
 
-
-print(os.environ['SHOULD_REBUILD'])
-
 project.set_treat_warnings_as_errors(True)
 project.set_debug_with_visual_studio(True)
 project.set_rebuild_project_dependencies(True)
