@@ -2,13 +2,13 @@
 
 #include "./ckg_types.h"
 //========================== Begin Types ==========================
-typedef enum CKG_ArenaFlag {
-  CKG_ARENA_FLAG_FIXED,
-  CKG_ARENA_FLAG_CIRCULAR,
-  CKG_ARENA_FLAG_EXTENDABLE_PAGES,
-  CKG_ARENA_FLAG_COUNT
-} CKG_ArenaFlag;
 
+#define CKG_ARENA_FLAG_FIXED 0
+#define CKG_ARENA_FLAG_CIRCULAR 1
+#define CKG_ARENA_FLAG_EXTENDABLE_PAGES 2
+#define CKG_ARENA_FLAG_COUNT 3
+
+typedef u8 CKG_ArenaFlag;
 typedef struct CKG_Arena CKG_Arena;
 //=========================== End Types ===========================
 

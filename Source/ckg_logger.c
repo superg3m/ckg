@@ -10,7 +10,7 @@
 #include "../Include/ckg_cstring.h"
 
 void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
-    char log_level_strings[CKG_LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
+    char log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
         "[FATAL]  : ",
         "[ERROR]  : ",
         "[WARN]   : ",
@@ -19,7 +19,7 @@ void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
         "",
     };
 
-    char* log_level_format[CKG_LOG_LEVEL_COUNT] = {
+    char* log_level_format[LOG_LEVEL_COUNT] = {
         CKG_RED_BACKGROUND,
         CKG_RED,
         CKG_PURPLE,

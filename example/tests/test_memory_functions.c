@@ -45,7 +45,7 @@ void test_ckg_memory_operations() {
 	ckg_assert(ckg_memory_compare(arr4, arr5, 3 * sizeof(int), 3 * sizeof(int)) == TRUE);
 	ckg_assert(!ckg_memory_compare(arr4, arr6, 3 * sizeof(int), 3 * sizeof(int)));
 
-	int test_data[] = {1, 2, 3, 12, 22, 23, 41, 52, 73};
+	u32 test_data[] = {1, 2, 3, 12, 22, 23, 41, 52, 73};
 	CKG_LOG_PRINT("[ ");
 	for (u32 i = 0; i < 9; i++) {
 		CKG_LOG_PRINT("%d ", test_data[i]);

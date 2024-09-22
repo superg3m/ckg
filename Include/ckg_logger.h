@@ -25,15 +25,15 @@
 #define CKG_LOG_LEVEL_CHARACTER_LIMIT 15
 #define CKG_PLATFORM_CHARACTER_LIMIT 512
 
-typedef enum CKG_LogLevel {
-    CKG_LOG_LEVEL_FATAL,
-    CKG_LOG_LEVEL_ERROR,
-    CKG_LOG_LEVEL_WARN,
-    CKG_LOG_LEVEL_DEBUG,
-    CKG_LOG_LEVEL_SUCCESS,
-    CKG_LOG_LEVEL_PRINT,
-    CKG_LOG_LEVEL_COUNT
-} CKG_LogLevel;
+// Log Levels
+#define LOG_LEVEL_FATAL 0
+#define LOG_LEVEL_ERROR 1
+#define LOG_LEVEL_WARN 2
+#define LOG_LEVEL_DEBUG 3
+#define LOG_LEVEL_SUCCESS 4
+#define LOG_LEVEL_PRINT 5
+#define LOG_LEVEL_COUNT 6
+typedef u8 CKG_LogLevel;
 //=========================== End Types ===========================
 
 //************************* Begin Functions *************************
@@ -48,10 +48,10 @@ extern "C" {
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
 #define ckg_log_output(log_level, message, ...) MACRO_ckg_log_output(log_level, message, ##__VA_ARGS__)
-#define CKG_LOG_PRINT(message, ...) ckg_log_output(CKG_LOG_LEVEL_PRINT, message, ##__VA_ARGS__)
-#define CKG_LOG_SUCCESS(message, ...) ckg_log_output(CKG_LOG_LEVEL_SUCCESS, message, ##__VA_ARGS__)
-#define CKG_LOG_DEBUG(message, ...) ckg_log_output(CKG_LOG_LEVEL_DEBUG, message, ##__VA_ARGS__)
-#define CKG_LOG_WARN(message, ...) ckg_log_output(CKG_LOG_LEVEL_WARN, message, ##__VA_ARGS__)
-#define CKG_LOG_ERROR(message, ...) ckg_log_output(CKG_LOG_LEVEL_ERROR, message, ##__VA_ARGS__)
-#define CKG_LOG_FATAL(message, ...) ckg_log_output(CKG_LOG_LEVEL_FATAL, message, ##__VA_ARGS__)
+#define CKG_LOG_PRINT(message, ...) ckg_log_output(LOG_LEVEL_PRINT, message, ##__VA_ARGS__)
+#define CKG_LOG_SUCCESS(message, ...) ckg_log_output(LOG_LEVEL_SUCCESS, message, ##__VA_ARGS__)
+#define CKG_LOG_DEBUG(message, ...) ckg_log_output(LOG_LEVEL_DEBUG, message, ##__VA_ARGS__)
+#define CKG_LOG_WARN(message, ...) ckg_log_output(LOG_LEVEL_WARN, message, ##__VA_ARGS__)
+#define CKG_LOG_ERROR(message, ...) ckg_log_output(LOG_LEVEL_ERROR, message, ##__VA_ARGS__)
+#define CKG_LOG_FATAL(message, ...) ckg_log_output(LOG_LEVEL_FATAL, message, ##__VA_ARGS__)
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++

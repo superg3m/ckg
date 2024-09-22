@@ -21,8 +21,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 - cls ; pwsh ./build.ps1 ; cd .\example\cl ; .\test_ckg.exe ; cd ../.. 
 
 # Goals
-
-I HAVE AND IDEA I'M GOING TO AUTO GENERATE THE ckg.h FILE
+- [ ] I need to make a public facing API header file
 
 ### key
 - '[x]': Finished

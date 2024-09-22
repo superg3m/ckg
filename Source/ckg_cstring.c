@@ -9,7 +9,7 @@ u32 ckg_cstr_length(const char* cstring) {
 	ckg_assert(cstring);
 
 	if (!cstring) {
-		return -1; // This should never get here but the compiler want this
+		return 0; // This should never get here but the compiler want this
 	}
 
 	u32 length = 0;

@@ -37,6 +37,8 @@
         "dbghelp.h": "c",
         "ckg_char.h": "c",
         "ckg_vector.h": "c",
-        "ckg_io.h": "c"
+        "ckg_io.h": "c",
+        "stdlib.h": "c",
+        "stdint.h": "c"
     }
 }
