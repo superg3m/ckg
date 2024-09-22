@@ -2,7 +2,6 @@
 
 #include "./ckg_types.h"
 //========================== Begin Types ==========================
-
 #define CKG_ARENA_FLAG_FIXED 0
 #define CKG_ARENA_FLAG_CIRCULAR 1
 #define CKG_ARENA_FLAG_EXTENDABLE_PAGES 2
