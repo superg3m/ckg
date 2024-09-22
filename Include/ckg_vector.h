@@ -20,11 +20,11 @@ extern "C" {
 
 
 //+++++++++++++++++++++++++++ Begin Macros ++++++++++++++++++++++++++
-	#define VECTOR_DEFAULT_CAPACITY 1
+#define VECTOR_DEFAULT_CAPACITY 1
 
-	#define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
-	#define ckg_vector_count(vector) (*ckg_vector_header_base(vector)).count
-	#define ckg_vector_capacity(vector) (*ckg_vector_header_base(vector)).capacity
-	#define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
-	#define ckg_vector_free(vector) ckg_free(ckg_vector_header_base(vector))
+#define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
+#define ckg_vector_count(vector) (*ckg_vector_header_base(vector)).count
+#define ckg_vector_capacity(vector) (*ckg_vector_header_base(vector)).capacity
+#define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+#define ckg_vector_free(vector) ckg_free(ckg_vector_header_base(vector))
 //++++++++++++++++++++++++++++ End Macros +++++++++++++++++++++++++++
