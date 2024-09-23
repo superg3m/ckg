@@ -6,7 +6,7 @@
     #define CKG_API
 #endif
 
-#if defined(CKG_IMPL_ALL)
+#if defined(CKG_IMPL)
     #define CKG_IMPL_TYPES
     #define CKG_IMPL_LOGGER
     #define CKG_IMPL_ASSERT
@@ -18,72 +18,15 @@
     #define CKG_IMPL_PLATFORM
 #endif
 
-#if defined(CKG_INCLUDE_ALL)
-    #define CKG_INCLUDE_TYPES
-    #define CKG_INCLUDE_LOGGER
-    #define CKG_INCLUDE_ASSERT
-    #define CKG_INCLUDE_MEMORY
-    #define CKG_INCLUDE_ARENA
-    #define CKG_INCLUDE_CSTRING
-    #define CKG_INCLUDE_CHAR
-    #define CKG_INCLUDE_COLLECTIONS
-    #define CKG_INCLUDE_PLATFORM
-#endif
-
-// Dependencies for each module
-#if defined(CKG_IMPL_TYPES) && !defined(CKG_INCLUDE_TYPES)
-    #define CKG_INCLUDE_TYPES
-#endif
-
-#if defined(CKG_IMPL_LOGGER) && !defined(CKG_INCLUDE_LOGGER)
-    #define CKG_INCLUDE_TYPES
-    #define CKG_INCLUDE_MEMORY
-    #define CKG_INCLUDE_CSTRING
-
-    #define CKG_INCLUDE_LOGGER
-#endif
-
-#if defined(CKG_IMPL_ASSERT) && !defined(CKG_INCLUDE_ASSERT)
-    #define CKG_INCLUDE_TYPES
-    #define CKG_INCLUDE_ASSERT
-#endif
-
-#if defined(CKG_IMPL_MEMORY) && !defined(CKG_INCLUDE_MEMORY)
-    #define CKG_INCLUDE_TYPES
-
-    #define CKG_INCLUDE_MEMORY
-#endif
-
-#if defined(CKG_IMPL_ARENA) && !defined(CKG_INCLUDE_ARENA)
-    #define CKG_INCLUDE_MEMORY
-    #define CKG_INCLUDE_COLLECTIONS
-
-    #define CKG_INCLUDE_ARENA
-#endif
-
-#if defined(CKG_IMPL_CSTRING) && !defined(CKG_INCLUDE_CSTRING)
-    #define CKG_INCLUDE_TYPES
-
-    #define CKG_INCLUDE_CSTRING
-#endif
-
-#if defined(CKG_IMPL_CHAR) && !defined(CKG_INCLUDE_CHAR)
-    #define CKG_INCLUDE_CHAR
-#endif
-
-#if defined(CKG_IMPL_COLLECTIONS) && !defined(CKG_INCLUDE_COLLECTIONS)
-    #define CKG_INCLUDE_TYPES
-    #define CKG_INCLUDE_MEMORY
-
-    #define CKG_INCLUDE_COLLECTIONS
-#endif
-
-#if defined(CKG_IMPL_PLATFORM) && !defined(CKG_INCLUDE_PLATFORM)
-    #define CKG_INCLUDE_TYPES
-    #define CKG_INCLUDE_MEMORY
-
-    #define CKG_INCLUDE_PLATFORM
-#endif
+#define CKG_INCLUDE_TYPES
+#define CKG_INCLUDE_LOGGER
+#define CKG_INCLUDE_ASSERT
+#define CKG_INCLUDE_MEMORY
+#define CKG_INCLUDE_ARENA
+#define CKG_INCLUDE_CSTRING
+#define CKG_INCLUDE_CHAR
+#define CKG_INCLUDE_COLLECTIONS
+#define CKG_INCLUDE_PLATFORM
 
 #if defined(CKG_INCLUDE_TYPES)
     #include <stdint.h>

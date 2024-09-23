@@ -9,7 +9,7 @@ args = parser.parse_args()
 build_type = args.build_type
 # --------------------------------------------------------------------------------------
 
-COMPILER = os.getenv("COMPILER", "gcc")
+COMPILER = os.getenv("COMPILER", "cl")
 project = Project("ckg", COMPILER)
 
 # Do different things depending on the platform
