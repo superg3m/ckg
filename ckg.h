@@ -7,7 +7,7 @@
     #define CKG_API
 #endif
 
-#if defined (CKG_INCLUDE_ALL)
+#if defined(CKG_INCLUDE_ALL)
     #define CKG_INCLUDE_TYPES
     #define CKG_INCLUDE_LOGGER
     #define CKG_INCLUDE_ASSERT
@@ -19,7 +19,7 @@
     #define CKG_INCLUDE_PLATFORM
 #endif
 
-#if defined (CKG_IMPL_ALL)
+#if defined(CKG_IMPL_ALL)
     #define CKG_IMPL_TYPES
     #define CKG_IMPL_LOGGER
     #define CKG_IMPL_ASSERT
@@ -31,7 +31,7 @@
     #define CKG_IMPL_PLATFORM
 #endif
 
-#if define(CKG_INCLUDE_TYPES)
+#if defined(CKG_INCLUDE_TYPES)
     #include <stdint.h>
     #include <stdio.h>
     #include <stdarg.h>
@@ -103,7 +103,9 @@
     CKG_API void ckg_stack_trace_dump();
 #endif
 
-#if define(CKG_INCLUDE_LOGGER)
+#if defined(CKG_INCLUDE_LOGGER)
+    // types
+
     //Regular text
     #define CKG_BLACK "\033[0;30m"
     #define CKG_RED "\033[0;31m"
@@ -148,6 +150,8 @@
 
 
 #if defined(CKG_INCLUDE_ASSERT)
+    // types
+
     #define CKG_ASSERT_ENABLED TRUE
     #if CKG_ASSERT_ENABLED == TRUE	   
         #define ckg_assert(expression)                            \
@@ -174,7 +178,9 @@
     #endif
 #endif
 
-#if (CKG_INCLUDE_MEMORY)
+#if defined(CKG_INCLUDE_MEMORY)
+    // types
+
     typedef void* (CKG_MemoryAllocator)(size_t);
     typedef void (CKG_MemoryFree)(void*);
 
@@ -223,6 +229,8 @@
 
 
 #if defined(CKG_INCLUDE_ARENA)
+    // types
+
     #define CKG_ARENA_FLAG_FIXED 0
     #define CKG_ARENA_FLAG_CIRCULAR 1
     #define CKG_ARENA_FLAG_EXTENDABLE_PAGES 2
@@ -244,6 +252,8 @@
 #endif
 
 #if defined(CKG_INCLUDE_CSTRING)
+    // types
+
 	/**
 	 * @brief returns a string buffer with nullterm
 	 * must free with ckg_free()
@@ -314,6 +324,8 @@
 #endif
 
 #if defined(CKG_INCLUDE_CHAR)
+    // types
+
     CKG_API Boolean ckg_char_is_digit(char c);
     CKG_API Boolean ckg_char_is_alpha(char c);
     CKG_API Boolean ckg_char_is_alpha_numeric(char c);
@@ -328,7 +340,9 @@
     // trig fucntion intrinsics or approximations with taylor series
 #endif
 
-#if defined (CKG_INCLUDE_COLLECTIONS)
+#if defined(CKG_INCLUDE_COLLECTIONS)
+    // types
+
     //
     // ========== START CKG_VECTOR ==========
     //

@@ -1,3 +1,4 @@
+#define CKG_INCLUDE_ALL
 #include "../../ckg.h"
 
 void test_ckg_memory_operations() {

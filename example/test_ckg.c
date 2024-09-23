@@ -1,4 +1,7 @@
+
+#define CKG_INCLUDE_ALL
 #include "../ckg.h"
+
 #include "./tests/test_functions.c"
 #if defined(PLATFORM_WINDOWS)
 	#include <windows.h>
