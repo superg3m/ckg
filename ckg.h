@@ -1,6 +1,5 @@
 #pragma once
 
-// unify this to be a single file
 #if defined(CKG_EXTERN)
     #define CKG_API extern
 #else
@@ -40,7 +39,7 @@
     #define CKG_INCLUDE_TYPES
     #define CKG_INCLUDE_MEMORY
     #define CKG_INCLUDE_CSTRING
-    
+
     #define CKG_INCLUDE_LOGGER
 #endif
 
