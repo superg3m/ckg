@@ -1,3 +1,5 @@
+#pragma once
+
 #if defined(CKG_EXTERN)
     #define CKG_API extern
 #else
@@ -77,9 +79,10 @@
 #endif
 
 #if defined(CKG_IMPL_PLATFORM) && !defined(CKG_INCLUDE_PLATFORM)
+    #define CKG_INCLUDE_TYPES
+    #define CKG_INCLUDE_MEMORY
+
     #define CKG_INCLUDE_PLATFORM
-    #define CKG_INCLUDE_TYPES       // Platform code might use type definitions
-    #define CKG_INCLUDE_MEMORY      // Platform might need memory management
 #endif
 
 #if defined(CKG_INCLUDE_TYPES)
