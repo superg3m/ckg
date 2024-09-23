@@ -9,6 +9,7 @@
 
 #if defined (CKG_INCLUDE_ALL)
     #define CKG_INCLUDE_TYPES
+    #define CKG_INCLUDE_MEMORY
     #define CKG_INCLUDE_ARENA
     #define CKG_INCLUDE_CSTRING
     #define CKG_INCLUDE_CHAR
@@ -20,6 +21,7 @@
 
 #if defined (CKG_IMPL_ALL)
     #define CKG_IMPL_TYPES
+    #define CKG_IMP_MEMORY
     #define CKG_IMPL_ARENA
     #define CKG_IMPL_CSTRING
     #define CKG_IMPL_CHAR
@@ -193,11 +195,218 @@
     #define ckg_arena_push_array(arena, type, element_count) ((type*)MACRO_ckg_arena_push(arena, sizeof(type) * element_count))
 #endif
 
-#include "./Include/ckg_memory.h"
-#include "./Include/ckg_cstring.h"
-#include "./Include/ckg_char.h"
-#include "./Include/ckg_logger.h"
-#include "./Include/ckg_math.h"
-#include "./Include/ckg_vector.h"
-#include "./Include/ckg_linked_list.h"
-#include "./Include/ckg_io.h"
+#if (CKG_INCLUDE_MEMORY)
+    typedef void* (CKG_MemoryAllocator)(size_t);
+    typedef void (CKG_MemoryFree)(void*);
+
+    /**
+     * @brief Note that the callback provided should zero out the memory allocation.
+     * Failing to bind the allocation callback will result in a default allocation callback.
+     */
+    CKG_API void ckg_bind_alloc_callback(CKG_MemoryAllocator* func_allocator);
+
+    /**
+     * @brief Failing to bind the callback will result in a default free callback.
+     */
+    CKG_API void ckg_bind_free_callback(CKG_MemoryFree* func_allocator);
+
+    CKG_API void* ckg_alloc(size_t allocation_size);
+    CKG_API void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);
+    CKG_API void* MACRO_ckg_free(void* data);
+
+    /**
+     * @brief Compares the bytes in the two buffers
+     * 
+     * @param buffer_one 
+     * @param buffer_two 
+     * @param b1_allocation_size 
+     * @param b2_allocation_size 
+     * @return Boolean 
+     */
+    CKG_API Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u32 b1_allocation_size, u32 b2_allocation_size);
+    CKG_API void ckg_memory_copy(const void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes);
+    CKG_API void ckg_memory_zero(void* data, size_t data_size_in_bytes);
+
+    CKG_API void MACRO_ckg_memory_delete_index(void* data, u32 number_of_elements, u32 data_capacity, size_t element_size_in_bytes, u32 index);
+    CKG_API void MACRO_ckg_memory_insert_index(void* data, u32 number_of_elements, u32 data_capacity, size_t element_size_in_bytes, u32 index);
+
+    #define ckg_memory_fill(buffer, buffer_count, fill_element) \
+    {														\
+        for (u32 i = 0; i < buffer_count; i++) { 			\
+            buffer[i] = fill_element;                       \
+        }                                                  	\
+    }
+
+    #define ckg_free(data) data = MACRO_ckg_free(data)
+    #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
+    #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
+#endif
+
+#if defined(CKG_INCLUDE_CSTRING)
+	/**
+	 * @brief returns a string buffer with nullterm
+	 * must free with ckg_free()
+	 * @param s1 
+	 * @return char* 
+	 */
+	CKG_API char* ckg_cstr_alloc(const char* s1);
+
+	/**
+	 * @brief Requires the string buffer to be cleared to zero terminated
+	 * 
+	 * @param string_buffer 
+	 * @param string_buffer_size 
+	 * @param source 
+	 */
+	CKG_API void ckg_cstr_append(char* string_buffer, size_t string_buffer_capacity, const char* to_append);
+	CKG_API void ckg_cstr_append_char(char* string_buffer, size_t string_buffer_capacity, const char to_append);
+
+	/**
+	 * @brief Requires the string buffer to be cleared to zero terminated
+	 * 
+	 * @param string_buffer 
+	 * @param string_buffer_size 
+	 * @param index 
+	 */
+	CKG_API void ckg_cstr_insert(char* string_buffer, size_t string_buffer_capacity, const char* to_insert, const u32 index);
+	CKG_API void ckg_cstr_insert_char(char* string_buffer, size_t string_buffer_capacity, const char to_insert, const u32 index);
+	
+	/**
+	 * @brief Requires the string buffer to be cleared to zero, modifies string_buffer
+	 * 
+	 * 
+	 * @param string_buffer 
+	 * @param string_buffer_size 
+	 */
+	CKG_API void ckg_cstr_copy(char* string_buffer, size_t string_buffer_capacity, const char* to_copy);
+
+	/**
+	 * @brief generate a random string and copy it to the dest pointer
+	 * 
+	 * @param dest 
+	 * @param length 
+	 */
+	CKG_API void ckg_cstr_random(char* dest, size_t length);
+	
+	/**
+	 * @brief Tests each charater in the string for equaility
+	 * returns TRUE(1) if equal and FALSE(0) if not equal
+	 * => if (ckg_cstr_equal("hi", "hi"))
+	 * 
+	 * 
+	 * @param s1 
+	 * @param s2 
+	 * @return Boolean 
+	 */
+	CKG_API Boolean ckg_cstr_equal(const char* s1, const char* s2);
+	CKG_API u32 ckg_cstr_length(const char* c_string);
+	CKG_API void ckg_cstr_clear(char* string_buffer);
+	// Inclusive start and end STR: SHOW | 0, 0 is: S | 0, 1 is: SH
+	CKG_API void ckg_substring(const char* string_buffer, char* returned_buffer, u32 start_range, u32 end_range);
+	CKG_API Boolean ckg_cstr_contains(const char* string_buffer, const char* contains);
+	CKG_API s32 ckg_cstr_index_of(const char* string_buffer, const char* sub_string);
+	CKG_API s32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string);
+	CKG_API Boolean ckg_cstr_starts_with(const char* string_buffer, const char* starts_with);
+	CKG_API Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with);
+	CKG_API void ckg_cstr_reverse(const char* str, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
+	CKG_API void ckg_cstr_int_to_cstr(char* string_buffer, size_t string_buffer_capacity, int number);
+#endif
+
+#if defined(CKG_INCLUDE_CHAR)
+    CKG_API Boolean ckg_char_is_digit(char c);
+    CKG_API Boolean ckg_char_is_alpha(char c);
+    CKG_API Boolean ckg_char_is_alpha_numeric(char c);
+    CKG_API Boolean ckg_char_is_upper(char c);
+    CKG_API Boolean ckg_char_is_lower(char c);
+#endif
+
+#if defined(CKG_INCLUDE_MATH)
+    #include <math.h>
+    // more here later
+    // round intrinsic
+    // trig fucntion intrinsics or approximations with taylor series
+#endif
+
+#if defined (CKG_INCLUDE_COLLECTIONS)
+    //
+    // ========== START CKG_VECTOR ==========
+    //
+    typedef struct CKG_VectorHeader {
+        u32 count;
+        u32 capacity;
+    } CKG_VectorHeader;
+
+    CKG_API void* ckg_vector_grow(void* vector, size_t element_size);
+
+
+    #define VECTOR_DEFAULT_CAPACITY 1
+    #define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
+    #define ckg_vector_count(vector) (*ckg_vector_header_base(vector)).count
+    #define ckg_vector_capacity(vector) (*ckg_vector_header_base(vector)).capacity
+    #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+    #define ckg_vector_free(vector) ckg_free(ckg_vector_header_base(vector))
+    //
+    // ========== END CKG_VECTOR ==========
+    //
+
+
+    //
+    // ========== START CKG_LinkedList ==========
+    //
+    typedef struct CKG_Node {
+        struct CKG_Node* next;
+        struct CKG_Node* prev;
+        size_t element_size_in_bytes;
+        void* data;
+    } CKG_Node;
+
+    typedef struct CKG_LinkedList {
+        CKG_Node* head;
+        CKG_Node* tail;
+        size_t element_size_in_bytes;
+        u32 count;
+        Boolean is_pointer_type;
+    } CKG_LinkedList;
+
+    CKG_API CKG_LinkedList* MACRO_ckg_linked_list_create(size_t element_size_in_bytes, Boolean is_pointer_type);
+    CKG_API CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u32 index, void* data);
+    CKG_API CKG_Node* ckg_linked_list_get_node(CKG_LinkedList* linked_list, u32 index);
+    CKG_API void* ckg_linked_list_get(CKG_LinkedList* linked_list, u32 index);
+    CKG_API void* ckg_linked_list_peek_head(CKG_LinkedList* linked_list);
+    CKG_API void* ckg_linked_list_peek_tail(CKG_LinkedList* linked_list);
+    CKG_API CKG_Node* ckg_linked_list_push(CKG_LinkedList* linked_list, void* data);
+    CKG_API CKG_Node ckg_linked_list_pop(CKG_LinkedList* linked_list);
+    CKG_API CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u32 index);
+    CKG_API void* MACRO_ckg_linked_list_free(CKG_LinkedList* linked_list);
+    CKG_API u32 ckg_linked_list_node_to_index(CKG_LinkedList* linked_list, CKG_Node* address);
+
+    #define ckg_linked_list_create(type, is_pointer_type) MACRO_ckg_linked_list_create(sizeof(type), is_pointer_type)
+    #define ckg_linked_list_free(linked_list) linked_list = MACRO_ckg_linked_list_free(linked_list)
+    //
+    // ========== END CKG_VECTOR ==========
+    //
+#endif 
+
+// Date: September 22, 2024
+// TODO(Jovanni): Make this good I hate the file system idea here!
+#if defined(CKG_INCLUDE_PLATFORM)
+    typedef struct CKG_FileSystem {
+        char* file_name;
+        FILE* handle;
+        u8* data;
+        size_t file_size;
+        Boolean reachedEOF;
+    } CKG_FileSystem;
+
+    CKG_API CKG_FileSystem ckg_file_system_create(char* file_name);
+    CKG_API void ckg_file_open(CKG_FileSystem* file_system);
+    CKG_API void ckg_file_close(CKG_FileSystem* file_system);
+    CKG_API size_t ckg_file_size(CKG_FileSystem* file_system);
+    CKG_API char* ckg_file_get_next_line(CKG_FileSystem* file_system);
+    CKG_API char ckg_file_get_next_char(CKG_FileSystem* file_system);
+#endif
+
+//
+// ===================================================== CKG_IMPL =====================================================
+//
+
