@@ -1,5 +1,3 @@
-#pragma once
-
 #if defined(CKG_EXTERN)
     #define CKG_API extern
 #else
