@@ -9,26 +9,26 @@
 
 #if defined (CKG_INCLUDE_ALL)
     #define CKG_INCLUDE_TYPES
+    #define CKG_INCLUDE_LOGGER
+    #define CKG_INCLUDE_ASSERT
     #define CKG_INCLUDE_MEMORY
     #define CKG_INCLUDE_ARENA
     #define CKG_INCLUDE_CSTRING
     #define CKG_INCLUDE_CHAR
     #define CKG_INCLUDE_COLLECTIONS
     #define CKG_INCLUDE_PLATFORM
-    #define CKG_INCLUDE_ASSERT
-    #define CKG_INCLUDE_LOGGER
 #endif
 
 #if defined (CKG_IMPL_ALL)
     #define CKG_IMPL_TYPES
-    #define CKG_IMP_MEMORY
+    #define CKG_IMPL_LOGGER
+    #define CKG_IMPL_ASSERT
+    #define CKG_IMPL_MEMORY
     #define CKG_IMPL_ARENA
     #define CKG_IMPL_CSTRING
     #define CKG_IMPL_CHAR
     #define CKG_IMPL_COLLECTIONS
     #define CKG_IMPL_PLATFORM
-    #define CKG_IMPL_ASSERT
-    #define CKG_IMPL_LOGGER
 #endif
 
 #if define(CKG_INCLUDE_TYPES)
@@ -174,27 +174,6 @@
     #endif
 #endif
 
-#if defined(CKG_INCLUDE_ARENA)
-    #define CKG_ARENA_FLAG_FIXED 0
-    #define CKG_ARENA_FLAG_CIRCULAR 1
-    #define CKG_ARENA_FLAG_EXTENDABLE_PAGES 2
-    #define CKG_ARENA_FLAG_COUNT 3
-    typedef u8 CKG_ArenaFlag;
-    typedef struct CKG_Arena CKG_Arena;
-
-
-    CKG_API CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment);
-    CKG_API void* MACRO_ckg_arena_push(CKG_Arena* arena, size_t element_size);	
-    CKG_API CKG_Arena* MACRO_ckg_arena_free(CKG_Arena* arena);
-    CKG_API void ckg_arena_clear(CKG_Arena* arena);
-
-    #define ckg_arena_create(allocation_size, name) MACRO_ckg_arena_create(allocation_size, name, CKG_ARENA_FLAG_EXTENDABLE_PAGES, 0)
-    #define ckg_arena_create_custom(allocation_size, name, flags, alignment) MACRO_ckg_arena_create(allocation_size, name, flags, alignment)
-    #define ckg_arena_free(arena) arena = MACRO_ckg_arena_free(arena)
-    #define ckg_arena_push(arena, type) ((type*)MACRO_ckg_arena_push(arena, sizeof(type)))
-    #define ckg_arena_push_array(arena, type, element_count) ((type*)MACRO_ckg_arena_push(arena, sizeof(type) * element_count))
-#endif
-
 #if (CKG_INCLUDE_MEMORY)
     typedef void* (CKG_MemoryAllocator)(size_t);
     typedef void (CKG_MemoryFree)(void*);
@@ -240,6 +219,28 @@
     #define ckg_free(data) data = MACRO_ckg_free(data)
     #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
     #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
+#endif
+
+
+#if defined(CKG_INCLUDE_ARENA)
+    #define CKG_ARENA_FLAG_FIXED 0
+    #define CKG_ARENA_FLAG_CIRCULAR 1
+    #define CKG_ARENA_FLAG_EXTENDABLE_PAGES 2
+    #define CKG_ARENA_FLAG_COUNT 3
+    typedef u8 CKG_ArenaFlag;
+    typedef struct CKG_Arena CKG_Arena;
+
+
+    CKG_API CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment);
+    CKG_API void* MACRO_ckg_arena_push(CKG_Arena* arena, size_t element_size);	
+    CKG_API CKG_Arena* MACRO_ckg_arena_free(CKG_Arena* arena);
+    CKG_API void ckg_arena_clear(CKG_Arena* arena);
+
+    #define ckg_arena_create(allocation_size, name) MACRO_ckg_arena_create(allocation_size, name, CKG_ARENA_FLAG_EXTENDABLE_PAGES, 0)
+    #define ckg_arena_create_custom(allocation_size, name, flags, alignment) MACRO_ckg_arena_create(allocation_size, name, flags, alignment)
+    #define ckg_arena_free(arena) arena = MACRO_ckg_arena_free(arena)
+    #define ckg_arena_push(arena, type) ((type*)MACRO_ckg_arena_push(arena, sizeof(type)))
+    #define ckg_arena_push_array(arena, type, element_count) ((type*)MACRO_ckg_arena_push(arena, sizeof(type) * element_count))
 #endif
 
 #if defined(CKG_INCLUDE_CSTRING)
@@ -410,3 +411,13 @@
 // ===================================================== CKG_IMPL =====================================================
 //
 
+// types
+// logger
+// assert
+// mmemory
+// arena
+// cstring
+// char
+// collections
+// math
+// platforms
