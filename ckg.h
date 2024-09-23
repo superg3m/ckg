@@ -120,7 +120,7 @@
     #define CKG_CYAN_BACKGROUND "\033[46m"
     #define CKG_COLOR_RESET "\033[0m"
 
-    #define CKG_LOG_LEVEL_CHARACTER_LIMIT 15
+    #define CKG_LOG_LEVEL_CHARACTER_LIMIT 12
     #define CKG_PLATFORM_CHARACTER_LIMIT 512
 
     // Log Levels
