@@ -1,5 +1,4 @@
 
-#define CKG_INCLUDE_ALL
 #include "../ckg.h"
 
 #include "./tests/test_functions.c"
