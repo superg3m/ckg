@@ -40,6 +40,7 @@
         "ckg_io.h": "c",
         "stdlib.h": "c",
         "stdint.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "stdarg.h": "c"
     }
 }
