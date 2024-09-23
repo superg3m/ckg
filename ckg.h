@@ -133,14 +133,13 @@
     #define LOG_LEVEL_COUNT 6
     typedef u8 CKG_LogLevel;
 
-    CKG_API void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...);
-    #define ckg_log_output(log_level, message, ...) MACRO_ckg_log_output(log_level, message, ##__VA_ARGS__)
-    #define CKG_LOG_PRINT(message, ...) ckg_log_output(LOG_LEVEL_PRINT, message, ##__VA_ARGS__)
-    #define CKG_LOG_SUCCESS(message, ...) ckg_log_output(LOG_LEVEL_SUCCESS, message, ##__VA_ARGS__)
-    #define CKG_LOG_DEBUG(message, ...) ckg_log_output(LOG_LEVEL_DEBUG, message, ##__VA_ARGS__)
-    #define CKG_LOG_WARN(message, ...) ckg_log_output(LOG_LEVEL_WARN, message, ##__VA_ARGS__)
-    #define CKG_LOG_ERROR(message, ...) ckg_log_output(LOG_LEVEL_ERROR, message, ##__VA_ARGS__)
-    #define CKG_LOG_FATAL(message, ...) ckg_log_output(LOG_LEVEL_FATAL, message, ##__VA_ARGS__)
+    CKG_API void CKG_LOG_CUSTOM(CKG_LogLevel log_level, const char* message, ...);
+    CKG_API void CKG_LOG_PRINT(const char* message, ...);
+    CKG_API void CKG_LOG_SUCCESS(const char* message, ...);
+    CKG_API void CKG_LOG_DEBUG(const char* message, ...);
+    CKG_API void CKG_LOG_WARN(const char* message, ...);
+    CKG_API void CKG_LOG_ERROR(const char* message, ...);
+    CKG_API void CKG_LOG_FATAL(const char* message, ...);
 #endif
 
 
@@ -495,7 +494,7 @@
         #include <windows.h>
     #endif
 
-    void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
+    internal void ckg_log_output(CKG_LogLevel log_level, const char* message, va_list args_list) {
         char log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
             "[FATAL]  : ",
             "[ERROR]  : ",
@@ -520,12 +519,9 @@
         char out_message2[CKG_PLATFORM_CHARACTER_LIMIT + CKG_LOG_LEVEL_CHARACTER_LIMIT];
         ckg_memory_zero(out_message2, sizeof(out_message2));  
         
-        va_list args_list;
-        va_start(args_list, message);
         vsnprintf(out_message, CKG_PLATFORM_CHARACTER_LIMIT, message, args_list);
-        va_end(args_list);
 
-        sprintf(out_message2, "%s%s", log_level_strings[log_level], out_message);
+        snprintf(out_message2, sizeof(out_message2), "%s%s", log_level_strings[log_level], out_message);
 
         int out_message2_length = ckg_cstr_length(out_message2);
 
@@ -542,6 +538,55 @@
         } else {
             printf("%s%.*s%s", log_level_format[log_level], out_message2_length, out_message2, CKG_COLOR_RESET);
         }
+    }
+
+    inline void CKG_LOG_CUSTOM(CKG_LogLevel log_level, const char* message, ...) {
+        va_list args;
+        va_start(args, message);
+        ckg_log_output(log_level, message, args);
+        va_end(args);
+    }
+
+    inline void CKG_LOG_PRINT(const char* message, ...) {
+        va_list args;
+        va_start(args, message);
+        ckg_log_output(LOG_LEVEL_PRINT, message, args);
+        va_end(args);
+    }
+
+    inline void CKG_LOG_SUCCESS(const char* message, ...) {
+        va_list args;
+        va_start(args, message);
+        ckg_log_output(LOG_LEVEL_SUCCESS, message, args);
+        va_end(args);
+    }
+
+    inline void CKG_LOG_DEBUG(const char* message, ...) {
+        va_list args;
+        va_start(args, message);
+        ckg_log_output(LOG_LEVEL_DEBUG, message, args);
+        va_end(args);
+    }
+
+    inline void CKG_LOG_WARN(const char* message, ...) {
+        va_list args;
+        va_start(args, message);
+        ckg_log_output(LOG_LEVEL_WARN, message, args);
+        va_end(args);
+    }
+
+    inline void CKG_LOG_ERROR(const char* message, ...) {
+        va_list args;
+        va_start(args, message);
+        ckg_log_output(LOG_LEVEL_ERROR, message, args);
+        va_end(args);
+    }
+
+    inline void CKG_LOG_FATAL(const char* message, ...) {
+        va_list args;
+        va_start(args, message);
+        ckg_log_output(LOG_LEVEL_FATAL, message, args);
+        va_end(args);
     }
 #endif
 
