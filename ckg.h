@@ -15,7 +15,7 @@
     #define CKG_IMPL_CSTRING
     #define CKG_IMPL_CHAR
     #define CKG_IMPL_COLLECTIONS
-    #define CKG_IMPL_PLATFORM
+    #define CKG_IMPL_OS
 #endif
 
 #define CKG_INCLUDE_TYPES
@@ -26,7 +26,7 @@
 #define CKG_INCLUDE_CSTRING
 #define CKG_INCLUDE_CHAR
 #define CKG_INCLUDE_COLLECTIONS
-#define CKG_INCLUDE_PLATFORM
+#define CKG_INCLUDE_OS
 
 #if defined(CKG_INCLUDE_TYPES)
     #include <stdint.h>
@@ -393,7 +393,7 @@
 
 // Date: September 22, 2024
 // TODO(Jovanni): Make this good I hate the file system idea here!
-#if defined(CKG_INCLUDE_PLATFORM)
+#if defined(CKG_INCLUDE_OS)
     typedef struct CKG_FileSystem {
         char* file_name;
         FILE* handle;
@@ -1386,7 +1386,7 @@
     // Nothing
 #endif
 
-#if defined(CKG_IMPL_PLATFORM)
+#if defined(CKG_IMPL_OS)
     //
     // ========== START CKG_FileSystem ==========
     //
