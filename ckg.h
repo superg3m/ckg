@@ -82,6 +82,7 @@
     #define PLATFORM_MAX_PATH 256
 
     #if defined(_WIN32)
+        #include <windows.h>
         #define PLATFORM_WINDOWS
         #define OS_DELIMITER '\\'
         #define CRASH __debugbreak()
@@ -442,7 +443,6 @@
     }
 
     #if defined(_MSC_VER )
-        #include <windows.h>
         #include <DbgHelp.h>
         #pragma comment(lib, "dbghelp")
         void ckg_stack_trace_dump() {
@@ -491,10 +491,6 @@
 #endif
 
 #if defined(CKG_IMPL_LOGGER)
-    #if defined(PLATFORM_WINDOWS)
-        #include <windows.h>
-    #endif
-
     void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
         char log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
             "[FATAL]  : ",
