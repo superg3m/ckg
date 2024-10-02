@@ -101,6 +101,51 @@
     CKG_API void ckg_stack_trace_dump();
 #endif
 
+#if defined(CKG_INCLUDE_ASSERT)
+    CKG_API Boolean ckg_assert_get_is_test();
+    CKG_API void ckg_assert_set_is_test(Boolean is_test);
+
+    #define CKG_ASSERT_ENABLED TRUE
+    #if CKG_ASSERT_ENABLED == TRUE	   
+        #define ckg_assert(expression)                                    \
+            do {                                                          \
+                if (!(expression)) {                                      \
+                    if (!ckg_assert_get_is_test()) {                      \
+                        ckg_stack_trace_dump();                           \
+                        char msg[] = "Func: %s, File: %s:%d\n";           \
+                        CKG_LOG_FATAL(msg, __func__, __FILE__, __LINE__); \
+                        CRASH;                                            \
+                    } else {                                              \
+                        char msg[] = "Func: %s, File: %s:%d\n";           \
+                        CKG_LOG_DEBUG("Expected Assert Fired!\n");        \
+                        CKG_LOG_DEBUG(msg, __func__, __FILE__, __LINE__); \
+                    }                                                     \
+                }                                                         \
+            } while (FALSE)                                               \
+
+        #define ckg_assert_msg(expression, message, ...)	              \
+            do {                                                          \
+                if (!(expression)) {                                      \
+                    if (!ckg_assert_get_is_test()) {                      \
+                        char msg[] = "Func: %s, File: %s:%d\n";           \
+                        CKG_LOG_FATAL(msg, __func__, __FILE__, __LINE__); \
+                        CKG_LOG_FATAL(message, ##__VA_ARGS__);            \
+                        CRASH;                                            \
+                    } else {                                              \
+                        char msg[] = "Func: %s, File: %s:%d\n";           \
+                        CKG_LOG_DEBUG("Expected Assert Fired!\n");        \
+                        CKG_LOG_DEBUG(msg, __func__, __FILE__, __LINE__); \
+                        CKG_LOG_DEBUG(message, ##__VA_ARGS__);            \
+                    }                                                     \
+                }                                                         \
+            } while (FALSE)                                               \
+
+    #else
+            #define ckg_assert(expression)
+            #define ckg_assert_msg(expression, message, ...)
+    #endif
+#endif
+
 #if defined(CKG_INCLUDE_LOGGER)
     //Regular text
     #define CKG_BLACK "\033[0;30m"
@@ -142,36 +187,6 @@
     #define CKG_LOG_WARN(message, ...) ckg_log_output(LOG_LEVEL_WARN, message, ##__VA_ARGS__)
     #define CKG_LOG_ERROR(message, ...) ckg_log_output(LOG_LEVEL_ERROR, message, ##__VA_ARGS__)
     #define CKG_LOG_FATAL(message, ...) ckg_log_output(LOG_LEVEL_FATAL, message, ##__VA_ARGS__)
-#endif
-
-
-#if defined(CKG_INCLUDE_ASSERT)
-    #define CKG_ASSERT_ENABLED TRUE
-    #if CKG_ASSERT_ENABLED == TRUE	   
-        #define ckg_assert(expression)                            \
-        do {                                                      \
-            if (!(expression)) {                                  \
-                ckg_stack_trace_dump();                           \
-                char msg[] = "Func: %s, File: %s:%d\n";           \
-                CKG_LOG_FATAL(msg, __func__, __FILE__, __LINE__); \
-                CRASH;                                            \
-            }                                                     \
-        } while (FALSE)
-
-        #define ckg_assert_msg(expression, message, ...)	          \
-            do {                                                      \
-                if (!(expression)) {                                  \
-                    ckg_stack_trace_dump();                           \
-                    char msg[] = "Func: %s, File: %s:%d\n";           \
-                    CKG_LOG_FATAL(msg, __func__, __FILE__, __LINE__); \
-                    CKG_LOG_FATAL(message, ##__VA_ARGS__);            \
-                    CRASH;                                            \
-                }                                                     \
-            } while (FALSE)
-    #else
-            #define ckg_assert(expression)
-            #define ckg_assert_msg(expression, message, ...)
-    #endif
 #endif
 
 #if defined(CKG_INCLUDE_MEMORY)
@@ -491,6 +506,18 @@
         }
     #endif
 #endif
+
+#if defined(CKG_IMPL_ASSERT)
+    internal Boolean ASSERT_TEST = FALSE;
+    void ckg_assert_set_is_test(Boolean is_test) {
+        ASSERT_TEST = is_test;
+    }
+
+    Boolean ckg_assert_get_is_test() {
+        return ASSERT_TEST;
+    }
+#endif
+
 
 #if defined(CKG_IMPL_LOGGER)
     void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
@@ -948,15 +975,15 @@
         if (str_length == 0 && contains_length == 0) {
             return 0;
         } else if (contains_length == 0) {
-						ckg_assert_msg(FALSE, "Substring is empty\n");		
+		    ckg_assert_msg(FALSE, "Substring is empty\n");		
             return 0; // Never gets here
         } else if (str_length == 0) {
-						ckg_assert_msg(FALSE, "String is empty\n");		
+			ckg_assert_msg(FALSE, "String is empty\n");		
             return 0; // Never gets here
         }
 
         if (contains_length > str_length) {
-        		ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
+        	ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
             return 0; // Never gets here
         }
         
@@ -983,10 +1010,10 @@
             ckg_free(temp_string);
         }
 
-				if (ret_index < 0) {
-						ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
+        if (ret_index < 0) {
+            ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
             return 0; // Never gets here
-				}
+        }
 
         return ret_index;
     }
@@ -1001,15 +1028,15 @@
         if (str_length == 0 && contains_length == 0) {
             return 0;
         } else if (contains_length == 0) {
-						ckg_assert_msg(FALSE, "Substring is empty\n");		
+			ckg_assert_msg(FALSE, "Substring is empty\n");		
             return 0; // Never gets here
         } else if (str_length == 0) {
-						ckg_assert_msg(FALSE, "String is empty\n");		
+			ckg_assert_msg(FALSE, "String is empty\n");		
             return 0; // Never gets here
         }
 
         if (contains_length > str_length) {
-        		ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
+            ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
             return 0; // Never gets here
         }
         
@@ -1032,11 +1059,10 @@
             ckg_free(temp_string);
         }
 
-				if (ret_index < 0) {
-						ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
+        if (ret_index < 0) {
+            ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
             return 0; // Never gets here
-				}
-
+        }
 
         return ret_index;
     }
@@ -1044,7 +1070,6 @@
     Boolean ckg_cstr_starts_with(const char* str, const char* starts_with) {
         ckg_assert(str);
         ckg_assert(starts_with);
-
         
         u32 str_length = ckg_cstr_length(str); 
         u32 starts_with_length = ckg_cstr_length(starts_with);

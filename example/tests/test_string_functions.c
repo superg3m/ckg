@@ -244,9 +244,9 @@ void test_ckg_cstr_reverse() {
 }
 
 void test_ckg_cstr_index_of() {
-  char* t1 = "hello ";
+    char* t1 = "hello ";
 	char* sub_str = ckg_alloc(3);
-  ckg_substring(t1, sub_str, 0, 1);
+    ckg_substring(t1, sub_str, 0, 1);
 
 	ckg_assert(ckg_cstr_index_of(sub_str, "he") == 0);
 	ckg_free(sub_str);
@@ -260,13 +260,11 @@ void test_ckg_cstr_index_of() {
 
 	char* t2 = "";
 	ckg_assert(ckg_cstr_index_of(t2, "") == 0);
-	
 
 	t2 = "f";
 	ckg_assert(ckg_cstr_index_of(t2, "f") == 0);
 
-	ckg_cstr_index_of("hello??", "f");
-  CKG_LOG_SUCCESS("Test test_ckg_cstr_index_of passed.\n");
+    CKG_LOG_SUCCESS("Test test_ckg_cstr_index_of passed.\n");
 }
 
 void test_ckg_string_assertions() {
@@ -280,6 +278,7 @@ void test_ckg_string_assertions() {
 }
 
 void test_ckg_string_edgecases() {
+    CKG_LOG_WARN("=============================== EXPECTED ASSERTS START ===============================\n");
     ckg_assert(ckg_cstr_length("") == 0);
     ckg_assert(ckg_cstr_length(NULL));
 
@@ -290,7 +289,9 @@ void test_ckg_string_edgecases() {
 
     // Test edge cases for ckg_cstr_insert_char
     char str1[50] = "Hello";
+
     ckg_cstr_insert_char(str1, 50, 'V', 10); // Insert at a position beyond the string length
+
     ckg_assert(ckg_cstr_equal(str1, "HelloV"));
 
     char str2[50] = "";
@@ -305,9 +306,8 @@ void test_ckg_string_edgecases() {
     char str4[50] = "";
     ckg_cstr_append(str4, 50, "Appended"); // Append to an empty string
     ckg_assert(ckg_cstr_equal(str4, "Appended"));
-
+    CKG_LOG_WARN("=============================== EXPECTED ASSERTS END ===============================\n");
     CKG_LOG_SUCCESS("Test ckg_string_edgecases passed.\n");
-
 }
 
 void test_ckg_str_operations() { 

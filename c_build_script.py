@@ -9,12 +9,12 @@ args = parser.parse_args()
 build_type = args.build_type
 # --------------------------------------------------------------------------------------
 
-COMPILER = os.getenv("COMPILER", "gcc")
+COMPILER = os.getenv("COMPILER", "cl")
 project = Project("ckg", COMPILER)
 
 # Do different things depending on the platform
 if COMPILER == "cl":
-	project.set_compiler_warning_level("4")
+	project.set_compiler_warning_level("2")
 	project.disable_specific_warnings(["5105", "4668", "4820", "4996"])
 elif COMPILER in ["gcc", "cc", "clang"]:
 	project.set_compiler_warning_level("all")
