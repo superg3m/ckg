@@ -307,8 +307,8 @@
 	// Inclusive start and end STR: SHOW | 0, 0 is: S | 0, 1 is: SH
 	CKG_API void ckg_substring(const char* string_buffer, char* returned_buffer, u32 start_range, u32 end_range);
 	CKG_API Boolean ckg_cstr_contains(const char* string_buffer, const char* contains);
-	CKG_API s32 ckg_cstr_index_of(const char* string_buffer, const char* sub_string);
-	CKG_API s32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string);
+	CKG_API u32 ckg_cstr_index_of(const char* string_buffer, const char* sub_string);
+	CKG_API u32 ckg_cstr_last_index_of(const char* string_buffer, const char* sub_string);
 	CKG_API Boolean ckg_cstr_starts_with(const char* string_buffer, const char* starts_with);
 	CKG_API Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with);
 	CKG_API void ckg_cstr_reverse(const char* str, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
@@ -936,7 +936,7 @@
         return contains_substring;
     }
 
-    s32 ckg_cstr_index_of(const char* str, const char* sub_string) {
+    u32 ckg_cstr_index_of(const char* str, const char* sub_string) {
         ckg_assert(str);
         ckg_assert(sub_string);
         
@@ -946,13 +946,16 @@
         if (str_length == 0 && contains_length == 0) {
             return 0;
         } else if (contains_length == 0) {
-            return -1;
+						ckg_assert_msg(FALSE, "Substring is empty\n");		
+            return 0; // Never gets here
         } else if (str_length == 0) {
-            return -1;
+						ckg_assert_msg(FALSE, "String is empty\n");		
+            return 0; // Never gets here
         }
 
         if (contains_length > str_length) {
-            return -1;
+        		ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
+            return 0; // Never gets here
         }
         
         s32 ret_index = -1;
@@ -978,10 +981,15 @@
             ckg_free(temp_string);
         }
 
+				if (ret_index < 0) {
+						ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
+            return 0; // Never gets here
+				}
+
         return ret_index;
     }
 
-    s32 ckg_cstr_last_index_of(const char* str, const char* sub_string) {
+    u32 ckg_cstr_last_index_of(const char* str, const char* sub_string) {
         ckg_assert(str);
         ckg_assert(sub_string);
         
@@ -991,13 +999,16 @@
         if (str_length == 0 && contains_length == 0) {
             return 0;
         } else if (contains_length == 0) {
-            return -1;
+						ckg_assert_msg(FALSE, "Substring is empty\n");		
+            return 0; // Never gets here
         } else if (str_length == 0) {
-            return -1;
+						ckg_assert_msg(FALSE, "String is empty\n");		
+            return 0; // Never gets here
         }
 
         if (contains_length > str_length) {
-            return -1;
+        		ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
+            return 0; // Never gets here
         }
         
         s32 ret_index = -1;
@@ -1018,6 +1029,12 @@
             }
             ckg_free(temp_string);
         }
+
+				if (ret_index < 0) {
+						ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", sub_string, str);		
+            return 0; // Never gets here
+				}
+
 
         return ret_index;
     }
