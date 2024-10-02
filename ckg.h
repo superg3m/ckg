@@ -158,13 +158,15 @@
             }                                                     \
         } while (FALSE)
 
-        #define ckg_assert_msg(expression, message, ...)	\
-            do {                                            \
-                if (!(expression)) {                        \
-                    ckg_stack_trace_dump();                 \
-                    CKG_LOG_FATAL(message, ##__VA_ARGS__);  \
-                    CRASH;                                  \
-                }                                           \
+        #define ckg_assert_msg(expression, message, ...)	          \
+            do {                                                      \
+                if (!(expression)) {                                  \
+                    ckg_stack_trace_dump();                           \
+                    char msg[] = "Func: %s, File: %s:%d\n";           \
+                    CKG_LOG_FATAL(msg, __func__, __FILE__, __LINE__); \
+                    CKG_LOG_FATAL(message, ##__VA_ARGS__);            \
+                    CRASH;                                            \
+                }                                                     \
             } while (FALSE)
     #else
             #define ckg_assert(expression)
