@@ -127,6 +127,7 @@
             do {                                                          \
                 if (!(expression)) {                                      \
                     if (!ckg_assert_get_is_test()) {                      \
+                        ckg_stack_trace_dump();                           \
                         char msg[] = "Func: %s, File: %s:%d\n";           \
                         CKG_LOG_FATAL(msg, __func__, __FILE__, __LINE__); \
                         CKG_LOG_FATAL(message, ##__VA_ARGS__);            \
