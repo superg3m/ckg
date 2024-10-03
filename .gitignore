@@ -45,3 +45,4 @@ example/cl/
 build_gcc/
 example/gcc/
 !c_build.py
+c_build_dependency_cache_*.json
