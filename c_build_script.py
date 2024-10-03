@@ -3,7 +3,7 @@ from c_build.source.Utilities import *
 from c_build.source.Manager import *
 # --------------------------------------------------------------------------------------s
 
-compiler_name = "cl"
+compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "gcc"
 compiler_std_version = "c11"
 compiler_warning_level = ""
 compiler_disable_specific_warnings = []
@@ -25,7 +25,7 @@ elif compiler_name in ["gcc", "cc", "clang"]:
 
 build_suffix = f"build_{compiler_name}"
 procedures_config = {
-    "ckit_lib": {
+    "ckg_lib": {
         "build_directory": f"./build_{compiler_name}",
         "output_name": C_BUILD_LIB('ckg', compiler_name),
         "source_files": ["../ckg.c"],
