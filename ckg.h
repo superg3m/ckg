@@ -906,9 +906,9 @@
         Boolean start_check = (start >= 0) && (start <= str_length - 1);
         Boolean end_check = (end >= 0) && (end <= str_length - 1);
 
-        ckg_assert_msg(start_check, "ckg_substring: Start range is outside expected range: [%d - %lld] got: %d", 0, str_length - 1, start);
-        ckg_assert_msg(end_check, "ckg_substring: End range is outside expected range: [%d - %lld] got: %d", 0, str_length - 1, end);
-        ckg_assert_msg(start <= end, "ckg_substring: Start range is greater than end range[start: %d > end: %d]", start, end);
+        ckg_assert_msg(start_check, "ckg_substring: Start range is outside expected range: [%d - %lld] got: %d\n", 0, str_length - 1, start);
+        ckg_assert_msg(end_check, "ckg_substring: End range is outside expected range: [%d - %lld] got: %d\n", 0, str_length - 1, end);
+        ckg_assert_msg(start <= end, "ckg_substring: Start range is greater than end range[start: %d > end: %d]\n", start, end);
 
         //char* str = "hello"
         //0 - 4 = hello\0 = 6
@@ -1442,7 +1442,7 @@
 
     internal u8* read_file_data(FILE* handle, size_t file_size) {
         u8* buffer = ckg_alloc(file_size);
-        ckg_assert_msg(fread(buffer, file_size, 1 , handle) != file_size, "Error reading file");
+        ckg_assert_msg(fread(buffer, file_size, 1 , handle) != file_size, "Error reading file\n");
         rewind(handle);
         return buffer;
     }
