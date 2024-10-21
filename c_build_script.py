@@ -3,19 +3,17 @@ from c_build.source.Utilities import *
 from c_build.source.Manager import *
 # --------------------------------------------------------------------------------------s
 
-compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "cl"
+compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "gcc"
 if not IS_WINDOWS():
     compiler_name = "gcc" 
-compiler_std_version = "c11"
 compiler_warning_level = ""
 compiler_disable_specific_warnings = []
 compiler_treat_warnings_as_errors = True
 
 project_name = "ckg"
 project_dependencies = [""]
-project_rebuild_project_dependencies = True
-project_debug_with_visual_studio = False
 project_executable_procedures = ["test_ckg.exe"]
+project_debug_with_visual_studio = False
 
 # Do different things depending on the platform
 if compiler_name == "cl":
