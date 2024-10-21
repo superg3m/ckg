@@ -110,3 +110,4 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 # Dev Notes (For me):
 - Write a bunch more tests!
 - I wonder if this makes sense of if ckit should just have this builtin.
+- Testing ckit
