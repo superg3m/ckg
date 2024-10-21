@@ -104,4 +104,9 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 - [x] test_vector_functions()
 - [x] test_string_functions() // I don't trust that validity of these test not comprehensive enough I think
 
-Write a bunch more tests!
+
+
+
+# Dev Notes (For me):
+- Write a bunch more tests!
+- I wonder if this makes sense of if ckit should just have this builtin.
