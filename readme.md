@@ -18,8 +18,6 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 3. ./debug.ps1
 4. ./run.ps1
 
-- cls ; pwsh ./build.ps1 ; cd .\example\cl ; .\test_ckg.exe ; cd ../.. 
-
 # Goals
 - [ ] I need to make a public facing API header file
 
