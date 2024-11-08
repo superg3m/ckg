@@ -715,7 +715,7 @@
     #define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
 
     typedef struct CKG_ArenaPage {
-        void* base_address;
+        u8* base_address;
         u64 capacity;
         u64 used;
     } CKG_ArenaPage;
@@ -735,7 +735,7 @@
         CKG_ArenaPage* ret = (CKG_ArenaPage*)ckg_alloc(sizeof(CKG_ArenaPage));
         ret->used = 0;
         ret->capacity = allocation_size;
-        ret->base_address = ckg_alloc(allocation_size != 0 ? allocation_size : ARENA_DEFAULT_ALLOCATION_SIZE);
+        ret->base_address = (u8*)ckg_alloc(allocation_size != 0 ? allocation_size : ARENA_DEFAULT_ALLOCATION_SIZE);
 
         return ret;
     }
@@ -802,7 +802,7 @@
 
         last_page = (CKG_ArenaPage*)ckg_linked_list_peek_tail(arena->pages); // tail might change
 
-        u8* ret = ((u8*)last_page->base_address) + last_page->used;
+        u8* ret = last_page->base_address + last_page->used;
         last_page->used += element_size;
         if ((last_page->used & (arena->alignment - 1)) != 0) { // if first bit is set then its not aligned
             last_page->used += (arena->alignment - (last_page->used & (arena->alignment - 1)));
