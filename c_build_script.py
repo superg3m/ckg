@@ -3,7 +3,7 @@ from c_build.source.Utilities import *
 from c_build.source.Manager import *
 # --------------------------------------------------------------------------------------s
 
-compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "gcc"
+compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "g++"
 if not IS_WINDOWS():
     compiler_name = "gcc" 
 compiler_warning_level = ""
@@ -28,7 +28,7 @@ procedures_config = {
     "ckg_lib": {
         "build_directory": f"./build_{compiler_name}",
         "output_name": C_BUILD_LIB('ckg', compiler_name),
-        "source_files": ["../ckg.c"],
+        "source_files": ["../ckg.cpp"],
         "additional_libs": [],
         "compile_time_defines": [],
         "include_paths": [],

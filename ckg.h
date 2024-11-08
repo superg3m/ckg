@@ -1,10 +1,10 @@
 #pragma once
 
-#if defined(CKG_EXTERN)
-    #define CKG_API extern
-#else
+#ifdef __cplusplus
+    #define CKG_API extern "C"
+#else 
     #define CKG_API
-#endif
+#endif 
 
 #if defined(CKG_IMPL)
     #define CKG_IMPL_TYPES
@@ -234,7 +234,12 @@
         }                                                  	\
     }
 
-    #define ckg_free(data) data = MACRO_ckg_free(data)
+    #ifdef __cplusplus
+        #define ckg_free(data) data = (decltype(data)) MACRO_ckg_free(data)
+    #else 
+        #define ckg_free(data) data = MACRO_ckg_free(data)
+    #endif
+    
     #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
     #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
 #endif
@@ -366,7 +371,13 @@
     #define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
     #define ckg_vector_count(vector) (*ckg_vector_header_base(vector)).count
     #define ckg_vector_capacity(vector) (*ckg_vector_header_base(vector)).capacity
-    #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+
+    #ifdef __cplusplus
+        #define ckg_vector_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+    #else 
+        #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+    #endif
+    
     #define ckg_vector_free(vector) ckg_free(ckg_vector_header_base(vector))
     //
     // ========== END CKG_VECTOR ==========
@@ -404,7 +415,13 @@
     CKG_API u32 ckg_linked_list_node_to_index(CKG_LinkedList* linked_list, CKG_Node* address);
 
     #define ckg_linked_list_create(type, is_pointer_type) MACRO_ckg_linked_list_create(sizeof(type), is_pointer_type)
-    #define ckg_linked_list_free(linked_list) linked_list = MACRO_ckg_linked_list_free(linked_list)
+
+    #ifdef __cplusplus
+        #define ckg_linked_list_free(linked_list) linked_list = (decltype(linked_list))MACRO_ckg_linked_list_free(linked_list)
+    #else 
+        #define ckg_linked_list_free(linked_list) linked_list = MACRO_ckg_linked_list_free(linked_list)
+    #endif
+    
     //
     // ========== END CKG_VECTOR ==========
     //
@@ -531,13 +548,13 @@
             "",
         };
 
-        char* log_level_format[LOG_LEVEL_COUNT] = {
+        const char* log_level_format[LOG_LEVEL_COUNT] = {
             CKG_RED_BACKGROUND,
             CKG_RED,
             CKG_PURPLE,
             CKG_BLUE,
             CKG_GREEN,
-            CKG_COLOR_RESET,
+            CKG_COLOR_RESET
         };
 
         char out_message[CKG_PLATFORM_CHARACTER_LIMIT];
@@ -641,7 +658,7 @@
             return;
         }
 
-        u8* temp_data_copy = ckg_alloc(source_size_in_bytes);
+        u8* temp_data_copy = (u8*)ckg_alloc(source_size_in_bytes);
         for (u32 i = 0; i < source_size_in_bytes; i++) {
             temp_data_copy[i] = ((u8*)source)[i];
         }
@@ -715,7 +732,7 @@
     }
 
     internal CKG_ArenaPage* ckg_arena_page_create(size_t allocation_size) {
-        CKG_ArenaPage* ret = ckg_alloc(sizeof(CKG_ArenaPage));
+        CKG_ArenaPage* ret = (CKG_ArenaPage*)ckg_alloc(sizeof(CKG_ArenaPage));
         ret->used = 0;
         ret->capacity = allocation_size;
         ret->base_address = ckg_alloc(allocation_size != 0 ? allocation_size : ARENA_DEFAULT_ALLOCATION_SIZE);
@@ -724,7 +741,7 @@
     }
 
     CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment) {
-        CKG_Arena* arena = ckg_alloc(sizeof(CKG_Arena));
+        CKG_Arena* arena = (CKG_Arena*)ckg_alloc(sizeof(CKG_Arena));
         arena->alignment = alignment == 0 ? 8 : alignment;
         arena->name = name;
         arena->flag = flag;
@@ -739,7 +756,7 @@
         ckg_assert(arena);
 
         for (u32 i = 0; i < arena->pages->count; i++) {
-            CKG_ArenaPage* page = ckg_linked_list_remove(arena->pages, 0).data;
+            CKG_ArenaPage* page = (CKG_ArenaPage*)ckg_linked_list_remove(arena->pages, 0).data;
             ckg_assert(page->base_address);
             ckg_free(page->base_address);
             ckg_free(page);
@@ -754,7 +771,7 @@
         ckg_assert(arena);
 
         for (u32 i = 0; i < arena->pages->count; i++) {
-            CKG_ArenaPage* page = ckg_linked_list_get(arena->pages, i);
+            CKG_ArenaPage* page = (CKG_ArenaPage*)ckg_linked_list_get(arena->pages, i);
             ckg_assert(page->base_address);
             ckg_memory_zero(page->base_address, page->used);
             page->used = 0;
@@ -764,7 +781,7 @@
     void* MACRO_ckg_arena_push(CKG_Arena* arena, size_t element_size) {
         ckg_assert(arena);
 
-        CKG_ArenaPage* last_page = ckg_linked_list_peek_tail(arena->pages);
+        CKG_ArenaPage* last_page = (CKG_ArenaPage*)ckg_linked_list_peek_tail(arena->pages);
         if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_FIXED)) { // single page assert if you run out of memory
             ckg_assert((last_page->used + element_size <= last_page->capacity));
         } else if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_CIRCULAR)) { // single page circle around if you run out of memory
@@ -783,7 +800,7 @@
             ckg_assert(FALSE);
         }
 
-        last_page = ckg_linked_list_peek_tail(arena->pages); // tail might change
+        last_page = (CKG_ArenaPage*)ckg_linked_list_peek_tail(arena->pages); // tail might change
 
         u8* ret = ((u8*)last_page->base_address) + last_page->used;
         last_page->used += element_size;
@@ -955,7 +972,7 @@
                 break;
             }
 
-            char* temp_string = ckg_alloc(contains_length + 1);
+            char* temp_string = (char*)ckg_alloc(contains_length + 1);
             ckg_substring(str, temp_string, i, end_index);
             if (ckg_cstr_equal(temp_string, contains)) {
                 contains_substring = TRUE;
@@ -1003,7 +1020,7 @@
                 break;
             }
 
-            char* temp_string = ckg_alloc((end_index - i) + 2);
+            char* temp_string = (char*)ckg_alloc((end_index - i) + 2);
             ckg_substring(str, temp_string, i, end_index);
             if (ckg_cstr_equal(temp_string, sub_string)) {
                 ret_index = i;
@@ -1052,7 +1069,7 @@
                 break;
             }
 
-            char* temp_string = ckg_alloc((end_index - i) + 1);
+            char* temp_string = (char*)ckg_alloc((end_index - i) + 1);
             ckg_substring(str, temp_string, i, end_index);
             if (ckg_cstr_equal(temp_string, sub_string)) {
                 ret_index = i;
@@ -1082,7 +1099,7 @@
         }
 
         Boolean starts_with_substring = FALSE;
-        char* temp_string = ckg_alloc(starts_with_length + 1);
+        char* temp_string = (char*)ckg_alloc(starts_with_length + 1);
         ckg_substring(str, temp_string, (u32)0, starts_with_length - 1);
         if (ckg_cstr_equal(temp_string, starts_with)) {
             starts_with_substring = TRUE;
@@ -1111,7 +1128,7 @@
         }
 
         Boolean starts_with_substring = FALSE;
-        char* temp_string = ckg_alloc(str_length - start_index + 1);
+        char* temp_string = (char*)ckg_alloc(str_length - start_index + 1);
         ckg_substring(str, temp_string, start_index, str_length - 1);
         if (ckg_cstr_equal(temp_string, ends_with)) {
             starts_with_substring = TRUE;
@@ -1200,7 +1217,7 @@
     // ========== START CKG_LinkedList ==========
     //
     CKG_LinkedList* MACRO_ckg_linked_list_create(size_t element_size_in_bytes, Boolean is_pointer_type) {
-        CKG_LinkedList* ret = ckg_alloc(sizeof(CKG_LinkedList));
+        CKG_LinkedList* ret = (CKG_LinkedList*)ckg_alloc(sizeof(CKG_LinkedList));
         ret->count = 0;
         ret->element_size_in_bytes = element_size_in_bytes;
         ret->head = NULLPTR;
@@ -1210,7 +1227,7 @@
     }
 
     CKG_Node* MACRO_ckg_node_create(CKG_LinkedList* linked_list, void* data) {
-        CKG_Node* ret = ckg_alloc(sizeof(CKG_Node));
+        CKG_Node* ret = (CKG_Node*)ckg_alloc(sizeof(CKG_Node));
         if (linked_list->is_pointer_type) {
             ret->data = data;
         } else {
@@ -1441,7 +1458,7 @@
     }
 
     internal u8* read_file_data(FILE* handle, size_t file_size) {
-        u8* buffer = ckg_alloc(file_size);
+        u8* buffer = (u8*)ckg_alloc(file_size);
         ckg_assert_msg(fread(buffer, file_size, 1 , handle) != file_size, "Error reading file\n");
         rewind(handle);
         return buffer;
@@ -1461,7 +1478,7 @@
     char* ckg_file_get_next_line(CKG_FileSystem* file_system) {
         // Date: July 06, 2024
         // TODO(Jovanni): this is temperary it needs to grow
-        char* line = ckg_alloc(2500); 
+        char* line = (char*)ckg_alloc(2500);
         ckg_memory_zero(line, 2500);
         char c;
         do {

@@ -136,8 +136,8 @@ void test_ckg_cstr_copy() {
 }
 
 void test_ckg_cstr_contains() {
-    char* t1 = "hello";
-    char* sub_str = ckg_alloc(3);
+    char t1[] = "hello";
+    char* sub_str = (char*)ckg_alloc(3);
     ckg_substring(t1, sub_str, 0, 1);
     ckg_assert(ckg_cstr_contains(sub_str, "he"));
     ckg_free(sub_str);
@@ -154,8 +154,8 @@ void test_ckg_cstr_contains() {
 }
 
 void test_ckg_cstr_starts_with() {
-    char* t1 = "hello";
-	char* sub_str = ckg_alloc(3);
+    char t1[] = "hello";
+	char* sub_str = (char*)ckg_alloc(3);
     ckg_substring(t1, sub_str, 0, 1);
 	ckg_assert(ckg_cstr_starts_with(sub_str, "he"));
 	ckg_free(sub_str);
@@ -166,7 +166,7 @@ void test_ckg_cstr_starts_with() {
 	ckg_assert(!ckg_cstr_starts_with(t1, ""));
 
 
-	char* t2 = "";
+	const char* t2 = "";
 	ckg_assert(ckg_cstr_starts_with(t2, ""));
 	
 
@@ -178,8 +178,8 @@ void test_ckg_cstr_starts_with() {
 }
 
 void test_ckg_cstr_ends_with() {
-    char* t1 = "hello";
-	char* sub_str = ckg_alloc(3);
+    char t1[] = "hello";
+	char* sub_str = (char*)ckg_alloc(3);
     ckg_substring(t1, sub_str, 0, 1);
 	ckg_assert(ckg_cstr_ends_with(sub_str, "he"));
 	ckg_assert(!ckg_cstr_ends_with(sub_str, "llo"));
@@ -190,7 +190,7 @@ void test_ckg_cstr_ends_with() {
 	ckg_assert(ckg_cstr_ends_with(t1, "hello"));
 	ckg_assert(ckg_cstr_ends_with(t1, "ello"));
 
-	char* t2 = "";
+	const char* t2 = "";
 	ckg_assert(ckg_cstr_ends_with(t2, ""));
 	
 
@@ -202,20 +202,20 @@ void test_ckg_cstr_ends_with() {
 }
 
 void test_ckg_cstr_reverse() {
-    char* t1 = "hello";
-	char* sub_str = ckg_alloc(3);
+    char t1[] = "hello";
+	char* sub_str = (char*)ckg_alloc(3);
     ckg_substring(t1, sub_str, 0, 1);
-    char* reversed_string = ckg_alloc(ckg_cstr_length(sub_str) + 1);
+    char* reversed_string = (char*)ckg_alloc(ckg_cstr_length(sub_str) + 1);
     ckg_cstr_reverse(sub_str, reversed_string, ckg_cstr_length(sub_str) + 1);
 	ckg_assert(ckg_cstr_equal(reversed_string, "eh"));
 	ckg_free(sub_str);
 	ckg_free(reversed_string);
 
-    char* reversed_string2 = ckg_alloc(ckg_cstr_length("Chicken") + 1);
+    char* reversed_string2 = (char*)ckg_alloc(ckg_cstr_length("Chicken") + 1);
     ckg_cstr_reverse("Chicken", reversed_string2, ckg_cstr_length("Chicken") + 1);
-    char* reversed_string3 = ckg_alloc(ckg_cstr_length("Roast") + 1);
+    char* reversed_string3 = (char*)ckg_alloc(ckg_cstr_length("Roast") + 1);
     ckg_cstr_reverse("Roast", reversed_string3, ckg_cstr_length("Chicken") + 1);
-    char* reversed_string4 = ckg_alloc(ckg_cstr_length("Soup") + 1);
+    char* reversed_string4 = (char*)ckg_alloc(ckg_cstr_length("Soup") + 1);
     ckg_cstr_reverse("Soup", reversed_string4, ckg_cstr_length("Chicken") + 1);
 
 	ckg_assert_msg(ckg_cstr_equal(reversed_string2, "nekcihC"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "nekcihC", reversed_string2);
@@ -227,14 +227,14 @@ void test_ckg_cstr_reverse() {
 	ckg_free(reversed_string4);
 
 
-	char* t2 = "";
-    char* reversed_t2 = ckg_alloc(ckg_cstr_length(t2) + 1);
+	const char* t2 = "";
+    char* reversed_t2 = (char*)ckg_alloc(ckg_cstr_length(t2) + 1);
     ckg_cstr_reverse(t2, reversed_t2, ckg_cstr_length(t2)+ 1);
 	ckg_assert_msg(ckg_cstr_equal(reversed_t2, ""), "test_ckg_cstr_reverse failed expected: %s | got: %s", "", reversed_t2);
     ckg_free(reversed_t2);
 
 	t2 = "f";
-    reversed_t2 = ckg_alloc(ckg_cstr_length(t2) + 1);
+    reversed_t2 = (char*)ckg_alloc(ckg_cstr_length(t2) + 1);
     ckg_cstr_reverse(t2, reversed_t2, ckg_cstr_length(t2) + 1);
 	ckg_assert_msg(ckg_cstr_equal(reversed_t2, "f"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
 	ckg_assert_msg(!ckg_cstr_equal(reversed_t2, "g"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
@@ -244,8 +244,8 @@ void test_ckg_cstr_reverse() {
 }
 
 void test_ckg_cstr_index_of() {
-    char* t1 = "hello ";
-	char* sub_str = ckg_alloc(3);
+    char t1[] = "hello ";
+	char* sub_str = (char*)ckg_alloc(3);
     ckg_substring(t1, sub_str, 0, 1);
 
 	ckg_assert(ckg_cstr_index_of(sub_str, "he") == 0);
@@ -258,7 +258,7 @@ void test_ckg_cstr_index_of() {
 
 	ckg_assert(ckg_cstr_index_of(t1, " ") == 5);
 
-	char* t2 = "";
+	const char* t2 = "";
 	ckg_assert(ckg_cstr_index_of(t2, "") == 0);
 
 	t2 = "f";
@@ -328,7 +328,7 @@ void test_ckg_str_operations() {
     test_ckg_cstr_index_of();
 
     int test_int_to_cstr = 5112512;
-    char* string_buffer = ckg_alloc(9);
+    char* string_buffer = (char*)ckg_alloc(9);
     ckg_cstr_int_to_cstr(string_buffer, 9, test_int_to_cstr);
     CKG_LOG_SUCCESS("INT TO STRING: %s\n", string_buffer);
 

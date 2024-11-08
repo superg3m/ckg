@@ -3,14 +3,14 @@
 
 void test_ckg_memory_operations() {
 	// Test ckg_alloc
-	int* ptr1 = ckg_alloc(sizeof(int));
+	int* ptr1 = (int*)ckg_alloc(sizeof(int));
 	ckg_assert(ptr1 != NULLPTR);
 	*ptr1 = 5;
 	ckg_assert(*ptr1 == 5);
 	ckg_free(ptr1);
 
 	// Test ckg_memory_callocate
-	int* ptr2 = ckg_alloc(10 * sizeof(int));
+	int* ptr2 = (int*)ckg_alloc(10 * sizeof(int));
 	ckg_assert(ptr2 != NULLPTR);
 	for (int i = 0; i < 10; i++) {
 		ptr2[i] = i;
@@ -21,8 +21,8 @@ void test_ckg_memory_operations() {
 	ckg_free(ptr2);
 
 	// Test ckg_realloc
-	int* ptr3 = ckg_alloc(sizeof(int));
-	int* ptr4 = ckg_realloc(ptr3, sizeof(int), 4 * sizeof(int));
+	int* ptr3 = (int*)ckg_alloc(sizeof(int));
+	int* ptr4 = (int*)ckg_realloc(ptr3, sizeof(int), 4 * sizeof(int));
 	ckg_assert(ptr4 != NULLPTR);
 	*ptr4 = 5;
 	ckg_assert(*ptr4 == 5);
