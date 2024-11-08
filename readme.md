@@ -1,5 +1,4 @@
-# builds uisng c-build with cl/gcc and on ubuntu(wsl)
-- If you are on linux all you need to do is change the compiler_type to "gcc" from "cl" in the c_build_config.json
+# builds using c-build with cl/gcc/g++ and on ubuntu(wsl)
 
 # CKG's Core Thesis
 - The point of the ckit granular (ckg) is building out everything at a granular level.
@@ -105,9 +104,5 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 - [x] test_string_functions() // I don't trust that validity of these test not comprehensive enough I think
 
 
-
-
 # Dev Notes (For me):
-- Write a bunch more tests!
-- I wonder if this makes sense of if ckit should just have this builtin.
-- Testing ckit
+	- Write a bunch more tests!
