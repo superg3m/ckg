@@ -1,4 +1,5 @@
 # builds using c-build with cl/gcc/g++ and on ubuntu(wsl)
+# Tested on clang before but not tested on clang++
 
 # CKG's Core Thesis
 - The point of the ckit granular (ckg) is building out everything at a granular level.
