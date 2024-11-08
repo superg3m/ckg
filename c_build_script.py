@@ -28,7 +28,7 @@ procedures_config = {
     "ckg_lib": {
         "build_directory": f"./build_{compiler_name}",
         "output_name": C_BUILD_LIB('ckg', compiler_name),
-        "source_files": ["../ckg.cpp"],
+        "source_files": ["../ckg.c"],
         "additional_libs": [],
         "compile_time_defines": [],
         "include_paths": [],
