@@ -16,6 +16,7 @@ compiler_disable_warnings = False
 project_name = "ckg"
 project_dependencies = [""]
 project_executable_procedures = ["test_ckg.exe"]
+project_rebuild_project_dependencies = False
 project_debug_with_visual_studio = False
 
 # Do different things depending on the platform
