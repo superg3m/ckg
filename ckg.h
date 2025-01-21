@@ -98,6 +98,14 @@
         #error "Unknown Platform???"
     #endif
 
+    #if defined(__clang__)
+        #define UNUSED_FUNCTION __attribute__((used))
+    #elif defined(__GNUC__) || defined(__GNUG__)
+        #define UNUSED_FUNCTION __attribute__((used))
+    #elif defined(_MSC_VER)
+        #define UNUSED_FUNCTION
+    #endif
+
     CKG_API void ckg_stack_trace_dump();
 #endif
 
@@ -516,7 +524,7 @@
             ckg_free(symbol);
             CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
         }
-    #elif defined(__GNUC__)
+    #elif defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
         void ckg_stack_trace_dump() {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
             // backtrace
