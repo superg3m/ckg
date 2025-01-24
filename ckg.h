@@ -262,13 +262,13 @@
     typedef struct CKG_Arena CKG_Arena;
 
 
-    CKG_API CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment);
+    CKG_API CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, CKG_ArenaFlag flag, u8 alignment);
     CKG_API void* MACRO_ckg_arena_push(CKG_Arena* arena, size_t element_size);	
     CKG_API CKG_Arena* MACRO_ckg_arena_free(CKG_Arena* arena);
     CKG_API void ckg_arena_clear(CKG_Arena* arena);
 
-    #define ckg_arena_create(allocation_size, name) MACRO_ckg_arena_create(allocation_size, name, CKG_ARENA_FLAG_EXTENDABLE_PAGES, 0)
-    #define ckg_arena_create_custom(allocation_size, name, flags, alignment) MACRO_ckg_arena_create(allocation_size, name, flags, alignment)
+    #define ckg_arena_create(allocation_size) MACRO_ckg_arena_create(allocation_size, CKG_ARENA_FLAG_EXTENDABLE_PAGES, 0)
+    #define ckg_arena_create_custom(allocation_size, flags, alignment) MACRO_ckg_arena_create(allocation_size, flags, alignment)
     #define ckg_arena_free(arena) arena = MACRO_ckg_arena_free(arena)
     #define ckg_arena_push(arena, type) ((type*)MACRO_ckg_arena_push(arena, sizeof(type)))
     #define ckg_arena_push_array(arena, type, element_count) ((type*)MACRO_ckg_arena_push(arena, sizeof(type) * element_count))
@@ -344,6 +344,9 @@
 	CKG_API Boolean ckg_cstr_ends_with(const char* string_buffer, const char* ends_with);
 	CKG_API void ckg_cstr_reverse(const char* str, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
 	CKG_API void ckg_cstr_int_to_cstr(char* string_buffer, size_t string_buffer_capacity, int number);
+
+    CKG_API char* ckg_cstr_va_sprint(u64* allocation_size_ptr, char* fmt, va_list args);
+    CKG_API char* MACRO_ckg_cstr_sprint(u64* allocation_size_ptr, char* fmt, ...);
 #endif
 
 #if defined(CKG_INCLUDE_CHAR)
@@ -748,10 +751,9 @@
         return ret;
     }
 
-    CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, const char* name, CKG_ArenaFlag flag, u8 alignment) {
+    CKG_Arena* MACRO_ckg_arena_create(size_t allocation_size, CKG_ArenaFlag flag, u8 alignment) {
         CKG_Arena* arena = (CKG_Arena*)ckg_alloc(sizeof(CKG_Arena));
         arena->alignment = alignment == 0 ? 8 : alignment;
-        arena->name = name;
         arena->flag = flag;
         arena->pages = ckg_linked_list_create(CKG_ArenaPage*, TRUE);
         CKG_ArenaPage* inital_page = ckg_arena_page_create(allocation_size);
@@ -1164,6 +1166,27 @@
             ckg_cstr_insert_char(string_buffer, string_buffer_capacity, c, 0);
             number /= (int)10;
         }
+    }
+
+    char* MACRO_ckg_cstr_va_sprint(u64* allocation_size_ptr, char* fmt, va_list args) {
+        u64 allocation_size = vsnprintf(NULLPTR, 0, fmt, args) + 1; // + 1 because null terminator
+        char* ret = ckg_alloc(allocation_size);
+        vsnprintf(ret, allocation_size, fmt, args);
+
+        if (allocation_size_ptr != NULLPTR) {
+            *allocation_size_ptr = allocation_size;
+        } 
+
+        return ret;
+    }
+
+    char* MACRO_ckg_cstr_sprint(u64* allocation_size_ptr, char* fmt, ...) {
+        va_list args;
+        va_start(args, fmt);
+        char* ret = MACRO_ckg_cstr_va_sprint(allocation_size_ptr, fmt, args);
+        va_end(args);
+
+        return ret;
     }
 #endif
 

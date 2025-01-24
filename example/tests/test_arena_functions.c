@@ -1,7 +1,7 @@
 #include "../../ckg.h"
 
 void test_ckg_arena_operations() {
-  CKG_Arena* arena = ckg_arena_create(1024, "Test Arena");
+  CKG_Arena* arena = ckg_arena_create(1024);
 
   // Test arena_push
   int* int_ptr = ckg_arena_push(arena, int);
@@ -26,7 +26,7 @@ void test_ckg_arena_operations() {
   const int arena_size_common = sizeof(int) * 16;
 
   // Test extendable arena
-  CKG_Arena* extendable_arena = ckg_arena_create(arena_size_common, "Extendable Arena");
+  CKG_Arena* extendable_arena = ckg_arena_create(arena_size_common);
   for (u32 i = 0; i < 32; i++) {
     int* ptr = ckg_arena_push(extendable_arena, int);
     *ptr = i;
@@ -34,7 +34,7 @@ void test_ckg_arena_operations() {
   ckg_arena_free(extendable_arena);
 
   // Test circular arena
-  CKG_Arena* circular_arena = ckg_arena_create_custom(arena_size_common, "Circular Arena", CKG_ARENA_FLAG_CIRCULAR, sizeof(int));
+  CKG_Arena* circular_arena = ckg_arena_create_custom(arena_size_common, CKG_ARENA_FLAG_CIRCULAR, sizeof(int));
   for (u32 i = 0; i < 32; i++) {
     int* ptr = ckg_arena_push(circular_arena, int);
     *ptr = i;
@@ -45,7 +45,7 @@ void test_ckg_arena_operations() {
   ckg_arena_free(circular_arena);
 
   // Test vector arena
-  CKG_Arena* fixed_arena = ckg_arena_create_custom(arena_size_common, "Fixed Arena", CKG_ARENA_FLAG_FIXED, sizeof(int));
+  CKG_Arena* fixed_arena = ckg_arena_create_custom(arena_size_common, CKG_ARENA_FLAG_FIXED, sizeof(int));
   for (u32 i = 0; i < 16; i++) {
     int* ptr = ckg_arena_push(fixed_arena, int);
     *ptr = i;
