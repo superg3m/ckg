@@ -740,7 +740,7 @@
         u8 alignment;
     } CKG_Arena;
 
-    Boolean ckg_CKG_ARENA_FLAG_is_set(CKG_Arena* arena, CKG_ArenaFlag flag) {
+    Boolean ckg_is_set(CKG_Arena* arena, CKG_ArenaFlag flag) {
         return arena->flag == flag;
     }
 
@@ -794,14 +794,14 @@
         ckg_assert(arena);
 
         CKG_ArenaPage* last_page = (CKG_ArenaPage*)ckg_linked_list_peek_tail(arena->pages);
-        if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_FIXED)) { // single page assert if you run out of memory
+        if (ckg_is_set(arena, CKG_ARENA_FLAG_FIXED)) { // single page assert if you run out of memory
             ckg_assert((last_page->used + element_size <= last_page->capacity));
-        } else if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_CIRCULAR)) { // single page circle around if you run out of memory
+        } else if (ckg_is_set(arena, CKG_ARENA_FLAG_CIRCULAR)) { // single page circle around if you run out of memory
             if ((last_page->used + element_size > last_page->capacity)) {
                 last_page->used = 0;
                 ckg_assert((last_page->used + element_size <= last_page->capacity));
             }
-        } else if (ckg_CKG_ARENA_FLAG_is_set(arena, CKG_ARENA_FLAG_EXTENDABLE_PAGES)) {
+        } else if (ckg_is_set(arena, CKG_ARENA_FLAG_EXTENDABLE_PAGES)) {
             ckg_assert(last_page->base_address);
             if ((last_page->used + element_size > last_page->capacity)) {
                 CKG_ArenaPage* next_page = ckg_arena_page_create((last_page->capacity + element_size) * 2);
