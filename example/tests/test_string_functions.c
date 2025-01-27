@@ -140,9 +140,6 @@ void test_ckg_cstr_contains() {
     char* sub_str = (char*)ckg_alloc(3);
     ckg_substring(t1, sub_str, 0, 1);
 
-    sub_str = (char*)ckg_alloc(1);
-    ckg_substring(t1, sub_str, 0, 0);
-
     ckg_assert(ckg_cstr_contains(sub_str, "he"));
     ckg_free(sub_str);
 
