@@ -379,7 +379,7 @@
     } CKG_VectorHeader;
 
     CKG_API void* ckg_vector_grow(void* vector, size_t element_size);
-
+    CKG_API void* MACRO_ckg_vector_free(void* vector);
 
     #define VECTOR_DEFAULT_CAPACITY 1
     #define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
@@ -392,7 +392,7 @@
         #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
     #endif
     
-    #define ckg_vector_free(vector) ckg_free(ckg_vector_header_base(vector))
+    #define ckg_vector_free(vector) vector = MACRO_ckg_vector_free(vector)
     //
     // ========== END CKG_VECTOR ==========
     //
@@ -1232,6 +1232,16 @@
 
         return vector;
     }
+
+    void* MACRO_ckg_vector_free(void* vector) {
+        CKG_VectorHeader* vector_base = ckg_vector_header_base(vector);
+        vector_base->count = 0;
+        vector_base->capacity = 0;
+        ckg_free(vector_base);
+
+        return vector_base;
+    }
+
     //
     // ========== END CKG_VECTOR ==========
     //

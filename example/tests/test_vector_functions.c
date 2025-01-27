@@ -14,5 +14,7 @@ void test_ckg_vector_operations() {
 	ckg_vector_push(int_vector, 4);
 
 	CKG_LOG_SUCCESS("All vector tests passed!\n"); 
+
+	ckg_vector_free(int_vector);
 	return;
 }
