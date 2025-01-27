@@ -103,6 +103,14 @@ int main() {
 
 	ckg_assert(GET_BIT(number_to_endian_swap, 0));
 
+	for (char i = 0; i < 26; i++) {
+		char c = i + 'a';
+		ckg_assert_msg(ckg_char_is_alpha(c), "Character: %c\n", c);
+
+		c = i + 'A';
+		ckg_assert_msg(ckg_char_is_alpha(c), "Character: %c\n", c);
+	}
+
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 	return 0;
 }
