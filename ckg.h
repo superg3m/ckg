@@ -768,7 +768,8 @@
     CKG_Arena* MACRO_ckg_arena_free(CKG_Arena* arena) {
         ckg_assert(arena);
 
-        for (u32 i = 0; i < arena->pages->count; i++) {
+        u32 page_count = arena->pages->count;
+        for (u32 i = 0; i < page_count; i++) {
             CKG_ArenaPage* page = (CKG_ArenaPage*)ckg_linked_list_remove(arena->pages, 0).data;
             ckg_assert(page->base_address);
             ckg_free(page->base_address);
