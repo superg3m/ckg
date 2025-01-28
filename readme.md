@@ -107,4 +107,5 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 
 # Dev Notes (For me):
 	- Write a bunch more tests!
-	-Take another look at substring
+	- Take another look at substring
+	- String views are next I need them!
