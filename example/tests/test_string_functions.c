@@ -333,6 +333,7 @@ void test_ckg_str_operations() {
     char* string_buffer = (char*)ckg_alloc(9);
     ckg_cstr_int_to_cstr(string_buffer, 9, test_int_to_cstr);
     CKG_LOG_SUCCESS("INT TO STRING: %s\n", string_buffer);
+    ckg_free(string_buffer);
 
     // test_ckg_string_edgecases();
     // test_ckg_string_assertions();
