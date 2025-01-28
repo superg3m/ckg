@@ -137,10 +137,10 @@ void test_ckg_cstr_copy() {
 
 void test_ckg_cstr_contains() {
     char t1[] = "hello";
-    char* sub_str = (char*)ckg_alloc(3);
+    char* sub_str = (char*)ckg_alloc(2);
     ckg_substring(t1, sub_str, 0, 1);
 
-    ckg_assert(ckg_cstr_contains(sub_str, "he"));
+    ckg_assert(ckg_cstr_contains(sub_str, "h"));
     ckg_free(sub_str);
 
     ckg_assert(!ckg_cstr_contains(t1, ""));
@@ -150,15 +150,16 @@ void test_ckg_cstr_contains() {
     ckg_assert(!ckg_cstr_contains(t1, ";;;;;;"));
     ckg_assert(ckg_cstr_contains(t1, "hello"));
     ckg_assert(!ckg_cstr_contains(t1, "hllo"));
+    ckg_assert(ckg_cstr_contains(t1, "hello"));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_contains passed.\n");
 }
 
 void test_ckg_cstr_starts_with() {
     char t1[] = "hello";
-	char* sub_str = (char*)ckg_alloc(3);
+	char* sub_str = (char*)ckg_alloc(2);
     ckg_substring(t1, sub_str, 0, 1);
-	ckg_assert(ckg_cstr_starts_with(sub_str, "he"));
+	ckg_assert(ckg_cstr_starts_with(sub_str, "h"));
 	ckg_free(sub_str);
 
 	ckg_assert(ckg_cstr_starts_with(t1, "hell"));
@@ -181,7 +182,7 @@ void test_ckg_cstr_starts_with() {
 void test_ckg_cstr_ends_with() {
     char t1[] = "hello";
 	char* sub_str = (char*)ckg_alloc(3);
-    ckg_substring(t1, sub_str, 0, 1);
+    ckg_substring(t1, sub_str, 0, 2);
 	ckg_assert(ckg_cstr_ends_with(sub_str, "he"));
 	ckg_assert(!ckg_cstr_ends_with(sub_str, "llo"));
 	ckg_free(sub_str);
@@ -205,7 +206,7 @@ void test_ckg_cstr_ends_with() {
 void test_ckg_cstr_reverse() {
     char t1[] = "hello";
 	char* sub_str = (char*)ckg_alloc(3);
-    ckg_substring(t1, sub_str, 0, 1);
+    ckg_substring(t1, sub_str, 0, 2);
     char* reversed_string = (char*)ckg_alloc(ckg_cstr_length(sub_str) + 1);
     ckg_cstr_reverse(sub_str, reversed_string, ckg_cstr_length(sub_str) + 1);
 	ckg_assert(ckg_cstr_equal(reversed_string, "eh"));
@@ -247,7 +248,7 @@ void test_ckg_cstr_reverse() {
 void test_ckg_cstr_index_of() {
     char t1[] = "hello ";
 	char* sub_str = (char*)ckg_alloc(3);
-    ckg_substring(t1, sub_str, 0, 1);
+    ckg_substring(t1, sub_str, 0, 2);
 
 	ckg_assert(ckg_cstr_index_of(sub_str, "he") == 0);
 	ckg_free(sub_str);

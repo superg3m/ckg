@@ -928,29 +928,18 @@
         *dest = '\0';
     }
 
-    void ckg_substring(const char* str, char* returned_buffer, u32 start, u32 end) {
-        ckg_assert(str);
-        ckg_assert(returned_buffer);
-        size_t str_length = ckg_cstr_length(str); 
+    void ckg_substring(const char* string_buffer, char* returned_buffer, u32 start_range, u32 end_range) {
+        ckg_assert(string_buffer);
 
-        Boolean start_check = (start >= 0) && (start <= str_length - 1);
-        Boolean end_check = (end >= 0) && (end <= str_length - 1);
+        u64 str_length = ckg_cstr_length(string_buffer);
+        ckg_assert_msg(start_range < str_length, "cj_substring: Start index out of range: [0 - %llu], got: %llu\n", str_length - 1, start_range);
+        ckg_assert_msg(end_range <= str_length, "cj_substring: End index out of range: [0 - %llu], got: %llu\n", str_length, end_range);
+        ckg_assert_msg(start_range <= end_range, "cj_substring: Start index is greater than end index (start: %llu, end: %llu)\n", start_range, end_range);
 
-        ckg_assert_msg(start_check, "ckg_substring: Start range is outside expected range: [%d - %lld] got: %d\n", 0, str_length - 1, start);
-        ckg_assert_msg(end_check, "ckg_substring: End range is outside expected range: [%d - %lld] got: %d\n", 1, str_length - 1, end);
-        ckg_assert_msg(start <= end, "ckg_substring: Start range is greater than end range[start: %d > end: %d]\n", start, end);
+        u64 length = end_range - start_range;
 
-        //char* str = "hello"
-        //0 - 4 = hello\0 = 6
-        //0 - 0 = h\0 = 2
-        //0 - 1 = he\0 = 3
-        //1 - 4 = ello\0 = 5
-
-        u32 counter = 0;
-        for (u32 i = start; i <= end; i++) {
-            returned_buffer[counter++] = str[i];
-        }
-        returned_buffer[counter] = '\0'; 
+        ckg_memory_copy((string_buffer + start_range), returned_buffer, length, length);
+        returned_buffer[length] = '\0';
     }
 
     Boolean ckg_cstr_contains(const char* str, const char* contains) {
@@ -980,7 +969,7 @@
                 continue;
             }
 
-            u32 end_index = (u32)(i + (contains_length - 1));
+            u32 end_index = (u32)(i + contains_length);
             if (end_index > str_length) {
                 break;
             }
@@ -1028,7 +1017,7 @@
                 continue;
             }
 
-            s32 end_index = (u32)(i + (contains_length - 1));
+            s32 end_index = (u32)(i + contains_length);
             if (end_index > str_length) {
                 break;
             }
@@ -1077,7 +1066,7 @@
                 continue;
             }
 
-            s32 end_index = (u32)(i + (contains_length - 1));
+            s32 end_index = (u32)(i + contains_length);
             if (end_index > str_length) {
                 break;
             }
@@ -1113,7 +1102,7 @@
 
         Boolean starts_with_substring = FALSE;
         char* temp_string = (char*)ckg_alloc(starts_with_length + 1);
-        ckg_substring(str, temp_string, (u32)0, starts_with_length - 1);
+        ckg_substring(str, temp_string, (u32)0, starts_with_length);
         if (ckg_cstr_equal(temp_string, starts_with)) {
             starts_with_substring = TRUE;
         }
@@ -1142,7 +1131,7 @@
 
         Boolean starts_with_substring = FALSE;
         char* temp_string = (char*)ckg_alloc(str_length - start_index + 1);
-        ckg_substring(str, temp_string, start_index, str_length - 1);
+        ckg_substring(str, temp_string, start_index, str_length);
         if (ckg_cstr_equal(temp_string, ends_with)) {
             starts_with_substring = TRUE;
         }
