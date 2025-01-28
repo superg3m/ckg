@@ -281,7 +281,7 @@
         u32 length;
     } CKG_StringView;
 
-    ckg_strview
+    // CKG_StringView ckg_strview_create(char* str, u32 start, u32 end);
 
 	/**
 	 * @brief returns a string buffer with nullterm
