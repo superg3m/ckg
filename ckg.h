@@ -276,10 +276,12 @@
 
 #if defined(CKG_INCLUDE_CSTRING)
     // types
-    typedef struct StringView {
+    typedef struct CKG_StringView {
         char* view;
         u32 length;
-    } StringView;
+    } CKG_StringView;
+
+    ckg_strview
 
 	/**
 	 * @brief returns a string buffer with nullterm
