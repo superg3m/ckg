@@ -71,7 +71,7 @@
 
     #define FIRST_DIGIT(number) ((int)number % 10);
 
-    CKG_API void U32_EndianSwap(u64* number_to_endian_swap);
+    CKG_API void U32_EndianSwap(u32* number_to_endian_swap);
     CKG_API void U64_EndianSwap(u64* number_to_endian_swap);
     #define GET_BIT(number, bit_to_check) ((number & (1 << bit_to_check)) >> bit_to_check)
     #define SET_BIT(number, bit_to_set) number |= (1 << bit_to_set);
@@ -463,13 +463,13 @@
 //
 
 #if defined(CKG_IMPL_TYPES)
-    void U32_EndianSwap(u64* number_to_endian_swap) {
-        u64 temp = *number_to_endian_swap;
+    void U32_EndianSwap(u32* number_to_endian_swap) {
+        u32 temp = *number_to_endian_swap;
         
-        u64 b0 = (temp >> 0) & 0xFF;
-        u64 b1 = (temp >> 8) & 0xFF;
-        u64 b2 = (temp >> 16) & 0xFF;
-        u64 b3 = (temp >> 24) & 0xFF;
+        u32 b0 = (temp >> 0) & 0xFF;
+        u32 b1 = (temp >> 8) & 0xFF;
+        u32 b2 = (temp >> 16) & 0xFF;
+        u32 b3 = (temp >> 24) & 0xFF;
 
         *number_to_endian_swap = (b0 << 24)|(b1 << 16)|(b2 << 8)|(b3 << 0);
     } 
