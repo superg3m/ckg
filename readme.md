@@ -111,3 +111,17 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	
 	- String views are next I need them!
 	- Fix all tests
+	- clean up stacks it should just be an array
+
+
+stack_of_state state;
+state_push(state, iniital);
+while (stack_is_empty(state) == false)
+{
+    current_state = stack_pop(state);
+    parse_next_thing(current_state); // from input
+    if (need_to_recurse) {
+       state_push(state, current_state);
+       state_push(state, some_recursion);
+    }
+}
