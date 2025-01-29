@@ -299,73 +299,28 @@ void test_ckg_cstr_reverse() {
     CKG_LOG_SUCCESS("Test ckg_cstr_reverse passed.\n");
 }
 
-/*
 void test_ckg_cstr_index_of() {
     char t1[] = "hello ";
-	char* sub_str = (char*)ckg_alloc(3);
-    ckg_substring(t1, sub_str, 0, 2);
+    u64 t1_length = sizeof("hello ") - 1;
+    CKG_StringView substring_view = ckg_strview_create(t1, 0, 2);
 
-	ckg_assert(ckg_cstr_index_of(sub_str, "he") == 0);
-	ckg_free(sub_str);
+	ckg_assert(ckg_cstr_index_of(CKG_SV_ARG(substring_view), CKG_LIT_ARG("he")) == 0);
+	ckg_assert(ckg_cstr_index_of(t1, t1_length, CKG_LIT_ARG("ell")) == 1);
+	ckg_assert(ckg_cstr_index_of(t1, t1_length, CKG_LIT_ARG("l")) == 2);
+	ckg_assert(ckg_cstr_index_of(t1, t1_length, CKG_LIT_ARG("o")) == 4);
+	ckg_assert(ckg_cstr_index_of(t1, t1_length, CKG_LIT_ARG("hello")) == 0);
 
-	ckg_assert(ckg_cstr_index_of(t1, "ell") == 1);
-	ckg_assert(ckg_cstr_index_of(t1, "l") == 2);
-	ckg_assert(ckg_cstr_index_of(t1, "o") == 4);
-	ckg_assert(ckg_cstr_index_of(t1, "hello") == 0);
-
-	ckg_assert(ckg_cstr_index_of(t1, " ") == 5);
+	ckg_assert(ckg_cstr_index_of(t1, t1_length, CKG_LIT_ARG(" ")) == 5);
 
 	const char* t2 = "";
-	ckg_assert(ckg_cstr_index_of(t2, "") == 0);
+    u64 t2_length = 0;
+	ckg_assert(ckg_cstr_index_of(t2, t2_length, CKG_LIT_ARG("")) == 0);
 
 	t2 = "f";
-	ckg_assert(ckg_cstr_index_of(t2, "f") == 0);
+    t2_length = 1;
+	ckg_assert(ckg_cstr_index_of(t2, t2_length, CKG_LIT_ARG("f")) == 0);
 
     CKG_LOG_SUCCESS("Test test_ckg_cstr_index_of passed.\n");
-}
-
-
-void test_ckg_string_assertions() {
-    char str1[10] = "Overflow";
-    ckg_cstr_append(str1, 10, "ingTest");
-    ckg_assert(!ckg_cstr_equal(str1, "OverflowingTest"));
-
-    char str2[6] = "Short";
-    ckg_cstr_append_char(str2, 6, 'X');
-    ckg_assert(!ckg_cstr_equal(str2, "ShortX"));
-}
-
-void test_ckg_string_edgecases() {
-    CKG_LOG_WARN("=============================== EXPECTED ASSERTS START ===============================\n");
-    ckg_assert(ckg_cstr_length("") == 0);
-    ckg_assert(ckg_cstr_length(NULL));
-
-    // Test edge cases for ckg_cstr_equal
-    ckg_assert(ckg_cstr_equal(NULL, NULL));
-    ckg_assert(!ckg_cstr_equal("Hello", NULL));
-    ckg_assert(!ckg_cstr_equal(NULL, "Hello"));
-
-    // Test edge cases for ckg_cstr_insert_char
-    char str1[50] = "Hello";
-
-    ckg_cstr_insert_char(str1, 50, 'V', 10); // Insert at a position beyond the string length
-
-    ckg_assert(ckg_cstr_equal(str1, "HelloV"));
-
-    char str2[50] = "";
-    ckg_cstr_insert_char(str2, 50, 'Z', 0); // Insert into an empty string
-    ckg_assert(ckg_cstr_equal(str2, "Z"));
-
-    // Test edge cases for ckg_cstr_append
-    char str3[50] = "Hello";
-    ckg_cstr_append(str3, 50, NULL); // Append a null string
-    ckg_assert(ckg_cstr_equal(str3, "Hello"));
-
-    char str4[50] = "";
-    ckg_cstr_append(str4, 50, "Appended"); // Append to an empty string
-    ckg_assert(ckg_cstr_equal(str4, "Appended"));
-    CKG_LOG_WARN("=============================== EXPECTED ASSERTS END ===============================\n");
-    CKG_LOG_SUCCESS("Test ckg_string_edgecases passed.\n");
 }
 
 void test_ckg_str_operations() { 
@@ -396,4 +351,3 @@ void test_ckg_str_operations() {
     CKG_LOG_DEBUG("======================= String Functions All Passed =======================\n");
     CKG_LOG_PRINT("\n");
 }
-*/
