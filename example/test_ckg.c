@@ -21,6 +21,7 @@ int main() {
     test_ckg_string_equal();
     test_ckg_cstr_insert_char();
     test_ckg_cstr_insert();
+    test_ckg_cstr_append();
 
     return 0;
 }
