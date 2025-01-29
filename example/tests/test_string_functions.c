@@ -157,138 +157,149 @@ void test_ckg_cstr_append_char() {
     CKG_LOG_SUCCESS("Test ckg_cstr_append_char passed.\n");
 }
 
-
-/*
 void test_ckg_cstr_clear() {
     char str1[50] = "Hello";
-    ckg_cstr_clear(str1);
-    ckg_assert(ckg_cstr_equal(str1, ""));
+    ckg_memory_zero(str1, 50);
+    ckg_assert(ckg_cstr_equal(str1, 0, "", 0));
 
     char str2[50] = "";
-    ckg_cstr_clear(str2);
-    ckg_assert(ckg_cstr_equal(str2, ""));
+    ckg_memory_zero(str2, 50);
+    ckg_assert(ckg_cstr_equal(str2, sizeof("") - 1, "", 0));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_clear passed.\n");
 }
 
 void test_ckg_cstr_copy() {
-    char str1[50] = {0};
-    ckg_cstr_copy(str1, 50, "Hello!");
-    ckg_assert(ckg_cstr_equal(str1, "Hello!"));
+    char str1[50] = "";
+    ckg_cstr_copy(str1, 50, CKG_LIT_ARG("Hello!"));
+    ckg_assert(ckg_cstr_equal(str1, sizeof("Hello!") - 1, CKG_LIT_ARG("Hello!")));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_copy passed.\n");
 }
 
 void test_ckg_cstr_contains() {
     char t1[] = "hello";
-    char* sub_str = (char*)ckg_alloc(2);
-    ckg_substring(t1, sub_str, 0, 1);
+    u64 t1_length = sizeof("hello") - 1;
 
-    ckg_assert(ckg_cstr_contains(sub_str, "h"));
-    ckg_free(sub_str);
+    CKG_StringView substring_view = ckg_strview_create(t1, 0, 1);
+    ckg_assert(ckg_cstr_contains(CKG_SV_ARG(substring_view), CKG_LIT_ARG("h")));
 
-    ckg_assert(!ckg_cstr_contains(t1, ""));
-    ckg_assert(ckg_cstr_contains(t1, "h"));
-    ckg_assert(ckg_cstr_contains(t1, "he"));
-    ckg_assert(ckg_cstr_contains(t1, "o"));
-    ckg_assert(!ckg_cstr_contains(t1, ";;;;;;"));
-    ckg_assert(ckg_cstr_contains(t1, "hello"));
-    ckg_assert(!ckg_cstr_contains(t1, "hllo"));
-    ckg_assert(ckg_cstr_contains(t1, "hello"));
+    ckg_assert(!ckg_cstr_contains(t1, t1_length, CKG_LIT_ARG("")));
+    ckg_assert(ckg_cstr_contains(t1, t1_length, CKG_LIT_ARG("h")));
+    ckg_assert(ckg_cstr_contains(t1, t1_length, CKG_LIT_ARG("he")));
+    ckg_assert(ckg_cstr_contains(t1, t1_length, CKG_LIT_ARG("o")));
+    ckg_assert(!ckg_cstr_contains(t1, t1_length, CKG_LIT_ARG(";;;;;;")));
+    ckg_assert(ckg_cstr_contains(t1, t1_length, CKG_LIT_ARG("hello")));
+    ckg_assert(!ckg_cstr_contains(t1, t1_length, CKG_LIT_ARG("hllo")));
+    ckg_assert(ckg_cstr_contains(t1, t1_length, CKG_LIT_ARG("hello")));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_contains passed.\n");
 }
 
 void test_ckg_cstr_starts_with() {
     char t1[] = "hello";
-	char* sub_str = (char*)ckg_alloc(2);
-    ckg_substring(t1, sub_str, 0, 1);
-	ckg_assert(ckg_cstr_starts_with(sub_str, "h"));
-	ckg_free(sub_str);
+    u64 t1_length = sizeof("hello") - 1;
+    CKG_StringView substring_view = ckg_strview_create(t1, 0, 2);
+	ckg_assert(ckg_cstr_starts_with(CKG_SV_ARG(substring_view), CKG_LIT_ARG("he")));
 
-	ckg_assert(ckg_cstr_starts_with(t1, "hell"));
-	ckg_assert(ckg_cstr_starts_with(t1, "hello"));
-	ckg_assert(!ckg_cstr_starts_with(t1, "hllo"));
-	ckg_assert(!ckg_cstr_starts_with(t1, ""));
+	ckg_assert(ckg_cstr_starts_with(t1, t1_length, CKG_LIT_ARG("hell")));
+	ckg_assert(ckg_cstr_starts_with(t1, t1_length, CKG_LIT_ARG("hello")));
+	ckg_assert(!ckg_cstr_starts_with(t1, t1_length, CKG_LIT_ARG("hllo")));
+	ckg_assert(!ckg_cstr_starts_with(t1, t1_length, CKG_LIT_ARG("")));
 
 
 	const char* t2 = "";
-	ckg_assert(ckg_cstr_starts_with(t2, ""));
-	
+    u64 t2_length = 0;
+	ckg_assert(ckg_cstr_starts_with(t2, t2_length, CKG_LIT_ARG("")));
 
 	t2 = "f";
-	ckg_assert(!ckg_cstr_starts_with(t2, "g"));
-	ckg_assert(ckg_cstr_starts_with(t2, "f"));
+    t2_length = 1;
+	ckg_assert(!ckg_cstr_starts_with(t2, t2_length, CKG_LIT_ARG("g")));
+	ckg_assert(ckg_cstr_starts_with(t2, t2_length, CKG_LIT_ARG("f")));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_starts_with passed.\n");
 }
 
 void test_ckg_cstr_ends_with() {
     char t1[] = "hello";
-	char* sub_str = (char*)ckg_alloc(3);
-    ckg_substring(t1, sub_str, 0, 2);
-	ckg_assert(ckg_cstr_ends_with(sub_str, "he"));
-	ckg_assert(!ckg_cstr_ends_with(sub_str, "llo"));
-	ckg_free(sub_str);
+    u64 t1_length = sizeof("hello") - 1;
+    CKG_StringView substring_view = ckg_strview_create(t1, 0, 2);
+	ckg_assert(ckg_cstr_ends_with(CKG_SV_ARG(substring_view), CKG_LIT_ARG("he")));
+	ckg_assert(!ckg_cstr_ends_with(CKG_SV_ARG(substring_view), CKG_LIT_ARG("llo")));
 
-	ckg_assert(ckg_cstr_ends_with(t1, ""));
-	ckg_assert(ckg_cstr_ends_with(t1, "lo"));
-	ckg_assert(ckg_cstr_ends_with(t1, "hello"));
-	ckg_assert(ckg_cstr_ends_with(t1, "ello"));
+	ckg_assert(ckg_cstr_ends_with(t1, t1_length, CKG_LIT_ARG("")));
+	ckg_assert(ckg_cstr_ends_with(t1, t1_length, CKG_LIT_ARG("lo")));
+	ckg_assert(ckg_cstr_ends_with(t1, t1_length, CKG_LIT_ARG("hello")));
+	ckg_assert(ckg_cstr_ends_with(t1, t1_length, CKG_LIT_ARG("ello")));
 
 	const char* t2 = "";
-	ckg_assert(ckg_cstr_ends_with(t2, ""));
+    u64 t2_length = 0;
+	ckg_assert(ckg_cstr_ends_with(t2, t2_length, CKG_LIT_ARG("")));
 	
-
 	t2 = "f";
-	ckg_assert(!ckg_cstr_ends_with(t2, "g"));
-	ckg_assert(ckg_cstr_ends_with(t2, "f"));
+    t2_length = 1;
+	ckg_assert(!ckg_cstr_ends_with(t2, t2_length, CKG_LIT_ARG("g")));
+	ckg_assert(ckg_cstr_ends_with(t2, t2_length, CKG_LIT_ARG("f")));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_ends_with passed.\n");
 }
 
 void test_ckg_cstr_reverse() {
     char t1[] = "hello";
-	char* sub_str = (char*)ckg_alloc(3);
-    ckg_substring(t1, sub_str, 0, 2);
-    char* reversed_string = (char*)ckg_alloc(ckg_cstr_length(sub_str) + 1);
-    ckg_cstr_reverse(sub_str, reversed_string, ckg_cstr_length(sub_str) + 1);
-	ckg_assert(ckg_cstr_equal(reversed_string, "eh"));
-	ckg_free(sub_str);
+
+    CKG_StringView substring_view = ckg_strview_create(t1, 0, 2);
+    u64 reversed_string_length = ckg_strview_length(substring_view);
+    u64 reversed_string_capacity = reversed_string_length + 1;
+    char* reversed_string = (char*)ckg_alloc(reversed_string_capacity);
+    ckg_cstr_reverse(CKG_SV_ARG(substring_view), reversed_string, reversed_string_capacity);
+
+	ckg_assert(ckg_cstr_equal(reversed_string, reversed_string_length, CKG_LIT_ARG("eh")));
 	ckg_free(reversed_string);
 
-    char* reversed_string2 = (char*)ckg_alloc(ckg_cstr_length("Chicken") + 1);
-    ckg_cstr_reverse("Chicken", reversed_string2, ckg_cstr_length("Chicken") + 1);
-    char* reversed_string3 = (char*)ckg_alloc(ckg_cstr_length("Roast") + 1);
-    ckg_cstr_reverse("Roast", reversed_string3, ckg_cstr_length("Chicken") + 1);
-    char* reversed_string4 = (char*)ckg_alloc(ckg_cstr_length("Soup") + 1);
-    ckg_cstr_reverse("Soup", reversed_string4, ckg_cstr_length("Chicken") + 1);
+    u64 reversed_string2_length = sizeof("Chicken") - 1;
+    u64 reversed_string2_capacity = reversed_string2_length + 1;
+    char* reversed_string2 = (char*)ckg_alloc(reversed_string2_capacity);
+    ckg_cstr_reverse(CKG_LIT_ARG("Chicken"), reversed_string2, reversed_string2_capacity);
 
-	ckg_assert_msg(ckg_cstr_equal(reversed_string2, "nekcihC"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "nekcihC", reversed_string2);
-	ckg_assert_msg(ckg_cstr_equal(reversed_string3, "tsaoR"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "tsaoR", reversed_string3);
-	ckg_assert_msg(ckg_cstr_equal(reversed_string4, "puoS"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "puoS", reversed_string4);
+    u64 reversed_string3_length = sizeof("Roast") - 1;
+    u64 reversed_string3_capacity = reversed_string3_length + 1;
+    char* reversed_string3 = (char*)ckg_alloc(reversed_string3_capacity);
+    ckg_cstr_reverse(CKG_LIT_ARG("Roast"), reversed_string3, reversed_string3_capacity);
+
+    u64 reversed_string4_length = sizeof("Soup") - 1;
+    u64 reversed_string4_capacity = reversed_string4_length + 1;
+    char* reversed_string4 = (char*)ckg_alloc(reversed_string4_capacity);
+    ckg_cstr_reverse(CKG_LIT_ARG("Soup"), reversed_string4, reversed_string4_capacity);
+
+	ckg_assert_msg(ckg_cstr_equal(reversed_string2, reversed_string2_length, CKG_LIT_ARG("nekcihC")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "nekcihC", reversed_string2);
+	ckg_assert_msg(ckg_cstr_equal(reversed_string3, reversed_string3_length, CKG_LIT_ARG("tsaoR")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "tsaoR", reversed_string3);
+	ckg_assert_msg(ckg_cstr_equal(reversed_string4, reversed_string4_length, CKG_LIT_ARG("puoS")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "puoS", reversed_string4);
 
 	ckg_free(reversed_string2);
 	ckg_free(reversed_string3);
 	ckg_free(reversed_string4);
 
-
 	const char* t2 = "";
-    char* reversed_t2 = (char*)ckg_alloc(ckg_cstr_length(t2) + 1);
-    ckg_cstr_reverse(t2, reversed_t2, ckg_cstr_length(t2)+ 1);
-	ckg_assert_msg(ckg_cstr_equal(reversed_t2, ""), "test_ckg_cstr_reverse failed expected: %s | got: %s", "", reversed_t2);
+    u64 reversed_t2_length = sizeof("") - 1;
+    u64 reversed_t2_capacity = reversed_t2_length + 1;
+    char* reversed_t2 = (char*)ckg_alloc(reversed_t2_capacity);
+    ckg_cstr_reverse(t2, reversed_t2_length, reversed_t2, reversed_t2_capacity);
+	ckg_assert_msg(ckg_cstr_equal(reversed_t2, reversed_t2_length, CKG_LIT_ARG("")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "\"\"", reversed_t2);
     ckg_free(reversed_t2);
 
 	t2 = "f";
-    reversed_t2 = (char*)ckg_alloc(ckg_cstr_length(t2) + 1);
-    ckg_cstr_reverse(t2, reversed_t2, ckg_cstr_length(t2) + 1);
-	ckg_assert_msg(ckg_cstr_equal(reversed_t2, "f"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
-	ckg_assert_msg(!ckg_cstr_equal(reversed_t2, "g"), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
+    reversed_t2_length = sizeof("f") - 1;
+    reversed_t2_capacity = reversed_t2_length + 1;
+    reversed_t2 = (char*)ckg_alloc(reversed_t2_capacity);
+    ckg_cstr_reverse(t2, reversed_t2_length, reversed_t2, reversed_t2_capacity);
+	ckg_assert_msg(ckg_cstr_equal(reversed_t2, reversed_t2_length, CKG_LIT_ARG("f")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
+	ckg_assert_msg(!ckg_cstr_equal(reversed_t2, reversed_t2_length, CKG_LIT_ARG("g")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
     ckg_free(reversed_t2);
 
     CKG_LOG_SUCCESS("Test ckg_cstr_reverse passed.\n");
 }
 
+/*
 void test_ckg_cstr_index_of() {
     char t1[] = "hello ";
 	char* sub_str = (char*)ckg_alloc(3);
@@ -312,6 +323,7 @@ void test_ckg_cstr_index_of() {
 
     CKG_LOG_SUCCESS("Test test_ckg_cstr_index_of passed.\n");
 }
+
 
 void test_ckg_string_assertions() {
     char str1[10] = "Overflow";

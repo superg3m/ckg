@@ -129,7 +129,7 @@ while (stack_is_empty(state) == false)
 JSON** states;
 stack_push(states, iniital);
 while (stack_is_empty(states) == false) {
-    JSON* current_state = stack_pop(state);
+    JSON* current_state = stack_pop(states);
     Boolean needs_to_recurse = parse_next_thing(arena, current_state);
     if (need_to_recurse) {
        state_push(states, current_state);

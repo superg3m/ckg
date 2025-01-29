@@ -277,7 +277,7 @@
 #if defined(CKG_INCLUDE_CSTRING)
     // types
     typedef struct CKG_StringView {
-        const char* str;
+        const char* ptr;
         u64 start;
         u64 end;
     } CKG_StringView;
@@ -290,7 +290,9 @@
     #define CKG_SV_LIT(lit) ckg_strview_create(lit, 0, sizeof(lit) - 1)
 
     #define CKG_LIT_ARG(lit) lit, sizeof(lit) - 1
-    #define CKG_SV_ARG(sv) sv.str + sv.start, sv.end - sv.start
+    #define CKG_SV_ARG(sv) sv.ptr + sv.start, sv.end - sv.start
+
+    #define ckg_strview_length(sv) (sv.end - sv.start)
 
     /**
 	 * @brief returns a string buffer with nullterm
@@ -844,7 +846,7 @@
         ckg_assert(start >= 0);
 
         CKG_StringView ret;
-        ret.str = str;
+        ret.ptr = str;
         ret.start = start;
         ret.end = end;
 
@@ -853,7 +855,7 @@
 
     char* ckg_strview_to_cstr(CKG_StringView str) {
         char* ret = ckg_alloc((str.end - str.start) + 1);
-        ckg_memory_copy(str.str + str.start, ret, str.end - str.start, (str.end - str.start) + 1);
+        ckg_memory_copy(str.ptr + str.start, ret, str.end - str.start, (str.end - str.start) + 1);
         return ret;
     }
 
@@ -926,16 +928,13 @@
         if (str_length == 0 && substring_length == 0) {
             return 0;
         } else if (substring_length == 0) {
-		    ckg_assert_msg(FALSE, "Substring is empty\n");		
-            return 0; // Never gets here
+            return -1;
         } else if (str_length == 0) {
-			ckg_assert_msg(FALSE, "String is empty\n");		
-            return 0; // Never gets here
+            return -1;
         }
 
         if (substring_length > str_length) {
-        	ckg_assert_msg(FALSE, "Can't find substring %s in string %s\n", substring, str);		
-            return 0; // Never gets here
+            return -1;
         }
 
         CKG_StringView substring_view = ckg_strview_create((char*)substring, 0, substring_length);
@@ -1053,7 +1052,7 @@
         ckg_assert(str);
         ckg_assert(reversed_buffer_capacity > str_length);
 
-        for (u64 i = str_length - 1; i >= 0; i--) {
+        for (s64 i = str_length - 1; i >= 0; i--) {
             ckg_cstr_append_char(returned_reversed_string_buffer, (str_length - 1) - i, reversed_buffer_capacity, str[i]);
         }
     }
