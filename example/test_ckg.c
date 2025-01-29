@@ -10,7 +10,7 @@ int main() {
     CKG_StringView s1 = ckg_strview_create(str, 5, 12);
     CKG_StringView s2 = CKG_SV_LIT("HEY_YOU");
 
-    ckg_assert(ckg_strview_equal(s1, s2));
+    ckg_assert(ckg_cstr_equal(CKG_SV_ARG(s1), CKG_SV_ARG(s2)));
     ckg_assert(ckg_cstr_contains(CKG_SV_ARG(s1), CKG_SV_ARG(s2)));
     
 

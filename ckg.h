@@ -287,19 +287,6 @@
     CKG_API CKG_StringView ckg_strview_create(char* str, u64 start, u64 end);
     CKG_API char* ckg_strview_to_cstr(CKG_StringView str);
 
-    /**
-	 * @brief Tests each charater in the string for equaility
-	 * returns TRUE(1) if equal and FALSE(0) if not equal
-	 * => if (ckg_cstr_equal("hi", "hi"))
-	 * 
-	 * 
-	 * @param s1 
-	 * @param s2 
-	 * @return Boolean 
-	 */
-    CKG_API Boolean ckg_strview_equal(CKG_StringView str1, CKG_StringView s2);
-
-
     #define CKG_SV_LIT(lit) ckg_strview_create(lit, 0, sizeof(lit) - 1)
 
     #define CKG_LIT_ARG(lit) lit, sizeof(lit) - 1
@@ -869,10 +856,6 @@
         return ret;
     }
 
-    CKG_API Boolean ckg_strview_equal(CKG_StringView s1, CKG_StringView s2) {
-        return ckg_memory_compare(s1.str + s1.start, s2.str + s2.start, s1.end - s1.start, s2.end - s2.start);
-    }
-
     CKG_API Boolean ckg_cstr_equal(const char* s1, u64 s1_length, const char* s2, u64 s2_length) {
         return ckg_memory_compare(s1, s2, s1_length, s2_length);
     }
@@ -977,7 +960,7 @@
             }
 
             CKG_StringView current_view = ckg_strview_create((char*)str, i, end_index);
-            if (ckg_strview_equal(substring_view, current_view)) {
+            if (ckg_cstr_equal(CKG_SV_ARG(substring_view), CKG_SV_ARG(current_view))) {
                 ret_index = i;
                 break;
             }
@@ -1023,7 +1006,7 @@
             }
 
             CKG_StringView current_view = ckg_strview_create((char*)str, i, end_index);
-            if (ckg_strview_equal(current_view, substring_view)) {
+            if (ckg_cstr_equal(CKG_SV_ARG(current_view), CKG_SV_ARG(substring_view))) {
                 ret_index = i;
             }
         }
