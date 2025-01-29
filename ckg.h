@@ -895,7 +895,6 @@
         char* source_ptr = str + index;
         ckg_memory_copy(source_ptr, source_ptr + 1, str_length - index, str_capacity - (index + 1));
         str[index] = to_insert;
-        printf("INSER: %s\n", str);
     }
 
     void ckg_cstr_append(char* str, u64 str_length, u64 str_capacity, const char* to_append, u64 to_append_length) {

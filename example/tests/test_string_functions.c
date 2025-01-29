@@ -147,12 +147,11 @@ void test_ckg_cstr_append_char() {
     ckg_cstr_append_char(str2, str2_length++, STR_CAP4, 'A');
     ckg_assert(ckg_cstr_equal(str2, str2_length, CKG_LIT_ARG("A")));
 
-    str1_length += sizeof("Hi") - 1;
+    str1_length = sizeof("Hi") - 1;
     ckg_cstr_copy(str1, STR_CAP4, CKG_LIT_ARG("Hi"));
     ckg_cstr_append_char(str1, str1_length++, STR_CAP4, ' ');
     ckg_cstr_append_char(str1, str1_length++, STR_CAP4, 'A');
     ckg_cstr_append_char(str1, str1_length++, STR_CAP4, '!');
-    CKG_LOG_DEBUG("STRI: %s\n", str1);
     ckg_assert(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("Hi A!")));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_append_char passed.\n");
