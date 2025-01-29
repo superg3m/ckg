@@ -20,6 +20,7 @@ int main() {
     test_ckg_cstr_length();
     test_ckg_string_equal();
     test_ckg_cstr_insert_char();
+    test_ckg_cstr_insert();
 
     return 0;
 }
