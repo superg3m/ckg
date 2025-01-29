@@ -52,12 +52,12 @@ void test_ckg_cstr_insert_char() {
     ckg_assert_msg(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("HeVllo")), "Test: ckg_cstr_insert_char failed -> got: %s | expected: %s\n", str1, "HeVllo");
 
     str1_length = hello_length;
-    ckg_memory_copy("Hello", str1, sizeof("Hello") - 1, STR_CAP1);
+    ckg_cstr_copy(str1, STR_CAP1, CKG_LIT_ARG("Hello"));
     ckg_cstr_insert_char(str1, str1_length++, STR_CAP1, 'X', 0);
     ckg_assert(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("XHello")));
 
     str1_length = hello_length;
-    ckg_memory_copy("Hello", str1, sizeof("Hello") - 1, STR_CAP1);
+    ckg_cstr_copy(str1, STR_CAP1, CKG_LIT_ARG("Hello"));
     ckg_cstr_insert_char(str1, str1_length++, STR_CAP1, 'Y', 5);
     ckg_assert(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("HelloY")));
 
@@ -80,13 +80,13 @@ void test_ckg_cstr_insert() {
     ckg_assert(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("He|TESTINGS|llo")));
 
     str1_length = hello_length;
-    ckg_memory_copy("Hello", str1, sizeof("Hello") - 1, STR_CAP2);
+    ckg_cstr_copy(str1, STR_CAP2, CKG_LIT_ARG("Hello"));
     ckg_cstr_insert(str1, str1_length, STR_CAP2, CKG_LIT_ARG("Start-"), 0);
     str1_length += sizeof("Start-") - 1;
     ckg_assert(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("Start-Hello")));
 
     str1_length = hello_length;
-    ckg_memory_copy("Hello", str1, sizeof("Hello") - 1, STR_CAP2);
+    ckg_cstr_copy(str1, STR_CAP2, CKG_LIT_ARG("Hello"));
     ckg_cstr_insert(str1, str1_length, STR_CAP2, CKG_LIT_ARG("-End"), 5);
     str1_length += sizeof("-End") - 1;
 
@@ -107,8 +107,9 @@ void test_ckg_cstr_append() {
     #define STR_CAP3 13
     char str1[STR_CAP3] = {0};
     u64 str1_length = 0;
-    ckg_memory_copy("Hello", str1, sizeof("Hello") - 1, STR_CAP3);
+
     str1_length = sizeof("Hello") - 1;
+    ckg_cstr_copy(str1, STR_CAP3, CKG_LIT_ARG("Hello"));
 
     ckg_cstr_append(str1, str1_length, STR_CAP3, CKG_LIT_ARG(" World!"));
     str1_length += sizeof(" World!") - 1;
@@ -123,34 +124,42 @@ void test_ckg_cstr_append() {
 
     ckg_assert(ckg_cstr_equal(str2, str2_length, CKG_LIT_ARG("Appended")));
 
-    ckg_memory_copy("Hello", str1, sizeof("Hello") - 1, STR_CAP3);
     str1_length = sizeof("Hello") - 1;
+    ckg_cstr_copy(str1, STR_CAP3, CKG_LIT_ARG("Hello"));
     ckg_cstr_append(str1, str1_length, STR_CAP3, CKG_LIT_ARG(""));
     ckg_assert(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("Hello")));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_append passed.\n");
 }
 
-/*
 void test_ckg_cstr_append_char() {
-    char str1[50] = {0};
-    ckg_cstr_copy(str1, 50, "Hello");
-    ckg_cstr_append_char(str1, 50, '!');
-    ckg_assert(ckg_cstr_equal(str1, "Hello!"));
+    #define STR_CAP4 50
+    char str1[STR_CAP4] = "";
+    u64 str1_length = 0;
+
+    str1_length = sizeof("Hello") - 1;
+    ckg_cstr_copy(str1, STR_CAP4, CKG_LIT_ARG("Hello"));
+    ckg_cstr_append_char(str1, str1_length++, STR_CAP4, '!');
+    ckg_assert(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("Hello!")));
 
     char str2[50] = "";
-    ckg_cstr_append_char(str2, 50, 'A');
-    ckg_assert(ckg_cstr_equal(str2, "A"));
+    u64 str2_length = 0;
+    ckg_cstr_append_char(str2, str2_length++, STR_CAP4, 'A');
+    ckg_assert(ckg_cstr_equal(str2, str2_length, CKG_LIT_ARG("A")));
 
-    ckg_cstr_copy(str1, 50, "Hi");
-    ckg_cstr_append_char(str1, 50, ' ');
-    ckg_cstr_append_char(str1, 50, 'A');
-    ckg_cstr_append_char(str1, 50, '!');
-    ckg_assert(ckg_cstr_equal(str1, "Hi A!"));
+    str1_length += sizeof("Hi") - 1;
+    ckg_cstr_copy(str1, STR_CAP4, CKG_LIT_ARG("Hi"));
+    ckg_cstr_append_char(str1, str1_length++, STR_CAP4, ' ');
+    ckg_cstr_append_char(str1, str1_length++, STR_CAP4, 'A');
+    ckg_cstr_append_char(str1, str1_length++, STR_CAP4, '!');
+    CKG_LOG_DEBUG("STRI: %s\n", str1);
+    ckg_assert(ckg_cstr_equal(str1, str1_length, CKG_LIT_ARG("Hi A!")));
 
     CKG_LOG_SUCCESS("Test ckg_cstr_append_char passed.\n");
 }
 
+
+/*
 void test_ckg_cstr_clear() {
     char str1[50] = "Hello";
     ckg_cstr_clear(str1);

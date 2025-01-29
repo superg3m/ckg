@@ -10,6 +10,7 @@ int main() {
     test_ckg_cstr_insert_char();
     test_ckg_cstr_insert();
     test_ckg_cstr_append();
+    test_ckg_cstr_append_char();
 
     return 0;
 }

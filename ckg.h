@@ -300,6 +300,7 @@
 	 */
 	CKG_API char* ckg_cstr_alloc(const char* s1);
     CKG_API Boolean ckg_cstr_equal(const char* s1, u64 s1_length, const char* s2, u64 s2_length);
+    CKG_API void ckg_cstr_copy(char* s1, u64 s1_capacity, const char* s2, u64 s2_length);
     CKG_API Boolean ckg_cstr_contains(const char* s1, u64 s1_length, const char* contains, u64 contains_length);
 
 	/**
@@ -856,8 +857,13 @@
         return ret;
     }
 
-    CKG_API Boolean ckg_cstr_equal(const char* s1, u64 s1_length, const char* s2, u64 s2_length) {
+    Boolean ckg_cstr_equal(const char* s1, u64 s1_length, const char* s2, u64 s2_length) {
         return ckg_memory_compare(s1, s2, s1_length, s2_length);
+    }
+
+    void ckg_cstr_copy(char* s1, u64 s1_capacity, const char* s2, u64 s2_length) {
+        ckg_memory_zero((void*)s1, s1_capacity);
+        ckg_memory_copy(s2, s1, s2_length, s1_capacity);
     }
 
     void ckg_cstr_insert(char* str, u64 str_length, u64 str_capacity, const char* to_insert, u64 to_insert_length, const u64 index) {
@@ -887,9 +893,9 @@
         ckg_assert_msg(expression, "ckg_cstr_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  str_length + to_insert_length, str_capacity);
 
         char* source_ptr = str + index;
-
         ckg_memory_copy(source_ptr, source_ptr + 1, str_length - index, str_capacity - (index + 1));
         str[index] = to_insert;
+        printf("INSER: %s\n", str);
     }
 
     void ckg_cstr_append(char* str, u64 str_length, u64 str_capacity, const char* to_append, u64 to_append_length) {
@@ -898,15 +904,6 @@
 
     void ckg_cstr_append_char(char* str, u64 str_length, u64 str_capacity, const char to_append) {
         ckg_cstr_insert_char(str, str_length, str_capacity, to_append, str_length);
-    }
-
-    void ckg_cstr_copy(char* str, u64 str_capacity, const char* to_copy) {
-        ckg_assert(to_copy);
-        ckg_assert(str);
-
-        u64 source_length = ckg_cstr_length(to_copy);
-        ckg_memory_zero(str, ckg_cstr_length(str));
-        ckg_memory_copy(to_copy, str, source_length + 1, str_capacity);
     }
 
     void ckg_cstr_random(char* dest, u64 dest_capacity, u64 length) {
