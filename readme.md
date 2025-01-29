@@ -122,6 +122,17 @@ while (stack_is_empty(state) == false)
     parse_next_thing(current_state); // from input
     if (need_to_recurse) {
        state_push(state, current_state);
-       state_push(state, some_recursion);
+       state_push(state, some_recursion_allocation); // here you can abort if you're running out of memory
     }
 }
+
+JSON** states;
+stack_push(states, iniital);
+while (stack_is_empty(states) == false) {
+    JSON* current_state = stack_pop(state);
+    Boolean needs_to_recurse = parse_next_thing(arena, current_state);
+    if (need_to_recurse) {
+       state_push(states, current_state);
+    }
+}
+
