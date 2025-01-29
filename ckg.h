@@ -384,17 +384,23 @@
     #define ckg_vector_count(vector) (*ckg_vector_header_base(vector)).count
     #define ckg_vector_capacity(vector) (*ckg_vector_header_base(vector)).capacity
 
+    #define ckg_stack_count(stack) (*ckg_vector_header_base(stack)).count
+
     #ifdef __cplusplus
         #define ckg_vector_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
         #define ckg_stack_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
 
     #else 
         #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
-        #define ckg_stack_push(stack, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+        #define ckg_stack_push(stack, element) stack = ckg_vector_grow(stack, sizeof(element)); stack[ckg_vector_header_base(stack)->count++] = element
     #endif
     
+    
     #define ckg_vector_free(vector) vector = MACRO_ckg_vector_free(vector)
-    #define ckg_stack_pop(stack) stack[ckg_vector_header_base(stack)->count--]
+    #define ckg_stack_free(vector) vector = MACRO_ckg_vector_free(vector)
+    #define ckg_stack_pop(stack) stack[--ckg_vector_header_base(stack)->count]
+    #define ckg_stack_peek(stack) stack[ckg_stack_count(stack) - 1]
+    #define ckg_stack_empty(stack) ckg_stack_count(stack) == 0
     //
     // ========== END CKG_VECTOR ==========
     //
