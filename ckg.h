@@ -386,11 +386,15 @@
 
     #ifdef __cplusplus
         #define ckg_vector_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+        #define ckg_stack_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+
     #else 
         #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+        #define ckg_stack_push(stack, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
     #endif
     
     #define ckg_vector_free(vector) vector = MACRO_ckg_vector_free(vector)
+    #define ckg_stack_pop(stack) stack[ckg_vector_header_base(stack)->count--]
     //
     // ========== END CKG_VECTOR ==========
     //
