@@ -334,6 +334,7 @@ void test_ckg_cstr_last_index_of() {
 	ckg_assert(ckg_cstr_last_index_of(t1, t1_length, CKG_LIT_ARG("o")) == 4);
 	ckg_assert(ckg_cstr_last_index_of(t1, t1_length, CKG_LIT_ARG("hello")) == 0);
 	ckg_assert(ckg_cstr_last_index_of(t1, t1_length, CKG_LIT_ARG("r")) == -1);
+	ckg_assert(ckg_cstr_last_index_of(t1, t1_length, CKG_LIT_ARG("h")) == 0);
 
 	const char* t2 = "";
     u64 t2_length = 0;
