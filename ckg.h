@@ -997,10 +997,10 @@
             return -1;
         }
 
-        CKG_StringView substring_view = ckg_strview_create((char*)str, 0, substring_length);
+        CKG_StringView substring_view = ckg_strview_create((char*)substring, 0, substring_length);
         
         s64 ret_index = -1;
-        for (u64 i = 0; i < str_length - substring_length; i++) {
+        for (u64 i = 0; i <= (str_length - substring_length); i++) {
             if (str[i] != substring[0]) {
                 continue;
             }

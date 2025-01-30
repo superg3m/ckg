@@ -323,6 +323,29 @@ void test_ckg_cstr_index_of() {
     CKG_LOG_SUCCESS("Test test_ckg_cstr_index_of passed.\n");
 }
 
+void test_ckg_cstr_last_index_of() {
+    char t1[] = "hello";
+    u64 t1_length = sizeof("hello") - 1;
+    CKG_StringView substring_view = ckg_strview_create(t1, 0, 2);
+
+	ckg_assert(ckg_cstr_last_index_of(CKG_SV_ARG(substring_view), CKG_LIT_ARG("he")) == 0);
+
+	ckg_assert(ckg_cstr_last_index_of(t1, t1_length, CKG_LIT_ARG("l")) == 3);
+	ckg_assert(ckg_cstr_last_index_of(t1, t1_length, CKG_LIT_ARG("o")) == 4);
+	ckg_assert(ckg_cstr_last_index_of(t1, t1_length, CKG_LIT_ARG("hello")) == 0);
+	ckg_assert(ckg_cstr_last_index_of(t1, t1_length, CKG_LIT_ARG("r")) == -1);
+
+	const char* t2 = "";
+    u64 t2_length = 0;
+	ckg_assert(ckg_cstr_last_index_of(t2, t2_length, CKG_LIT_ARG("")) == 0);
+
+	t2 = "ffefe";
+    t2_length = sizeof("ffefe") - 1;
+	ckg_assert(ckg_cstr_last_index_of(t2, t2_length, CKG_LIT_ARG("fe")) == 3);
+
+    CKG_LOG_SUCCESS("Test test_ckg_cstr_last_index_of passed.\n");
+}
+
 void test_ckg_str_operations() { 
     CKG_LOG_PRINT("\n");
     CKG_LOG_DEBUG("======================= Testing String Functions =======================\n");
@@ -339,6 +362,7 @@ void test_ckg_str_operations() {
     test_ckg_cstr_ends_with();
     test_ckg_cstr_reverse();
     test_ckg_cstr_index_of();
+    test_ckg_cstr_last_index_of();
 
     int test_int_to_cstr = 5112512;
     char* string_buffer = (char*)ckg_alloc(9);
