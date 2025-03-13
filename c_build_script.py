@@ -70,7 +70,7 @@ procedures_config = {
         output_name = "test_ckg.exe",
         source_files = ["../*.c"],
         additional_libs = [f"../../build_{cc.compiler_name}/{C_BUILD_LIB('ckg', cc.compiler_name)}"],
-        compile_time_defines = ["asfsd=1"],
+        compile_time_defines = [""],
         compiler_inject_into_args = [],
         include_paths = [],
     ),
