@@ -3,7 +3,6 @@ import os
 import sys
 
 def FIND_C_BUILD(current_dir):
-    print(os.path.join(current_dir, "c_build"))
     if os.path.isdir(os.path.join(current_dir, "c_build")):
         sys.path.insert(0, current_dir)
         return
