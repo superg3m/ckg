@@ -13,8 +13,8 @@ pc: ProjectConfig = ProjectConfig(
 
 cc: CompilerConfig = CompilerConfig(
     compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "INVALID_COMPILER",
-    compiler_warning_level = [],
-    compiler_disable_specific_warnings = False,
+    compiler_warning_level = "",
+    compiler_disable_specific_warnings = [""],
     compiler_treat_warnings_as_errors = True,
     compiler_disable_warnings  = False,
     compiler_disable_sanitizer = True
