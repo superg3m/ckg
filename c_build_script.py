@@ -24,7 +24,7 @@ project_debug_with_visual_studio = False
 if compiler_name == "cl":
 	compiler_warning_level = "4"
 	compiler_disable_specific_warnings = ["5105", "4668", "4820", "4996"]
-elif compiler_name in ["gcc", "cc", "clang"]:
+else:
 	compiler_warning_level = "all"
 	compiler_disable_specific_warnings = ["deprecated-declarations"]
 
