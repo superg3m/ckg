@@ -3,10 +3,14 @@ from c_build.source.Utilities import *
 from c_build.source.Manager import *
 # --------------------------------------------------------------------------------------
 
-compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "cl"
+compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "INVALID_COMPILER"
 
-if not IS_WINDOWS():
-    compiler_name = "gcc" 
+if IS_WINDOWS():
+    compiler_name = "cl"
+if IS_DARWIN():
+    compiler_name = "clang"
+elif IS_LINUX():
+    compiler_name = "gcc"
 
 compiler_warning_level = ""
 compiler_disable_specific_warnings = []
