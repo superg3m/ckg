@@ -7,7 +7,7 @@ pc: ProjectConfig = ProjectConfig(
     project_name = "ckg",
     project_dependencies = [],
     project_debug_with_visual_studio = True,
-    project_rebuild_project_dependencies = True,
+    project_rebuild_project_dependencies = False,
     project_executable_procedures  = ["test_ckg.exe"]
 )
 
