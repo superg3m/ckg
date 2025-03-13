@@ -36,6 +36,7 @@ procedures_config = {
         "source_files": ["../ckg.c"],
         "additional_libs": [],
         "compile_time_defines": [],
+        "compiler_inject_into_args": [],
         "include_paths": [],
     },
 	"test_ckg": {
@@ -44,6 +45,7 @@ procedures_config = {
         "source_files": ["../*.c"],
         "additional_libs": [f"../../build_{compiler_name}/{C_BUILD_LIB('ckg', compiler_name)}"],
         "compile_time_defines": [],
+        "compiler_inject_into_args": [],
         "include_paths": [],
     },
 }
