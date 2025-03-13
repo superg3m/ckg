@@ -2,21 +2,17 @@
 import os
 import sys
 
-def FIND_C_BUILD():
-    current_dir = os.path.abspath(os.path.dirname(__file__))
+def FIND_C_BUILD(current_dir):
+    print(os.path.join(current_dir, "c_build"))
+    if os.path.isdir(os.path.join(current_dir, "c_build")):
+        sys.path.insert(0, current_dir)
+        return
 
-    while True:
-        possible_path = os.path.join(current_dir, "c_build")
-        if os.path.isdir(possible_path):
-            sys.path.insert(0, current_dir)
-            return
+    parent_dir = os.path.dirname(current_dir)
+    if parent_dir != current_dir:
+        FIND_C_BUILD(parent_dir)
 
-        parent_dir = os.path.dirname(current_dir)
-        if parent_dir == current_dir:
-            break
-        current_dir = parent_dir
-
-FIND_C_BUILD()
+FIND_C_BUILD(os.path.abspath(os.path.dirname(__file__)))
 from c_build.source.Utilities import *
 from c_build.source.Manager import *
 # --------------------------------------------------------------------------------------s
