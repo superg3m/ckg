@@ -12,7 +12,7 @@ def FIND_C_BUILD(current_dir):
         FIND_C_BUILD(parent_dir)
 
 FIND_C_BUILD(os.path.abspath(os.path.dirname(__file__)))
-from c_build.source.Utilities import *
+from c_build.source.UserUtilities import *
 from c_build.source.Manager import *
 # --------------------------------------------------------------------------------------s
 
@@ -57,7 +57,7 @@ if IS_WINDOWS():
 procedures_config = {
     "ckg_lib": ProcedureConfigElement(
         build_directory = f"./build_{cc.compiler_name}",
-        output_name = C_BUILD_LIB('ckg', cc.compiler_name),
+        output_name = GET_LIB_NAME(cc, 'ckg'),
         source_files = ["../ckg.c"],
         additional_libs = [],
         compile_time_defines = [],
@@ -69,7 +69,7 @@ procedures_config = {
         build_directory = f"./example/{cc.compiler_name}",
         output_name = "test_ckg.exe",
         source_files = ["../*.c"],
-        additional_libs = [f"../../build_{cc.compiler_name}/{C_BUILD_LIB('ckg', cc.compiler_name)}"],
+        additional_libs = [f"../../build_{cc.compiler_name}/{GET_LIB_NAME(cc, 'ckg')}"],
         compile_time_defines = [""],
         compiler_inject_into_args = [],
         include_paths = [],
