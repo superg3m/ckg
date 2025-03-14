@@ -34,11 +34,11 @@ cc: CompilerConfig = CompilerConfig(
     compiler_disable_sanitizer = True
 )
 
-if IS_WINDOWS() and not C_BUILD_IS_DEPENDENCY():
+if IS_WINDOWS():
     cc.compiler_name = "cl"
-if IS_DARWIN() and not C_BUILD_IS_DEPENDENCY():
+if IS_DARWIN():
     cc.compiler_name = "clang"
-elif IS_LINUX() and not C_BUILD_IS_DEPENDENCY():
+elif IS_LINUX():
     cc.compiler_name = "gcc"
 
 if cc.compiler_name == "cl":
