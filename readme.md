@@ -107,32 +107,4 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 
 # Dev Notes (For me):
 	- Write a bunch more tests!
-	- Take another look at substring
-	
-	- String views are next I need them!
-	- Fix all tests
-	- clean up stacks it should just be an array
-
-
-stack_of_state state;
-state_push(state, iniital);
-while (stack_is_empty(state) == false)
-{
-    current_state = stack_pop(state);
-    parse_next_thing(current_state); // from input
-    if (need_to_recurse) {
-       state_push(state, current_state);
-       state_push(state, some_recursion_allocation); // here you can abort if you're running out of memory
-    }
-}
-
-JSON** states;
-stack_push(states, iniital);
-while (stack_is_empty(states) == false) {
-    JSON* current_state = stack_pop(states);
-    Boolean needs_to_recurse = parse_next_thing(arena, current_state);
-    if (need_to_recurse) {
-       state_push(states, current_state);
-    }
-}
-
+	- I need to string view a lot more...
