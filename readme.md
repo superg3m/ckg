@@ -112,4 +112,5 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- string views!!!
 	- arenas
 	- allocators
+	- ckg_printf()
 

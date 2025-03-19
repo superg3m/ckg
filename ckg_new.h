@@ -26,6 +26,9 @@
 #define CKG_INCLUDE_COLLECTIONS
 #define CKG_INCLUDE_IO
 
+// KEY NOTES:
+// - Whenever you see [OPTIONAL] that means you can use NULLPTR for that param
+
 #define CKG_INCLUDE_TYPES
 #if defined(CKG_INCLUDE_TYPES)
     #include <stdint.h>
@@ -175,14 +178,13 @@
     #endif
 #endif
 
-
 #define CKG_ERRORS
 #if defined(CKG_ERRORS)
     /*
-    +--------------+----------------------------+
-    | ErrorType    |        Error Code          |
-    | (4bits)      |         (28bits)           |
-    +--------------+----------------------------+
+    +------------+----------------------------+
+    | Error Type |        Error Code          |
+    | (4bits)    |         (28bits)           |
+    +------------+----------------------------+
     */
 
     #define CKG_ERROR_SUCCESS 0
@@ -248,10 +250,6 @@ typedef struct CKG_StringView {
 
 #define CKG_SV_LIT(string_literal) (CKG_StringView){string_literal, sizeof(string_literal) - 1}
 CKG_StringView ckg_sv_create(u8* data, u32 length);
-
-// KEY NOTES:
-// - Whenever you see [OPTIONAL] that means you can use NULLPTR for that param
-
 
 #if defined(CKG_INCLUDE_MEMORY)
     typedef void*(CKG_Alloc_T)(CKG_Allocator* allocator, size_t allocation_size);
