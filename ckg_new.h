@@ -254,35 +254,13 @@ CKG_StringView ckg_sv_create(u8* data, u32 length);
 
 
 #if defined(CKG_INCLUDE_MEMORY)
-    // types
-
-    typedef void* (CKG_MemoryAllocator)(u64);
-    typedef void (CKG_MemoryFree)(void*);
-
     typedef void*(CKG_Alloc_T)(CKG_Allocator* allocator, size_t allocation_size);
     typedef void(CKG_Free_T)(CKG_Allocator* allocator, void* data);
-    typedef void(CKG_Realloc_T)(CKG_Allocator* allocator, void* data, size_t allocation_size);
-    typedef struct CKG_Allocator {
-        CKG_Alloc_T* ckg_allocate;
-        CKG_Free_T* ckg_free;
-        CKG_Realloc_T* ckg_realloc;
-        void* user_data;
-    };
+    typedef struct CKG_Allocator CKG_Allocator;
 
-    /**
-     * @brief Note that the callback provided should zero out the memory allocation.
-     * Failing to bind the allocation callback will result in a default allocation callback.
-     */
-    CKG_API void ckg_bind_alloc_callback(CKG_MemoryAllocator* func_allocator);
-
-    /**
-     * @brief Failing to bind the callback will result in a default free callback.
-     */
-    CKG_API void ckg_bind_free_callback(CKG_MemoryFree* func_allocator);
-
-    CKG_API void* ckg_alloc(u64 allocation_size);
-    CKG_API void* ckg_realloc(void* data, u64 old_allocation_size, u64 new_allocation_size);
-    CKG_API void* MACRO_ckg_free(void* data);
+    CKG_API void* ckg_alloc(size_t allocation_size);
+    CKG_API void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);
+    CKG_API void  ckg_free(void* data);
 
     /**
      * @brief Compares the bytes in the two buffers returns true if equal
@@ -306,12 +284,6 @@ CKG_StringView ckg_sv_create(u8* data, u32 length);
             buffer[i] = fill_element;                       \
         }                                                  	\
     }
-
-    #ifdef __cplusplus
-        #define ckg_free(data) data = (decltype(data)) MACRO_ckg_free(data)
-    #else 
-        #define ckg_free(data) data = MACRO_ckg_free(data)
-    #endif
     
     #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
     #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
@@ -334,7 +306,7 @@ CKG_StringView ckg_sv_create(u8* data, u32 length);
      * @param memory 
      * @param allocation_size 
      * @param flag 
-     * @param alignment [OPTIONAL]
+     * @param alignment
      * @return CKG_API* 
      */
     CKG_API CKG_Arena* ckg_arena_create_custom(void* memory, size_t allocation_size, CKG_ArenaFlag flag, u8 alignment);
@@ -349,6 +321,130 @@ CKG_StringView ckg_sv_create(u8* data, u32 length);
     #define ckg_arena_push_array(arena, type, element_count) ((type*)ckg_arena_push_custom(arena, sizeof(type) * element_count))
     #define ckg_arena_pop(arena, type) ckg_arena_pop_custom(arena, sizeof(type))
     #define ckg_arena_pop_array(arena, type) ckg_arena_pop_custom(arena, sizeof(type) * element_count)
+#endif
+
+//
+// ===================================================== CKG_IMPL =====================================================
+//
+
+#if defined(CKG_IMPL_MEMORY)
+    typedef struct CKG_Allocator {
+        CKG_Alloc_T* allocate;
+        CKG_Free_T* free;
+        void* ctx;
+    };
+
+    internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free};
+
+    internal void* ckg_default_libc_malloc(CKG_Allocator* allocator, size_t allocation_size) {
+        void* ret = malloc(allocator, allocation_size);
+        ckg_memory_zero(ret, allocation_size);
+        return ret;
+    }
+
+    internal void ckg_default_libc_free(CKG_Allocator* allocator, void* data) {
+        free(allocator, data);
+    }
+
+    void* ckg_alloc(size_t allocation_size) {
+        ckg_assert(allocation_size != 0);
+        return allocator.allocate(allocation_size);
+    }
+
+    void ckg_free(void* data) {
+        ckg_assert(data);
+
+        allocator.free(data);
+    }
+
+    void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size) {
+        ckg_assert(old_allocation_size != 0);
+        ckg_assert(new_allocation_size != 0);
+
+        void* ret = ckg_alloc(new_allocation_size);
+        ckg_memory_copy(data, ret, old_allocation_size, new_allocation_size);
+        ckg_free(data);
+        return ret;
+    }
+
+    Boolean ckg_memory_compare(const void* buffer_one, const void* buffer_two, u64 buffer_one_size, u64 buffer_two_size) {
+        ckg_assert(buffer_one);
+        ckg_assert(buffer_two);
+
+        if (buffer_one_size != buffer_two_size) {
+            return FALSE;
+        }
+
+        u8* buffer_one_data = (u8*)buffer_one;
+        u8* buffer_two_data = (u8*)buffer_two;
+        for (u64 i = 0; i < buffer_one_size; i++) {
+            if (buffer_one_data[i] != buffer_two_data[i]) {
+                return FALSE;
+            }
+        }
+
+        return TRUE;
+    }
+
+    void ckg_memory_copy(const void* source, void* destination, u64 source_size_in_bytes, u64 destination_size_in_bytes) {
+        ckg_assert(source);
+        ckg_assert(destination);
+        ckg_assert(source_size_in_bytes <= destination_size_in_bytes);
+        if (source_size_in_bytes == 0) {
+            return;
+        }
+
+        u8* temp_data_copy = (u8*)ckg_alloc(source_size_in_bytes);
+        for (u64 i = 0; i < source_size_in_bytes; i++) {
+            temp_data_copy[i] = ((u8*)source)[i];
+        }
+
+        for (u64 i = 0; i < source_size_in_bytes; i++) {
+            ((u8*)destination)[i] = temp_data_copy[i];
+        }
+
+        ckg_free(temp_data_copy);
+    }
+
+    void ckg_memory_zero(void* data, u64 data_size_in_bytes) {
+        for (u64 i = 0; i < data_size_in_bytes; i++) {
+            ((u8*)data)[i] = 0;
+        }
+    }
+
+    // Date: September 12, 2024
+    // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
+    void MACRO_ckg_memory_delete_index(void* data, u64 number_of_elements, u64 data_capacity, u64 element_size_in_bytes, u64 index) {
+        ckg_assert((s32)number_of_elements - 1 >= 0);
+        ckg_assert(index < data_capacity);
+        ckg_assert(index >= 0);
+
+        u8* byte_data = (u8*)data;
+
+        u64 total_size = element_size_in_bytes * data_capacity;
+        u64 source_offset = (index + 1) * element_size_in_bytes;
+        u64 dest_offset =  index * element_size_in_bytes;
+
+        u64 payload_source_size = (number_of_elements * element_size_in_bytes) - source_offset;
+        ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
+    }
+
+    // Date: September 12, 2024
+    // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
+    void MACRO_ckg_memory_insert_index(void* data, u64 number_of_elements, u64 data_capacity, u64 element_size_in_bytes, u64 index) {
+        ckg_assert((number_of_elements + 1) < data_capacity);
+        ckg_assert(index < data_capacity - 1);
+        ckg_assert(index >= 0);
+
+        u8* byte_data = (u8*)data;
+
+        u64 total_size = element_size_in_bytes * data_capacity;
+        u64 source_offset = index * element_size_in_bytes;
+        u64 dest_offset = (index + 1) * element_size_in_bytes;
+
+        u64 payload_source_size = (number_of_elements * element_size_in_bytes) - source_offset;
+        ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
+    }
 #endif
 
 #if defined(CKG_IMPL_ARENA) 

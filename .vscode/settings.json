@@ -42,6 +42,7 @@
         "stdint.h": "c",
         "stdio.h": "c",
         "stdarg.h": "c",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "iosfwd": "cpp"
     }
 }
