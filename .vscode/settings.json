@@ -41,6 +41,7 @@
         "stdlib.h": "c",
         "stdint.h": "c",
         "stdio.h": "c",
-        "stdarg.h": "c"
+        "stdarg.h": "c",
+        "initializer_list": "cpp"
     }
 }
