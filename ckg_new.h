@@ -276,12 +276,12 @@ CKG_StringView ckg_sv_create(u8* data, u32 length);
     CKG_API void MACRO_ckg_memory_delete_index(void* data, u64 number_of_elements, u64 data_capacity, u64 element_size_in_bytes, u64 index);
     CKG_API void MACRO_ckg_memory_insert_index(void* data, u64 number_of_elements, u64 data_capacity, u64 element_size_in_bytes, u64 index);
 
-    #define ckg_memory_fill(buffer, buffer_count, fill_element) \
-    {														\
-        for (u64 i = 0; i < buffer_count; i++) { 			\
-            buffer[i] = fill_element;                       \
-        }                                                  	\
-    }
+    #define ckg_memory_fill(_buffer, _buffer_count, _fill_element) \
+    {														       \
+        for (int i = 0; i < (int)_buffer_count; i++) { 			   \
+            _buffer[i] = _fill_element;                            \
+        }                                                  	       \
+    }                                                              \
     
     #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
     #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
