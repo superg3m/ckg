@@ -244,9 +244,16 @@
 #endif
 
 #if defined(CKG_INCLUDE_MEMORY)
+    typedef struct CKG_Allocator {
+        CKG_Alloc_T* allocate;
+        CKG_Free_T* free;
+        void* ctx;
+    } CKG_Allocator;
+
     typedef void*(CKG_Alloc_T)(CKG_Allocator* allocator, size_t allocation_size);
     typedef void(CKG_Free_T)(CKG_Allocator* allocator, void* data);
-    typedef struct CKG_Allocator CKG_Allocator;
+
+    CKG_API void ckg_bind_custom_allocator(CKG_Alloc_T* a, CKG_Free_T* f, void* ctx);
 
     CKG_API void* ckg_alloc(size_t allocation_size);
     CKG_API void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);
@@ -376,13 +383,19 @@
 //
 
 #if defined(CKG_IMPL_MEMORY)
-    typedef struct CKG_Allocator {
-        CKG_Alloc_T* allocate;
-        CKG_Free_T* free;
-        void* ctx;
-    };
+    internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free, 0};
 
-    internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free};
+    void ckg_bind_custom_allocator(CKG_Alloc_T* a, CKG_Free_T* f, void* ctx) {
+        ckg_assert(a);
+        ckg_assert(f);
+        
+        allocator.allocate = a;
+        allocator.free = f;
+
+        if (ctx) {
+            allocator.ctx = ctx;
+        }
+    }
 
     internal void* ckg_default_libc_malloc(CKG_Allocator* allocator, size_t allocation_size) {
         return malloc(allocator, allocation_size);
@@ -585,7 +598,7 @@
         return length;
     }
 
-    CKG_StringView ckg_strview_create(char* str, size_t length) {
+    CKG_StringView ckg_sv_create(const char* str, size_t length) {
         ckg_assert(str);
         ckg_assert(length >= 0);
 
@@ -660,7 +673,7 @@
             return -1;
         }
 
-        CKG_StringView substring_view = ckg_strview_create((char*)substring, 0, substring_length);
+        CKG_StringView substring_view = ckg_sv_create(substring, substring_length);
         
         s64 ret_index = -1;
         for (size_t i = 0; i <= str_length - substring_length; i++) {
@@ -677,7 +690,7 @@
                 break;
             }
 
-            CKG_StringView current_view = ckg_strview_create((char*)str, i, end_index);
+            CKG_StringView current_view = ckg_strview_create(str + i, end_index);
             if (ckg_cstr_equal(CKG_SV_ARG(substring_view), CKG_SV_ARG(current_view))) {
                 ret_index = i;
                 break;
@@ -710,7 +723,7 @@
             return -1;
         }
 
-        CKG_StringView substring_view = ckg_strview_create((char*)substring, 0, substring_length);
+        CKG_StringView substring_view = ckg_sv_create(substring, substring_length);
         
         s64 ret_index = -1;
         for (size_t i = 0; i <= (str_length - substring_length); i++) {
@@ -723,7 +736,7 @@
                 break;
             }
 
-            CKG_StringView current_view = ckg_strview_create((char*)str, i, end_index);
+            CKG_StringView current_view = ckg_sv_create(str + i, end_index);
             if (ckg_cstr_equal(CKG_SV_ARG(current_view), CKG_SV_ARG(substring_view))) {
                 ret_index = i;
             }
