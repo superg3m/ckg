@@ -243,14 +243,6 @@
     }
 #endif
 
-typedef struct CKG_StringView {
-    u8* data;
-    u32 length;
-} CKG_StringView;
-
-#define CKG_SV_LIT(string_literal) (CKG_StringView){string_literal, sizeof(string_literal) - 1}
-CKG_StringView ckg_sv_create(u8* data, u32 length);
-
 #if defined(CKG_INCLUDE_MEMORY)
     typedef void*(CKG_Alloc_T)(CKG_Allocator* allocator, size_t allocation_size);
     typedef void(CKG_Free_T)(CKG_Allocator* allocator, void* data);
@@ -320,6 +312,84 @@ CKG_StringView ckg_sv_create(u8* data, u32 length);
     #define ckg_arena_pop(arena, type) ckg_arena_pop_custom(arena, sizeof(type))
     #define ckg_arena_pop_array(arena, type) ckg_arena_pop_custom(arena, sizeof(type) * element_count)
 #endif
+
+#if defined(CKG_INCLUDE_CSTRING)
+    typedef struct CKG_StringView {
+        u8* data;
+        u32 length;
+    } CKG_StringView;
+    
+    #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
+    #define CKG_LIT_ARG(literal) literal, sizeof(literal) - 1
+    CKG_StringView ckg_sv_create(u8* data, u32 length);
+    CKG_API char* ckg_sv_to_cstr(CKG_StringView str);
+
+    /**
+	 * @brief returns a string buffer with nullterm
+	 * must free with ckg_free()
+	 * @param s1 
+	 * @return char* 
+	 */
+	CKG_API char* ckg_cstr_alloc(const char* s1);
+    CKG_API Boolean ckg_cstr_equal(const char* s1, u64 s1_length, const char* s2, u64 s2_length);
+    CKG_API void ckg_cstr_copy(char* s1, u64 s1_capacity, const char* s2, u64 s2_length);
+    CKG_API Boolean ckg_cstr_contains(const char* s1, u64 s1_length, const char* contains, u64 contains_length);
+
+	/**
+	 * @brief Requires the string buffer to be cleared to zero terminated
+	 * 
+	 * @param string_buffer 
+	 * @param string_buffer_size 
+	 * @param source 
+	 */
+	CKG_API void ckg_cstr_append(char* str, u64 str_length, u64 str_capacity, const char* to_append, u64 to_append_length);
+	CKG_API void ckg_cstr_append_char(char* str, u64 str_length, u64 str_capacity, const char to_append);
+
+	/**
+	 * @brief Requires the string buffer to be cleared to zero terminated
+	 * 
+	 * @param string_buffer 
+	 * @param string_buffer_size 
+	 * @param index 
+	 */
+	CKG_API void ckg_cstr_insert(char* str, u64 str_length, u64 str_capacity, const char* to_insert, u64 to_insert_length, const u64 index);
+	CKG_API void ckg_cstr_insert_char(char* str, u64 str_length, u64 str_capacity, const char to_insert, const u64 index);
+
+	/**
+	 * @brief generate a random string and copy it to the dest pointer
+	 * 
+	 * @param dest 
+	 * @param dest_capacity 
+	 * @param string_length_to_generate 
+	 */
+	CKG_API void ckg_cstr_random(char* dest, u64 dest_capacity, u64 string_length_to_generate);
+	
+
+	CKG_API u64 ckg_cstr_length(const char* c_string);
+	CKG_API s64 ckg_cstr_index_of(const char* str, u64 str_length, const char* substring, u64 substring_length);
+	CKG_API s64 ckg_cstr_last_index_of(const char* str, u64 str_length, const char* substring, u64 substring_length);
+	CKG_API Boolean ckg_cstr_starts_with(const char* str, u64 str_length, const char* starts_with, u64 starts_with_length);
+	CKG_API Boolean ckg_cstr_ends_with(const char* str, u64 str_length, const char* ends_with, u64 ends_with_length);
+	CKG_API void ckg_cstr_reverse(const char* str, u64 str_length, char* returned_reversed_string_buffer, u64 reversed_buffer_capacity);
+	CKG_API void ckg_cstr_int_to_cstr(char* str, u64 str_capacity, int number);
+
+    CKG_API char* ckg_cstr_va_sprint(u64* allocation_size_ptr, char* fmt, va_list args);
+    CKG_API char* MACRO_ckg_cstr_sprint(u64* allocation_size_ptr, char* fmt, ...);
+
+    #define ckg_cstr_sprint(allocation_size_ptr, fmt, ...) MACRO_ckg_cstr_sprint(allocation_size_ptr, fmt, ##__VA_ARGS__)
+#endif
+
+/**
+ * @brief returns null terminated file data 
+ * 
+ * @param file_name 
+ * @param file_name_length [OPTIONAL]
+ * @param file_size 
+ * @param err
+ * @return u8* 
+ */
+u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_Error* err);
+
 
 //
 // ===================================================== CKG_IMPL =====================================================
@@ -510,15 +580,3 @@ CKG_StringView ckg_sv_create(u8* data, u32 length);
         return ret;
     }
 #endif
-
-
-/**
- * @brief returns null terminated file data 
- * 
- * @param file_name 
- * @param file_name_length [OPTIONAL]
- * @param file_size 
- * @param err
- * @return u8* 
- */
-u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_Error* err);
