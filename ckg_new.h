@@ -10,7 +10,7 @@
     #define CKG_IMPL_ASSERT
     #define CKG_IMPL_MEMORY
     #define CKG_IMPL_ARENA
-    #define CKG_IMPL_STR
+    #define CKG_IMPL_STRING
     #define CKG_IMPL_CHAR
     #define CKG_IMPL_COLLECTIONS
     #define CKG_IMPL_IO
@@ -22,7 +22,7 @@
 #define CKG_INCLUDE_ERRORS
 #define CKG_INCLUDE_MEMORY
 #define CKG_INCLUDE_ARENA
-#define CKG_INCLUDE_STR
+#define CKG_INCLUDE_STRING
 #define CKG_INCLUDE_CHAR
 #define CKG_INCLUDE_COLLECTIONS
 #define CKG_INCLUDE_IO
@@ -313,7 +313,7 @@
     #define ckg_arena_pop_array(arena, type) ckg_arena_pop_custom(arena, sizeof(type) * element_count)
 #endif
 
-#if defined(CKG_INCLUDE_STR)
+#if defined(CKG_INCLUDE_STRING)
     /**
 	 * @brief returns a string buffer with nullterm
 	 * in most cases free with ckg_free()
@@ -355,19 +355,21 @@
 	#define ckg_sv_last_index_of(sv1, sv2) ckg_str_last_index_of(sv1.data, sv1.length, sv2.data, sv2.length)
 	#define ckg_sv_starts_with(sv1, sv2) ckg_str_starts_with(sv1.data, sv1.length, sv2.data, sv2.length)
 	#define ckg_sv_ends_with(sv1, sv2) ckg_str_ends_with(sv1.data, sv1.length, sv2.data, sv2.length)
-
 #endif
 
-/**
- * @brief returns null terminated file data 
- * 
- * @param file_name 
- * @param file_name_length [OPTIONAL]
- * @param file_size 
- * @param err
- * @return u8* 
- */
-u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_Error* err);
+
+#if defined(CKG_INCLUDE_IO)
+    /**
+     * @brief returns null terminated file data 
+     * 
+     * @param file_name 
+     * @param file_name_length [OPTIONAL]
+     * @param file_size 
+     * @param err
+     * @return u8* 
+     */
+    u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_Error* err);
+#endif
 
 //
 // ===================================================== CKG_IMPL =====================================================
@@ -383,9 +385,7 @@ u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_
     internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free};
 
     internal void* ckg_default_libc_malloc(CKG_Allocator* allocator, size_t allocation_size) {
-        void* ret = malloc(allocator, allocation_size);
-        ckg_memory_zero(ret, allocation_size);
-        return ret;
+        return malloc(allocator, allocation_size);
     }
 
     internal void ckg_default_libc_free(CKG_Allocator* allocator, void* data) {
@@ -394,7 +394,10 @@ u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_
 
     void* ckg_alloc(size_t allocation_size) {
         ckg_assert(allocation_size != 0);
-        return allocator.allocate(allocation_size);
+
+        void* ret = allocator.allocate(allocation_size);
+        ckg_memory_zero(ret, allocation_size);
+        return ret;
     }
 
     void ckg_free(void* data) {
@@ -559,7 +562,13 @@ u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_
     }
 #endif
 
-#if defined(CKG_IMPL_CSTRING)
+#if defined(CKG_IMPL_STRING)
+    char* ckg_cstr_alloc(char* s1, size_t length) {
+        char* ret = ckg_alloc(length + 1) ;
+        ckg_memory_copy(ret, s1, length + 1, length);
+        return ret;
+    }
+
     size_t ckg_cstr_length(const char* cstring) {
         ckg_assert(cstring);
 
@@ -576,29 +585,22 @@ u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_
         return length;
     }
 
-    CKG_StringView ckg_strview_create(char* str, size_t start, size_t end) {
+    CKG_StringView ckg_strview_create(char* str, size_t length) {
         ckg_assert(str);
-        ckg_assert(start >= 0);
+        ckg_assert(length >= 0);
 
         CKG_StringView ret;
-        ret.ptr = str;
-        ret.start = start;
-        ret.end = end;
+        ret.data = str;
+        ret.length = length;
 
         return ret;
     }
 
-    char* ckg_strview_to_cstr(CKG_StringView str) {
-        char* ret = ckg_alloc((str.end - str.start) + 1);
-        ckg_memory_copy(str.ptr + str.start, ret, str.end - str.start, (str.end - str.start) + 1);
-        return ret;
-    }
-
-    bool ckg_cstr_equal(const char* s1, size_t s1_length, const char* s2, size_t s2_length) {
+    bool ckg_str_equal(const char* s1, size_t s1_length, const char* s2, size_t s2_length) {
         return ckg_memory_compare(s1, s2, s1_length, s2_length);
     }
 
-    void ckg_cstr_copy(char* s1, size_t s1_capacity, const char* s2, size_t s2_length) {
+    void ckg_str_copy(char* s1, size_t s1_capacity, const char* s2, size_t s2_length) {
         ckg_memory_zero((void*)s1, s1_capacity);
         ckg_memory_copy(s2, s1, s2_length, s1_capacity);
     }
@@ -642,21 +644,7 @@ u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_
         ckg_cstr_insert_char(str, str_length, str_capacity, to_append, str_length);
     }
 
-    void ckg_cstr_random(char* dest, size_t dest_capacity, size_t length) {
-        char charset[] = "0123456789"
-                        "abcdefghijklmnopqrstuvwxyz"
-                        "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-        ckg_assert(length < dest_capacity);
-
-        while (length-- > 0) {
-            size_t index = rand() % (sizeof(charset) - 1);
-            *dest++ = charset[index];
-        }
-        *dest = '\0';
-    }
-
-    s64 ckg_cstr_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length) {
+    s64 ckg_str_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length) {
         ckg_assert(str);
         ckg_assert(substring);
 
