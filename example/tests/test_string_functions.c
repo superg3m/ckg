@@ -1,4 +1,4 @@
-#include "../../ckg_new.h"
+#include "../../ckg.h"
 
 void test_ckg_cstr_length() {
     const int expected_size = 5;

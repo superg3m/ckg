@@ -1,4 +1,4 @@
-#include "../../ckg_new.h"
+#include "../../ckg.h"
 
 void test_ckg_arena_operations() {
   u8 function_memory[1024] = {0};

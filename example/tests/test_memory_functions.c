@@ -1,4 +1,4 @@
-#include "../../ckg_new.h"
+#include "../../ckg.h"
 
 void test_ckg_memory_operations() {
 	// Test ckg_alloc

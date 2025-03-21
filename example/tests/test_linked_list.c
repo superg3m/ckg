@@ -1,4 +1,4 @@
-#include "../../ckg_new.h"
+#include "../../ckg.h"
 
 void linked_list_operations() {
 	CKG_LinkedList* linked_list = ckg_linked_list_create(char*, TRUE);

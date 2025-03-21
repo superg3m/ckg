@@ -45,7 +45,6 @@
         "initializer_list": "cpp",
         "iosfwd": "cpp",
         "ios": "c",
-        "ckg_new.h": "c",
         "xlocnum": "c"
     }
 }

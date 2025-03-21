@@ -1,5 +1,5 @@
 
-#include "../ckg_new.h"
+#include "../ckg.h"
 #include "./tests/test_functions.c"
 
 void* custom_alloc_callback(CKG_Allocator* allocator, size_t allocation_size) {
