@@ -279,6 +279,7 @@
     #define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
 
     typedef enum CKG_ArenaFlag {
+        CKG_ARENA_FLAG_INVALID = -1,
         CKG_ARENA_FLAG_FIXED = 0,
         CKG_ARENA_FLAG_CIRCULAR,
         CKG_ARENA_FLAG_COUNT,
@@ -317,6 +318,7 @@
     #define ckg_arena_push_array(arena, type, element_count) ((type*)ckg_arena_push_custom(arena, sizeof(type) * element_count))
     #define ckg_arena_pop(arena, type) MACRO_ckg_arena_pop(arena, sizeof(type))
     #define ckg_arena_pop_array(arena, type) MACRO_ckg_arena_pop(arena, sizeof(type) * element_count)
+    #define ckg_arena_temp(arena, code_block) ckg_arena_begin_temp(arena); code_block; ckg_arena_end_temp(arena);
 #endif
 
 #if defined(CKG_INCLUDE_STRING)
@@ -775,18 +777,19 @@
     }
 #endif
 
-#if defined(CKG_IMPL_ARENA) 
-    internal bool ckg_is_set(CKG_Arena* arena, CKG_ArenaFlag flag) {
-        ckg_assert_msg(arena, "Must have a valid arena!\n");
+#if defined(CKG_IMPL_ARENA)
+    internal bool arena_is_valid(CKG_ArenaFlag flag) {
+        return flag >= 0 && flag <= (CKG_ARENA_FLAG_COUNT - 1);
+    }
 
+    internal bool ckg_arena_flag_is_set(CKG_Arena* arena, CKG_ArenaFlag flag) {
         return arena->flag == flag;
     }
 
     CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, CKG_ArenaFlag flag, u8 alignment) {
         ckg_assert_msg(memory, "Memory can't be a null pointer!\n");
         ckg_assert_msg(allocation_size != 0, "Can't have a zero allocation size!\n");
-        ckg_assert_msg(memory, "Memory can't be a null pointer!\n");
-        ckg_assert_msg(flag >= 0 && flag <= (CKG_ARENA_FLAG_COUNT - 1), "Can't have a arena flag outside of the acceptable range!\n");
+        ckg_assert_msg(arena_is_valid(flag), "Can't have a arena flag outside of the acceptable range!\n");
 
         CKG_Arena arena;
         arena.used = 0;
@@ -799,25 +802,32 @@
     }
 
     void ckg_arena_free(CKG_Arena* arena) {
+        ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
+
         ckg_free(arena->base_address);
-        arena->used = 0;
+        arena->flag = CKG_ARENA_FLAG_INVALID;
     }
 
     void ckg_arena_zero(CKG_Arena* arena) {
+        ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
+
         ckg_memory_zero(arena->base_address, arena->capacity);
         arena->used = 0;
     }
 
     void ckg_arena_reset(CKG_Arena* arena) {
+        ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
+
         arena->used = 0;
     }
 
     void* ckg_arena_push_custom(CKG_Arena* arena, size_t element_size) {
+        ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
         ckg_assert_msg(element_size != 0, "Element size can't be zero!\n");
 
-        if (ckg_is_set(arena, CKG_ARENA_FLAG_FIXED)) {
-            ckg_assert_msg((arena->used + element_size <= arena->capacity), "Ran out of arena memory! Ensure you are using ckg_arena_sizeof() in your memory calculation.\n");
-        } else if (ckg_is_set(arena, CKG_ARENA_FLAG_CIRCULAR)) {
+        if (ckg_arena_flag_is_set(arena, CKG_ARENA_FLAG_FIXED)) {
+            ckg_assert_msg((arena->used + element_size <= arena->capacity), "Ran out of arena memory!\n");
+        } else if (ckg_arena_flag_is_set(arena, CKG_ARENA_FLAG_CIRCULAR)) {
             if ((arena->used + element_size > arena->capacity)) {
                 arena->used = sizeof(CKG_Arena);
                 ckg_assert_msg((arena->used + element_size <= arena->capacity), "Element size exceeds circular arena allocation capacity!\n");
@@ -834,14 +844,20 @@
     }
 
     void MACRO_ckg_arena_pop(CKG_Arena* arena, size_t bytes_to_pop) {
+        ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
+
         arena->used -= bytes_to_pop;
     }
 
     void ckg_arena_begin_temp(CKG_Arena* arena) {
+        ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
+
         arena->used_save_point = arena->used;
     }
 
     void ckg_arena_end_temp(CKG_Arena* arena) {
+        ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
+
         arena->used = arena->used_save_point;
         arena->used_save_point = 0;
     }
