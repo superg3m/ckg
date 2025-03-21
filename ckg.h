@@ -322,6 +322,7 @@
 	 */
 	CKG_API char* ckg_cstr_alloc(char* s1, size_t length);
     CKG_API size_t ckg_cstr_length(const char* c_string);
+    CKG_API void ckg_cstr_clear(char* s1, size_t length);
     CKG_API void ckg_cstr_copy(char* dest, size_t dest_capacity, const char* source, size_t source_length);
 	CKG_API void ckg_cstr_append(char* str, size_t str_length, size_t str_capacity, const char* to_append, size_t to_append_length);
 	CKG_API void ckg_cstr_append_char(char* str, size_t str_length, size_t str_capacity, const char to_append);
@@ -346,8 +347,11 @@
     } CKG_StringView;
     
     CKG_StringView ckg_sv_create(const char* data, size_t length);
+    CKG_StringView ckg_str_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
     CKG_StringView* ckg_sv_split(const char* data, size_t length, char* delimitor, size_t delimitor_length);
+    
     #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
+    #define CKG_SV_EMPTY() (CKG_StringView){"", 0}
     #define CKG_LIT_ARG(literal) literal, sizeof(literal) - 1
 
     #define ckg_sv_equal(sv1, sv2) ckg_str_equal(sv1.data, sv1.length, sv2.data, sv2.length)
@@ -878,6 +882,10 @@
         return length;
     }
 
+    void ckg_cstr_clear(char* s1, size_t length) {
+        ckg_memory_zero(s1, length);
+    }
+
     CKG_StringView ckg_sv_create(const char* data, size_t length) {
         ckg_assert(data);
         ckg_assert(length >= 0);
@@ -885,6 +893,34 @@
         CKG_StringView ret;
         ret.data = data;
         ret.length = length;
+
+        return ret;
+    }
+
+    CKG_StringView ckg_str_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length) {
+        ckg_assert(str);
+        ckg_assert(start_delimitor);
+        ckg_assert(end_delimitor);
+        ckg_assert(!ckg_cstr_equal(start_delimitor, start_delimitor_length, end_delimitor, end_delimitor_length));
+
+        s64 start_delimitor_index = ckg_cstr_index_of(str, str_length, start_delimitor, start_delimitor_length); 
+        s64 end_delimitor_index = ckg_cstr_index_of(str, str_length, end_delimitor, end_delimitor_length);
+        if (start_delimitor_index == -1 || end_delimitor_index == -1) {
+            return CKG_SV_EMPTY();
+        }
+
+        if (start_delimitor_index == -1 || end_delimitor_index == -1) {
+            return CKG_SV_EMPTY();
+        } else if (start_delimitor_index > end_delimitor_index) {
+            return CKG_SV_EMPTY(); // The start delimtor is after the end delimitor
+        }
+
+        CKG_StringView ret = CKG_SV_EMPTY();
+        u64 i = (u64)(start_delimitor_index + start_delimitor_length);
+        ret.data = str + i;
+        while (i < (u64)end_delimitor_index) {
+            ret.length++;
+        }
 
         return ret;
     }
@@ -912,13 +948,12 @@
             }
 
             if (found_index == 0) {
-                CKG_StringView empty_string = ckg_sv_create(CKG_LIT_ARG(""));
-                ckg_vector_push(ret_vector, empty_string);
+                ckg_vector_push(ret_vector, CKG_SV_EMPTY());
             } else {
                 CKG_StringView substring = ckg_sv_create(str_view.data, found_index);
                 ckg_vector_push(ret_vector, substring);
             }
-            
+
             str_view.data += (found_index + 1);
             str_view.length -= (found_index + 1);
         }
