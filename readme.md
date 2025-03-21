@@ -107,10 +107,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 
 # Dev Notes (For me):
 	- Write a bunch more tests!
-	- I need to string view a lot more...
-	- I want to actually have error values returned as a param assert honstly shouldn't even be a function anymore
-	- string views!!!
-	- arenas
-	- allocators
 	- ckg_printf()
+	- thead_local (Experiement with this more)
+	- CKG_INCLUDE_THREADING
 
