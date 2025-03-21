@@ -464,7 +464,7 @@
      * @param err
      * @return u8* 
      */
-    u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_Error* err);
+    u8* ckg_io_read_entire_file(char* file_name, u32 file_name_length, u32* file_size, CKG_Error* err);
 
     // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
     // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
@@ -887,6 +887,43 @@
         ret.length = length;
 
         return ret;
+    }
+
+    CKG_StringView* ckg_sv_split(const char* data, size_t length, char* delimitor, size_t delimitor_length) {
+        ckg_assert(data);
+        ckg_assert(delimitor);
+        ckg_assert_msg(delimitor_length > 0, "delimitor can not be a empty string!\n");
+
+        if (length == 0) {
+            CKG_StringView* ret_vector = NULLPTR;
+            CKG_StringView current = ckg_sv_create(data, length);
+            ckg_vector_push(ret_vector, current);
+
+            return ret_vector;
+        }
+
+        CKG_StringView* ret_vector = NULLPTR;
+        CKG_StringView str_view = ckg_sv_create(data, length);
+        while (TRUE) {
+            s64 found_index = ckg_str_index_of(str_view.data, str_view.length, delimitor, delimitor_length);
+            if (found_index == -1) {
+                ckg_vector_push(ret_vector, str_view);
+                return ret_vector;
+            }
+
+            if (found_index == 0) {
+                CKG_StringView empty_string = ckg_sv_create(CKG_LIT_ARG(""));
+                ckg_vector_push(ret_vector, empty_string);
+            } else {
+                CKG_StringView substring = ckg_sv_create(str_view.data, found_index);
+                ckg_vector_push(ret_vector, substring);
+            }
+            
+            str_view.data += (found_index + 1);
+            str_view.length -= (found_index + 1);
+        }
+
+        return ret_vector;
     }
 
     bool ckg_str_equal(const char* s1, size_t s1_length, const char* s2, size_t s2_length) {

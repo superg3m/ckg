@@ -57,6 +57,16 @@ int main() {
 		ckg_assert_msg(ckg_char_is_alpha(c), "Character: %c\n", c);
 	}
 
+	
+	CKG_StringView* split_strings = ckg_sv_split(CKG_LIT_ARG("They said it couldn't be done. They tried to recite the dark magics to me! THEY DON'T KNOW I WAS THERE WHEN THEY WERE WRITTEN!"), CKG_LIT_ARG(" "));
+	for (u32 i = 0; i < ckg_vector_count(split_strings); i++) {
+		CKG_StringView line = split_strings[i];
+		CKG_LOG_SUCCESS("str #%d | %.*s\n", i, line.length, line.data);
+	}
+	ckg_vector_free(split_strings);
+
+	CKG_LOG_DEBUG("JUST MAKING SURE THIS IS GOOD!\n");
+
 	ckg_arena_free(arena);
 
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
