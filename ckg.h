@@ -284,7 +284,14 @@
         CKG_ARENA_FLAG_COUNT,
     } CKG_ArenaFlag;
 
-    typedef struct CKG_Arena CKG_Arena;
+    typedef struct CKG_Arena {
+        u8* base_address;
+        size_t capacity;
+        size_t used_save_point;
+        size_t used;
+        u8 alignment;
+        CKG_ArenaFlag flag;
+    } CKG_Arena;
     
     /**
      * @brief 
@@ -295,19 +302,17 @@
      * @param alignment
      * @return CKG_API* 
      */
-    CKG_API CKG_Arena* ckg_arena_create_custom(void* memory, size_t allocation_size, CKG_ArenaFlag flag, u8 alignment);
-    CKG_API CKG_Arena* MACRO_ckg_arena_free(CKG_Arena* arena);
+    CKG_API CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, CKG_ArenaFlag flag, u8 alignment);
+    CKG_API void ckg_arena_free(CKG_Arena* arena);
     CKG_API void* ckg_arena_push_custom(CKG_Arena* arena, size_t element_size);	
     CKG_API void ckg_arena_begin_temp(CKG_Arena* arena);
     CKG_API void ckg_arena_end_temp(CKG_Arena* arena);
     CKG_API void ckg_arena_zero(CKG_Arena* arena);
     CKG_API void ckg_arena_reset(CKG_Arena* arena);
     CKG_API void MACRO_ckg_arena_pop(CKG_Arena* arena, size_t bytes_to_pop);
-    CKG_API size_t ckg_arena_sizeof();
     
     #define ckg_arena_create_fixed(memory, allocation_size) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_FIXED, 0)
     #define ckg_arena_create_circular(memory, allocation_size) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_CIRCULAR 0)
-    #define ckg_arena_free(arena) arena = MACRO_ckg_arena_free(arena)
     #define ckg_arena_push(arena, type) ((type*)ckg_arena_push_custom(arena, sizeof(type)))
     #define ckg_arena_push_array(arena, type, element_count) ((type*)ckg_arena_push_custom(arena, sizeof(type) * element_count))
     #define ckg_arena_pop(arena, type) MACRO_ckg_arena_pop(arena, sizeof(type))
@@ -771,59 +776,43 @@
 #endif
 
 #if defined(CKG_IMPL_ARENA) 
-    typedef struct CKG_Arena {
-        u8* base_address;
-        size_t capacity;
-        size_t used_save_point;
-        size_t used;
-        u8 alignment;
-        CKG_ArenaFlag flag;
-    } CKG_Arena;
-
     internal bool ckg_is_set(CKG_Arena* arena, CKG_ArenaFlag flag) {
         ckg_assert_msg(arena, "Must have a valid arena!\n");
 
         return arena->flag == flag;
     }
 
-    CKG_Arena* ckg_arena_create_custom(void* memory, size_t allocation_size, CKG_ArenaFlag flag, u8 alignment) {
+    CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, CKG_ArenaFlag flag, u8 alignment) {
         ckg_assert_msg(memory, "Memory can't be a null pointer!\n");
         ckg_assert_msg(allocation_size != 0, "Can't have a zero allocation size!\n");
-        ckg_assert_msg(allocation_size >= sizeof(CKG_Arena), "Not enough allocation space for bootstraping the arena!\n");
         ckg_assert_msg(memory, "Memory can't be a null pointer!\n");
         ckg_assert_msg(flag >= 0 && flag <= (CKG_ARENA_FLAG_COUNT - 1), "Can't have a arena flag outside of the acceptable range!\n");
 
-        CKG_Arena* arena = (CKG_Arena*)memory; // bootstrap
-        arena->used = sizeof(CKG_Arena);
-        arena->capacity = allocation_size;
-        arena->base_address = (u8*)memory + arena->used;
-        arena->alignment = alignment == 0 ? 8 : alignment;
-        arena->flag = flag;
+        CKG_Arena arena;
+        arena.used = 0;
+        arena.capacity = allocation_size;
+        arena.base_address = (u8*)memory;
+        arena.alignment = alignment == 0 ? 8 : alignment;
+        arena.flag = flag;
 
         return arena;
     }
 
-    CKG_Arena* MACRO_ckg_arena_free(CKG_Arena* arena) {
-        ckg_assert_msg(arena, "Must have a valid arena!\n");
-
-        return NULLPTR;
+    void ckg_arena_free(CKG_Arena* arena) {
+        ckg_free(arena->base_address);
+        arena->used = 0;
     }
 
     void ckg_arena_zero(CKG_Arena* arena) {
-        ckg_assert_msg(arena, "Must have a valid arena!\n");
-
         ckg_memory_zero(arena->base_address, arena->capacity);
         arena->used = 0;
     }
 
     void ckg_arena_reset(CKG_Arena* arena) {
-        ckg_assert_msg(arena, "Must have a valid arena!\n");
-
         arena->used = 0;
     }
 
     void* ckg_arena_push_custom(CKG_Arena* arena, size_t element_size) {
-        ckg_assert_msg(arena, "Must have a valid arena!\n");
         ckg_assert_msg(element_size != 0, "Element size can't be zero!\n");
 
         if (ckg_is_set(arena, CKG_ARENA_FLAG_FIXED)) {
@@ -842,10 +831,6 @@
         }
 
         return ret;
-    }
-
-    size_t ckg_arena_sizeof() {
-        return sizeof(CKG_Arena);
     }
 
     void MACRO_ckg_arena_pop(CKG_Arena* arena, size_t bytes_to_pop) {
@@ -904,10 +889,10 @@
         ckg_assert(str);
         ckg_assert(start_delimitor);
         ckg_assert(end_delimitor);
-        ckg_assert(!ckg_cstr_equal(start_delimitor, start_delimitor_length, end_delimitor, end_delimitor_length));
+        ckg_assert(!ckg_str_equal(start_delimitor, start_delimitor_length, end_delimitor, end_delimitor_length));
 
-        s64 start_delimitor_index = ckg_cstr_index_of(str, str_length, start_delimitor, start_delimitor_length); 
-        s64 end_delimitor_index = ckg_cstr_index_of(str, str_length, end_delimitor, end_delimitor_length);
+        s64 start_delimitor_index = ckg_str_index_of(str, str_length, start_delimitor, start_delimitor_length); 
+        s64 end_delimitor_index = ckg_str_index_of(str, str_length, end_delimitor, end_delimitor_length);
         if (start_delimitor_index == -1 || end_delimitor_index == -1) {
             return CKG_SV_EMPTY();
         }
@@ -1460,7 +1445,7 @@
 
             LARGE_INTEGER large_int = {0};
             BOOL success = GetFileSizeEx(file_handle, &large_int);
-            ckit_assert(success);
+            ckg_assert(success);
 
             size_t file_size = large_int.QuadPart + 1;
             if (file_size > SIZE_MAX) {
@@ -1478,7 +1463,7 @@
             success = ReadFile(file_handle, file_data, (DWORD)file_size, &bytes_read, NULLPTR);
             CloseHandle(file_handle);
 
-            ckit_assert(success && bytes_read == (file_size - 1));
+            ckg_assert(success && bytes_read == (file_size - 1));
 
             if (returned_file_size) {
                 *returned_file_size = (size_t)file_size;
