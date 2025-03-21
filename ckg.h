@@ -204,7 +204,8 @@
     #define CKG_ERROR_ARGS_MASK (1 << 28)
     typedef enum CKG_Error {
         CKG_ERROR_IO_FILE_NOT_FOUND = (CKG_ERROR_IO_MASK | 0),
-        CKG_ERROR_IO_COUNT = 1,
+        CKG_ERROR_IO_FILE_TOO_BIG,
+        CKG_ERROR_IO_COUNT = 2,
 
         CKG_ERROR_ARG_ONE_INVALID = (CKG_ERROR_ARGS_MASK | 0),
         CKG_ERROR_ARG_ONE_NULLPTR,
@@ -459,16 +460,18 @@
 #endif 
 
 #if defined(CKG_INCLUDE_IO)
+
+    bool ckg_io_path_exists(const char* path);
     /**
      * @brief returns null terminated file data 
      * 
      * @param file_name 
-     * @param file_name_length [OPTIONAL]
-     * @param file_size 
+     * @param file_name_length
+     * @param file_size [OPTIONAL]
      * @param err
      * @return u8* 
      */
-    u8* ckg_io_read_entire_file(char* file_name, u32 file_name_length, u32* file_size, CKG_Error* err);
+    CKG_API u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err);
 
     // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
     // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
@@ -1435,4 +1438,102 @@
     //
     // ========== END CKG_LinkedList ==========
     //
+#endif
+
+#if defined(CKG_IMPL_IO)
+    #if defined(PLATFORM_WINDOWS)
+        bool ckg_io_path_exists(const char* path) {
+            return (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES);
+        }
+
+        u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
+            ckg_assert(ckg_io_path_exists(file_name));
+
+            HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
+            if (file_handle == INVALID_HANDLE_VALUE) {
+                if (err) {
+                    *err = CKG_ERROR_IO_FILE_NOT_FOUND;
+                }
+
+                return NULLPTR; // Failed to open file
+            }
+
+            LARGE_INTEGER large_int = {0};
+            BOOL success = GetFileSizeEx(file_handle, &large_int);
+            ckit_assert(success);
+
+            size_t file_size = large_int.QuadPart + 1;
+            if (file_size > SIZE_MAX) {
+                CloseHandle(file_handle);
+                if (err) {
+                    *err = CKG_ERROR_IO_FILE_TOO_BIG;
+                }
+
+                return NULLPTR; // File too large to handle
+            }
+
+            u8* file_data = (u8*)ckg_alloc(file_size); // +1 for null-terminator
+
+            DWORD bytes_read = 0;
+            success = ReadFile(file_handle, file_data, (DWORD)file_size, &bytes_read, NULLPTR);
+            CloseHandle(file_handle);
+
+            ckit_assert(success && bytes_read == (file_size - 1));
+
+            if (returned_file_size) {
+                *returned_file_size = (size_t)file_size;
+            }
+
+            return file_data;
+        }
+    #else
+        bool ckg_io_path_exists(const char* path) {
+            FILE *fptr = fopen(path, "r");
+
+            if (fptr == NULL) {
+                return FALSE;
+            }
+
+            fclose(fptr);
+
+            return TRUE;
+        }
+
+        u8* ckg_io_read_entire_file(char* file_name, u32* returned_file_size, CKG_Error* err) {
+            ckg_assert_msg(ckit_os_path_exists(path), "Path doesn't exist\n");
+
+            FILE* file_handle = fopen(path, "rb");
+            if (file_handle == NULLPTR) {
+                if (err) {
+                    *err = CKG_ERROR_IO_FILE_NOT_FOUND;
+                }
+
+                return NULLPTR;
+            }
+
+            fseek(file_handle, 0L, SEEK_END);
+            size_t file_size = ftell(file_handle);
+            rewind(file_handle);
+
+            u8* file_data = ckit_alloc(file_size + 1); // +1 for null terminator
+
+            if (fread(file_data, file_size, 1, file_handle) != 1) {
+                fclose(file_handle);
+                ckit_free(file_data);
+                ckit_assert_msg(FALSE, "Error reading file");
+                return NULLPTR;
+            }
+
+            fclose(file_handle);
+
+            if (returned_file_size) {
+                *returned_file_size = file_size + 1;
+            }
+
+            return file_data;
+        }
+    #endif
+
+    // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
+    // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
 #endif
