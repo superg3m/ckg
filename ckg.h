@@ -465,6 +465,9 @@
      * @return u8* 
      */
     u8* ckg_io_read_file(char* file_name, u32 file_name_length, u32* file_size, CKG_Error* err);
+
+    // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
+    // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
 #endif
 
 //
