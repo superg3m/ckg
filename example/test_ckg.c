@@ -20,7 +20,6 @@ int main() {
 	CKG_Arena arena = ckg_arena_create_fixed(program_stack_memory, TOTAL_MEMORY_SIZE);
 	ckg_bind_custom_allocator(custom_alloc_callback, custom_free_callback, &arena);
 
-
 	ckg_arena_temp(&arena, {
 		test_ckg_memory_operations();
 		test_ckg_arena_operations();
