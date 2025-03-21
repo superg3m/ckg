@@ -44,6 +44,8 @@
         "stdarg.h": "c",
         "initializer_list": "cpp",
         "iosfwd": "cpp",
-        "ios": "c"
+        "ios": "c",
+        "ckg_new.h": "c",
+        "xlocnum": "c"
     }
 }

@@ -366,8 +366,6 @@
 #endif
 
 #if defined(CKG_INCLUDE_COLLECTIONS)
-    // types
-
     //
     // ========== START CKG_VECTOR ==========
     //

@@ -1,5 +1,4 @@
-#define CKG_INCLUDE_ALL
-#include "../../ckg.h"
+#include "../../ckg_new.h"
 
 void test_ckg_memory_operations() {
 	// Test ckg_alloc
@@ -102,5 +101,6 @@ void test_ckg_memory_operations() {
 	}
 
 	CKG_LOG_SUCCESS("All memory tests passed!\n");
+
 	return;
 }

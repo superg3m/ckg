@@ -1,2 +1,2 @@
 #define CKG_IMPL
-#include "./ckg.h"
+#include "./ckg_new.h"

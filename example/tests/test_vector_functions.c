@@ -1,9 +1,9 @@
-#include "../../ckg.h"
+#include "../../ckg_new.h"
 
 void test_ckg_vector_operations() {
 	int* int_vector = NULLPTR;
 
-	for (int i = 0; i < 200; i++) {
+	for (int i = 0; i < 1000; i++) {
 		ckg_vector_push(int_vector, i);
 	}
 
@@ -22,14 +22,14 @@ void test_ckg_vector_operations() {
 void test_ckg_stack_operations() {
 	int* int_stack = NULLPTR;
 
-	for (int i = 0; i < 200; i++) {
-		ckg_stack_push(int_stack, i);
+	for (int i = 0; i < 2040; i++) {
+		ckg_stack_push(int_stack, i + 1);
 	}
 
 	u64 stack_count = ckg_stack_count(int_stack);
 	for (u64 i = 0; i < stack_count; i++) {
 		int value2 = ckg_stack_pop(int_stack);
-		ckg_assert(value2 == (199 - i));
+		ckg_assert(value2 == (2040 - i));
 	}
 
 	if (ckg_stack_empty(int_stack)) {

@@ -1,30 +1,31 @@
 
-#include "../ckg.h"
-
+#include "../ckg_new.h"
 #include "./tests/test_functions.c"
-#if defined(PLATFORM_WINDOWS)
-	#include <windows.h>
 
-	void* win32_memory_alloc_callback(size_t allocation_size) {
-		void* ret = VirtualAlloc(0, allocation_size, MEM_COMMIT, PAGE_READWRITE);
-		return ret;
-	}
+void* custom_alloc_callback(CKG_Allocator* allocator, size_t allocation_size) {
+	CKG_Arena* arena = (CKG_Arena*)allocator->ctx;
+	return ckg_arena_push_custom(arena, allocation_size);
+}
 
-	void win32_memory_free_callback(void* data) {
-		VirtualFree(data, 0, MEM_RELEASE);
-	}
-#endif
+void custom_free_callback(CKG_Allocator* allocator, void* data) {
+	(void)allocator; 
+	(void)data;
+	return;
+}
+
+#define TOTAL_MEMORY_SIZE KiloBytes(32)
 
 int main() {
-	#if defined(PLATFORM_WINDOWS)
-		ckg_bind_alloc_callback(win32_memory_alloc_callback);
-		ckg_bind_free_callback(win32_memory_free_callback);
-	#endif
+	u8 program_stack_memory[TOTAL_MEMORY_SIZE] = {0};
+	CKG_Arena* arena = ckg_arena_create_fixed(program_stack_memory, TOTAL_MEMORY_SIZE);
+	ckg_bind_custom_allocator(custom_alloc_callback, custom_free_callback, arena);
 
-	test_ckg_memory_operations();
-	test_ckg_arena_operations();
-	test_ckg_str_operations();
-	test_ckg_vector_operations();
+	ckg_arena_begin_temp(arena);
+		test_ckg_memory_operations();
+		test_ckg_arena_operations();
+		test_ckg_str_operations();
+		test_ckg_vector_operations();
+	ckg_arena_end_temp(arena);
 	test_ckg_stack_operations();
 
 	linked_list_operations();
@@ -55,6 +56,8 @@ int main() {
 		c = i + 'A';
 		ckg_assert_msg(ckg_char_is_alpha(c), "Character: %c\n", c);
 	}
+
+	ckg_arena_free(arena);
 
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 	return 0;
