@@ -505,9 +505,6 @@
     typedef struct CKG_WorkQueue CKG_WorkQueue;
     typedef bool (CKG_Job_T)(ThreadInfo*, void*);
 
-    #if defined(PLATFORM_WINDOWS)
-        #define CKG_WRITE_FENCE _
-
     CKG_WorkQueue* ckg_work_queue_create();
     void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job_func, void *param);
     void ckg_work_queue_suspend_job(CKG_WorkQueue* queue, int job_index);
