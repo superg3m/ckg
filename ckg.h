@@ -17,6 +17,7 @@
     #define CKG_IMPL_CHAR
     #define CKG_IMPL_COLLECTIONS
     #define CKG_IMPL_IO
+    #define CKG_IMPL_THREADING
 #endif
 
 #define CKG_INCLUDE_TYPES
@@ -30,6 +31,7 @@
 #define CKG_INCLUDE_MATH
 #define CKG_INCLUDE_COLLECTIONS
 #define CKG_INCLUDE_IO
+#define CKG_INCLUDE_THREADING
 
 // KEY NOTES:
 // - Whenever you see [OPTIONAL] that means you can use NULLPTR for that param
@@ -106,10 +108,16 @@
 
     #if defined(__clang__)
         #define UNUSED_FUNCTION __attribute__((used))
+        #define WRITE_FENCE() __asm__ volatile("" ::: "memory"); __asm__ volatile("sfence" ::: "memory")
+        #define READ_FENCE() __asm__ volatile("" ::: "memory");
     #elif defined(__GNUC__) || defined(__GNUG__)
         #define UNUSED_FUNCTION __attribute__((used))
+        #define WRITE_FENCE() __asm__ volatile("" ::: "memory"); __asm__ volatile("sfence" ::: "memory")
+        #define READ_FENCE() __asm__ volatile("" ::: "memory");
     #elif defined(_MSC_VER)
         #define UNUSED_FUNCTION
+        #define WRITE_FENCE() _WriteBarrier(); _mm_sfence()
+        #define READ_FENCE() _ReadBarrier()
     #endif
 
     CKG_API void ckg_stack_trace_dump();
@@ -482,6 +490,32 @@
 
     // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
     // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
+#endif
+
+#if defined(CKG_INCLUDE_THREADING)
+    typedef struct ThreadInfo {
+        int thread_index;
+    } ThreadInfo;
+
+    typedef struct JobEntry {
+        void* data;
+        bool isDone;
+    } JobEntry;
+
+    typedef struct CKG_WorkQueue CKG_WorkQueue;
+    typedef bool (CKG_Job_T)(ThreadInfo*, void*);
+
+    #if defined(PLATFORM_WINDOWS)
+        #define CKG_WRITE_FENCE _
+
+    CKG_WorkQueue* ckg_work_queue_create();
+    void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job_func, void *param);
+    void ckg_work_queue_suspend_job(CKG_WorkQueue* queue, int job_index);
+    void ckg_work_queue_resume_job(CKG_WorkQueue* queue, int job_index);
+    void ckg_work_queue_close(CKG_WorkQueue* queue);
+    void ckg_work_queue_open(CKG_WorkQueue* queue);
+    void ckg_work_queue_wait_until_done(CKG_WorkQueue* queue);
+    void ckg_work_queue_free(CKG_WorkQueue* queue);
 #endif
 
 //
@@ -1537,4 +1571,32 @@
 
     // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
     // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
+#endif
+
+#if defined(CKG_IMPL_THREADING)
+    typedef struct ThreadInfo {
+        int thread_index;
+    } ThreadInfo;
+
+    typedef struct JobEntry {
+        void* data;
+        bool isDone;
+    } JobEntry;
+
+    typedef struct CKG_WorkQueue CKG_WorkQueue {
+
+    }
+    typedef bool (CKG_Job_T)(ThreadInfo*, void*);
+
+    #if defined(PLATFORM_WINDOWS)
+        #define CKG_WRITE_FENCE _
+
+    CKG_WorkQueue* ckg_work_queue_create();
+    void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job_func, void *param);
+    void ckg_work_queue_suspend_job(CKG_WorkQueue* queue, int job_index);
+    void ckg_work_queue_resume_job(CKG_WorkQueue* queue, int job_index);
+    void ckg_work_queue_close(CKG_WorkQueue* queue);
+    void ckg_work_queue_open(CKG_WorkQueue* queue);
+    void ckg_work_queue_wait_until_done(CKG_WorkQueue* queue);
+    void ckg_work_queue_free(CKG_WorkQueue* queue);
 #endif
