@@ -448,17 +448,7 @@
     #define ckg_ring_buffer_write(buffer) (*ckg_ring_buffer_header_base(buffer)).write
     #define ckg_ring_buffer_count(buffer) (*ckg_ring_buffer_header_base(buffer)).count
     #define ckg_ring_buffer_capacity(buffer) (*ckg_ring_buffer_header_base(buffer)).capacity
-    
-    void* ckg_ring_buffer_create(int capacity, size_t element_size) {
-        size_t allocation_size = sizeof(CKG_RingBufferHeader) + (capacity * element_size);
-        void* buffer = ckg_alloc(allocation_size);
-        ZeroMemory(buffer, allocation_size);
-        buffer = (char*)buffer + sizeof(CKG_RingBufferHeader);
-        ckg_ring_buffer_capacity(buffer) = capacity;
-    
-        return buffer;
-    }
-    
+
     #define ckg_ring_buffer_full(buffer) (ckg_ring_buffer_count(buffer) == ckg_ring_buffer_capacity(buffer))
     #define ckg_ring_buffer_empty(buffer) (ckg_ring_buffer_count(buffer) == 0)
     #define ckg_ring_buffer_enqueue(buffer, element) ckg_assert_msg(!ckg_ring_buffer_full(buffer), "Ring buffer is full!\n"); buffer[ckg_ring_buffer_write(buffer)] = element; ckg_ring_buffer_header_base(buffer)->count++; ckg_ring_buffer_header_base(buffer)->write = (ckg_ring_buffer_write(buffer) + 1) % ckg_ring_buffer_capacity(buffer);
@@ -1284,7 +1274,6 @@
     //
     // ========== START CKG_RingBuffer ==========
     //
-
     // Date: March 22, 2025
     // NOTE(Jovanni): Do we actually need this at all because we have a circular arena?
     void* ckg_ring_buffer_create(int capacity, size_t element_size) {
