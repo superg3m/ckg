@@ -730,6 +730,7 @@
 
     void* MACRO_ckg_free(void* data) {
         ckg_assert(data);
+        
         allocator.free(&allocator, data);
         return NULLPTR;
     }
