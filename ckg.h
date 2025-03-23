@@ -426,7 +426,7 @@
     #define ckg_stack_free(stack) stack = MACRO_ckg_vector_free(stack)
     #define ckg_stack_pop(stack) stack[--ckg_vector_header_base(stack)->count]
     #define ckg_stack_peek(stack) stack[ckg_stack_count(stack) - 1]
-    #define ckg_stack_empty(stack) ckg_stack_count(stack) == 0
+    #define ckg_stack_empty(stack) (ckg_stack_count(stack) == 0)
     //
     // ========== END CKG_VECTOR ==========
     //
