@@ -443,6 +443,8 @@
     } CKG_RingBufferHeader;
     
     void* ckg_ring_buffer_create(int capacity, size_t element_size);
+    void* MACRO_ckg_ring_buffer_free(void* buffer);
+    #define ckg_ring_buffer_free(buffer) buffer = MACRO_ckg_ring_buffer_free(buffer)
     #define ckg_ring_buffer_header_base(buffer) ((CKG_RingBufferHeader*)(((char*)buffer) - sizeof(CKG_RingBufferHeader)))
     #define ckg_ring_buffer_read(buffer) (*ckg_ring_buffer_header_base(buffer)).read
     #define ckg_ring_buffer_write(buffer) (*ckg_ring_buffer_header_base(buffer)).write
@@ -519,26 +521,14 @@
 #endif
 
 #if defined(CKG_INCLUDE_THREADING)
-    typedef struct ThreadInfo {
-        int thread_index;
-    } ThreadInfo;
-
-    typedef struct JobEntry {
-        void* data;
-        bool isDone;
-    } JobEntry;
-
+    typedef void (CKG_Job_T)(void*);
+    typedef struct CKG_JobEntry CKG_JobEntry;
     typedef struct CKG_WorkQueue CKG_WorkQueue;
-    typedef bool (CKG_Job_T)(ThreadInfo*, void*);
 
-    CKG_WorkQueue* ckg_work_queue_create();
-    void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job_func, void *param);
-    void ckg_work_queue_suspend_job(CKG_WorkQueue* queue, int job_index);
-    void ckg_work_queue_resume_job(CKG_WorkQueue* queue, int job_index);
-    void ckg_work_queue_close(CKG_WorkQueue* queue);
-    void ckg_work_queue_open(CKG_WorkQueue* queue);
+    void ckg_work_queue_create(CKG_WorkQueue* queue, int job_capacity);
+    void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job, void* param);
     void ckg_work_queue_wait_until_done(CKG_WorkQueue* queue);
-    void ckg_work_queue_free(CKG_WorkQueue* queue);
+    DWORD WINAPI ckg_worker_thread(void* param);
 #endif
 
 //
@@ -1266,7 +1256,6 @@
 
         return vector_base;
     }
-
     //
     // ========== END CKG_VECTOR ==========
     //
@@ -1284,6 +1273,17 @@
         ckg_ring_buffer_capacity(buffer) = capacity;
     
         return buffer;
+    }
+
+    void* MACRO_ckg_ring_buffer_free(void* vector) {
+        CKG_RingBufferHeader* ring_base = ckg_ring_buffer_header_base(vector);
+        ring_base->count = 0;
+        ring_base->capacity = 0;
+        ring_base->read = 0;
+        ring_base->write = 0;
+        ckg_free(vector);
+
+        return NULLPTR;
     }
     //
     // ========== END CKG_RingBuffer ==========
@@ -1615,29 +1615,75 @@
 #endif
 
 #if defined(CKG_IMPL_THREADING)
-    typedef struct ThreadInfo {
-        int thread_index;
-    } ThreadInfo;
-
-    typedef struct JobEntry {
-        void* data;
-        bool isDone;
-    } JobEntry;
-
-    typedef struct CKG_WorkQueue CKG_WorkQueue {
-
-    }
-    typedef bool (CKG_Job_T)(ThreadInfo*, void*);
+    typedef struct CKG_JobEntry {
+        CKG_Job_T* job;
+        void* param;
+    } CKG_JobEntry;
 
     #if defined(PLATFORM_WINDOWS)
-        #define CKG_WRITE_FENCE _
+        typedef struct CKG_WorkQueue {
+            SRWLOCK lock;
+            CONDITION_VARIABLE work_ready;
+            CONDITION_VARIABLE work_done;
+            CKG_JobEntry* jobs; // Circular queue
+            int active_thread_count;
+        } CKG_WorkQueue;
 
-    CKG_WorkQueue* ckg_work_queue_create();
-    void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job_func, void *param);
-    void ckg_work_queue_suspend_job(CKG_WorkQueue* queue, int job_index);
-    void ckg_work_queue_resume_job(CKG_WorkQueue* queue, int job_index);
-    void ckg_work_queue_close(CKG_WorkQueue* queue);
-    void ckg_work_queue_open(CKG_WorkQueue* queue);
-    void ckg_work_queue_wait_until_done(CKG_WorkQueue* queue);
-    void ckg_work_queue_free(CKG_WorkQueue* queue);
+        void ckg_work_queue_create(CKG_WorkQueue* queue, int job_capacity) {
+            InitializeSRWLock(&queue->lock);
+            InitializeConditionVariable(&queue->work_ready);
+            InitializeConditionVariable(&queue->work_done);
+            queue->jobs = ckg_ring_buffer_create(job_capacity, sizeof(CKG_JobEntry));
+            queue->active_thread_count = 0;
+        }
+
+        void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job, void* param) {
+            AcquireSRWLockExclusive(&queue->lock);
+            
+            CKG_JobEntry job_entry = (CKG_JobEntry){job, param};
+            ckg_ring_buffer_enqueue(queue->jobs, job_entry);
+            WakeConditionVariable(&queue->work_ready);
+        
+            ReleaseSRWLockExclusive(&queue->lock);
+        }
+
+        void ckg_work_queue_wait_until_done(CKG_WorkQueue* queue) {
+            AcquireSRWLockExclusive(&queue->lock);
+        
+            while (!ckg_ring_buffer_empty(queue->jobs) || queue->active_thread_count > 0) {
+                SleepConditionVariableSRW(&queue->work_done, &queue->lock, INFINITE, 0);
+            }
+        
+            ReleaseSRWLockExclusive(&queue->lock);
+        }
+
+        DWORD WINAPI ckg_worker_thread(void* param) {
+            CKG_WorkQueue* q = (CKG_WorkQueue*)param;
+        
+            while (true) {
+                AcquireSRWLockExclusive(&q->lock);
+                while (ckg_ring_buffer_empty(q->jobs)) {
+                    SleepConditionVariableSRW(&q->work_ready, &q->lock, INFINITE, 0);
+                }
+        
+                CKG_JobEntry entry = ckg_ring_buffer_dequeue(q->jobs);
+                ReleaseSRWLockExclusive(&q->lock);
+        
+                entry.job(entry.param);
+        
+                AcquireSRWLockExclusive(&q->lock);
+                if (ckg_ring_buffer_empty(q->jobs)) {
+                    WakeConditionVariable(&q->work_done);
+                }
+                ReleaseSRWLockExclusive(&q->lock);
+            }
+        
+            return 0;
+        }
+    #elif defined(PLATFORM_LINUX)
+    
+
+    #endif
+
+
 #endif
