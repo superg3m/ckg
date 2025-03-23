@@ -1269,7 +1269,7 @@
     void* ckg_ring_buffer_create(int capacity, size_t element_size) {
         size_t allocation_size = sizeof(CKG_RingBufferHeader) + (capacity * element_size);
         void* buffer = ckg_alloc(allocation_size);
-        ZeroMemory(buffer, allocation_size);
+        ckg_memory_zero(buffer, allocation_size);
         buffer = (char*)buffer + sizeof(CKG_RingBufferHeader);
         ckg_ring_buffer_capacity(buffer) = capacity;
     
