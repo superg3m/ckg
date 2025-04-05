@@ -1241,6 +1241,8 @@
 #endif
 
 #if defined(CKG_IMPL_MATH)
+
+    // THIS IS ENTIRELY WRONG!
     bool ckg_line2D_intersection(CKG_Line2D *intersection, CKG_Line2D line0, CKG_Line2D line1) {
         bool vertical = line0.p1.x - line0.p0.x == 0;
         bool horizontal = line0.p1.y - line0.p0.y == 0;
