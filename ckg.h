@@ -1273,15 +1273,15 @@
             return top_check && bottom_check;
         }
 
-        float m = (line0.p1.y - line0.p0.y) / (line0.p1.y - line0.p0.y);
-        float b = (m * line0.p0.x) + line0.p0.y;
+        float m  = (line0.p1.y - line0.p0.y) / (line0.p1.y - line0.p0.y);
+        float b  = -(m * line0.p0.x) + line0.p0.y;
         float y0 = (m * line1.p0.x) + b;
         float y1 = (m * line1.p1.x) + b;
 
-        bool left_check = line0.p0.x >= line1.p0.x;
-        bool right_check = line0.p0.x <= line1.p1.x;
-        bool top_check = line0.p0.y >= line1.p0.y;
-        bool bottom_check = line0.p0.y <= line1.p1.y;
+        bool left_check   = ((m * line1.p0.x) + b) >= line1.p0.x;
+        bool right_check  = ((m * line1.p1.x) + b) <= line1.p1.x;
+        bool bottom_check = y0 <= line1.p1.y;
+        bool top_check    = y1 >= line1.p0.y;
         bool is_intersecting = left_check && right_check && top_check && bottom_check;
 
         if (is_intersecting && intersection) {

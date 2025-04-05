@@ -41,8 +41,11 @@
 compilation_errors.txt
 c_build/
 build_cl/
+example/gcc/
+example/clang/
 example/cl/
 build_gcc/
 example/gcc/
 !c_build.py
 c_build_dependency_cache_*.json
+.vscode/
