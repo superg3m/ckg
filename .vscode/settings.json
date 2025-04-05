@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.mysql": "sql",
         "ckg_types.h": "c",
         "ckg_logger.h": "c",
         "ckg.h": "c",
@@ -45,6 +46,9 @@
         "initializer_list": "cpp",
         "iosfwd": "cpp",
         "ios": "c",
-        "xlocnum": "c"
+        "xlocnum": "c",
+        "__locale": "c",
+        "string": "c",
+        "string_view": "c"
     }
 }

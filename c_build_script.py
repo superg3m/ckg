@@ -46,7 +46,7 @@ if cc.compiler_name == "cl":
     cc.compiler_disable_specific_warnings = ["5105", "4668", "4820", "4996"]
 else:
     cc.compiler_warning_level = "all"
-    cc.compiler_disable_specific_warnings = ["deprecated-declarations"]
+    cc.compiler_disable_specific_warnings = ["deprecated-declarations", "missing-braces"]
 
 executable_procedure_libs = []
 if IS_WINDOWS():

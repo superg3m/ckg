@@ -15,6 +15,7 @@
     #define CKG_IMPL_ARENA
     #define CKG_IMPL_STRING
     #define CKG_IMPL_CHAR
+    #define CKG_IMPL_MATH
     #define CKG_IMPL_COLLECTIONS
     #define CKG_IMPL_IO
     #define CKG_IMPL_THREADING
@@ -392,6 +393,25 @@
     // more here later
     // round intrinsic
     // trig fucntion intrinsics or approximations with taylor series
+
+    typedef struct CKG_Point2D {
+        union {
+            struct {
+                float x;
+                float y;
+            };
+            float data[2];
+        };
+    } CKG_Point2D;
+
+
+    typedef struct CKG_Line2D {
+        CKG_Point2D p0;
+        CKG_Point2D p1;
+    } CKG_Line2D;
+
+    bool ckg_line2D_intersection(CKG_Line2D *intersection, CKG_Line2D line0, CKG_Line2D line1);
+
 #endif
 
 #if defined(CKG_INCLUDE_COLLECTIONS)
@@ -528,7 +548,7 @@
     void ckg_work_queue_create(CKG_WorkQueue* queue, int job_capacity);
     void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job, void* param);
     void ckg_work_queue_wait_until_done(CKG_WorkQueue* queue);
-    DWORD WINAPI ckg_worker_thread(void* param);
+    int  ckg_worker_thread(void* param);
 #endif
 
 //
@@ -992,7 +1012,7 @@
 
         CKG_StringView* ret_vector = NULLPTR;
         CKG_StringView str_view = ckg_sv_create(data, length);
-        while (TRUE) {
+        while (true) {
             s64 found_index = ckg_str_index_of(str_view.data, str_view.length, delimitor, delimitor_length);
             if (found_index == -1) {
                 ckg_vector_push(ret_vector, str_view);
@@ -1217,6 +1237,61 @@
 
     bool ckg_char_is_alpha_numeric(char c) {
         return ckg_char_is_alpha(c) || ckg_char_is_digit(c);
+    }
+#endif
+
+#if defined(CKG_IMPL_MATH)
+    bool ckg_line2D_intersection(CKG_Line2D *intersection, CKG_Line2D line0, CKG_Line2D line1) {
+        bool vertical = line0.p1.x - line0.p0.x == 0;
+        bool horizontal = line0.p1.y - line0.p0.y == 0;
+
+        if (vertical) {
+            bool left_check = line0.p0.x >= line1.p0.x;
+            bool right_check = line0.p0.x <= line1.p1.x;
+
+            if (intersection) {
+                *intersection = (CKG_Line2D){
+                    (CKG_Point2D){line0.p0.x, line1.p0.y},
+                    (CKG_Point2D){line0.p0.x, line1.p1.y}
+                };
+            }
+
+            return left_check && right_check;
+        }
+
+        if (horizontal) {
+            bool top_check = line0.p0.y >= line1.p0.y;
+            bool bottom_check = line0.p0.y <= line1.p1.y;
+
+            if (intersection) {
+                *intersection = (CKG_Line2D){
+                    (CKG_Point2D){line1.p0.x, line0.p0.y},
+                    (CKG_Point2D){line1.p1.x, line0.p0.y}
+                };
+            }
+
+            return top_check && bottom_check;
+        }
+
+        float m = (line0.p1.y - line0.p0.y) / (line0.p1.y - line0.p0.y);
+        float b = (m * line0.p0.x) + line0.p0.y;
+        float y0 = (m * line1.p0.x) + b;
+        float y1 = (m * line1.p1.x) + b;
+
+        bool left_check = line0.p0.x >= line1.p0.x;
+        bool right_check = line0.p0.x <= line1.p1.x;
+        bool top_check = line0.p0.y >= line1.p0.y;
+        bool bottom_check = line0.p0.y <= line1.p1.y;
+        bool is_intersecting = left_check && right_check && top_check && bottom_check;
+
+        if (is_intersecting && intersection) {
+            *intersection = (CKG_Line2D){
+                (CKG_Point2D){line1.p0.x, y0},
+                (CKG_Point2D){line1.p1.x, y1}
+            };
+        }
+
+        return is_intersecting;
     }
 #endif
 
@@ -1523,7 +1598,7 @@
             return (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES);
         }
 
-        u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
+        u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err); {
             ckg_assert(ckg_io_path_exists(file_name));
 
             HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
@@ -1568,18 +1643,18 @@
             FILE *fptr = fopen(path, "r");
 
             if (fptr == NULL) {
-                return FALSE;
+                return false;
             }
 
             fclose(fptr);
 
-            return TRUE;
+            return true;
         }
 
-        u8* ckg_io_read_entire_file(char* file_name, u32* returned_file_size, CKG_Error* err) {
-            ckg_assert_msg(ckit_os_path_exists(path), "Path doesn't exist\n");
+        u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
+            ckg_assert_msg(ckg_io_path_exists(file_name), "Path doesn't exist\n");
 
-            FILE* file_handle = fopen(path, "rb");
+            FILE* file_handle = fopen(file_name, "rb");
             if (file_handle == NULLPTR) {
                 if (err) {
                     *err = CKG_ERROR_IO_FILE_NOT_FOUND;
@@ -1592,12 +1667,12 @@
             size_t file_size = ftell(file_handle);
             rewind(file_handle);
 
-            u8* file_data = ckit_alloc(file_size + 1); // +1 for null terminator
+            u8* file_data = ckg_alloc(file_size + 1); // +1 for null terminator
 
             if (fread(file_data, file_size, 1, file_handle) != 1) {
                 fclose(file_handle);
-                ckit_free(file_data);
-                ckit_assert_msg(FALSE, "Error reading file");
+                ckg_free(file_data);
+                ckg_assert_msg(false, "Error reading file");
                 return NULLPTR;
             }
 
