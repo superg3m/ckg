@@ -410,8 +410,7 @@
         CKG_Point2D p1;
     } CKG_Line2D;
 
-    bool ckg_line2D_intersection(CKG_Line2D *intersection, CKG_Line2D line0, CKG_Line2D line1);
-
+    bool ckg_line2D_intersection(CKG_Point2D *intersection, CKG_Line2D line0, CKG_Line2D line1);
 #endif
 
 #if defined(CKG_INCLUDE_COLLECTIONS)
@@ -1241,59 +1240,28 @@
 #endif
 
 #if defined(CKG_IMPL_MATH)
+    internal int determinate(CKG_Point2D A, CKG_Point2D B) {
+        return (A.x * B.y) - (A.y * B.x);
+    }
 
-    // THIS IS ENTIRELY WRONG!
-    bool ckg_line2D_intersection(CKG_Line2D *intersection, CKG_Line2D line0, CKG_Line2D line1) {
-        bool vertical = line0.p1.x - line0.p0.x == 0;
-        bool horizontal = line0.p1.y - line0.p0.y == 0;
+    bool ckg_line2D_intersection(CKG_Point2D *intersection, CKG_Line2D line0, CKG_Line2D line1) {
+        CKG_Point2D xdiff = {line0.p0.x - line0.p1.x, line1.p0.x - line1.p1.x};
+        CKG_Point2D ydiff = {line0.p0.y - line0.p1.y, line1.p0.y - line1.p1.y};
 
-        if (vertical) {
-            bool left_check = line0.p0.x >= line1.p0.x;
-            bool right_check = line0.p0.x <= line1.p1.x;
-
-            if (intersection) {
-                *intersection = (CKG_Line2D){
-                    (CKG_Point2D){line0.p0.x, line1.p0.y},
-                    (CKG_Point2D){line0.p0.x, line1.p1.y}
-                };
-            }
-
-            return left_check && right_check;
+        float div = determinate(xdiff, ydiff);
+        if (div == 0) {
+            return false;
         }
 
-        if (horizontal) {
-            bool top_check = line0.p0.y >= line1.p0.y;
-            bool bottom_check = line0.p0.y <= line1.p1.y;
+        CKG_Point2D d = {determinate(line0.p0, line0.p1), determinate(line1.p0, line1.p1)};
 
-            if (intersection) {
-                *intersection = (CKG_Line2D){
-                    (CKG_Point2D){line1.p0.x, line0.p0.y},
-                    (CKG_Point2D){line1.p1.x, line0.p0.y}
-                };
-            }
-
-            return top_check && bottom_check;
+        float x = determinate(d, xdiff) / div;
+        float y = determinate(d, ydiff) / div;
+        if (intersection) {
+            *intersection = (CKG_Point2D){x, y};
         }
 
-        float m  = (line0.p1.y - line0.p0.y) / (line0.p1.y - line0.p0.y);
-        float b  = -(m * line0.p0.x) + line0.p0.y;
-        float y0 = (m * line1.p0.x) + b;
-        float y1 = (m * line1.p1.x) + b;
-
-        bool left_check   = ((m * line1.p0.x) + b) >= line1.p0.x;
-        bool right_check  = ((m * line1.p1.x) + b) <= line1.p1.x;
-        bool bottom_check = y0 <= line1.p1.y;
-        bool top_check    = y1 >= line1.p0.y;
-        bool is_intersecting = left_check && right_check && top_check && bottom_check;
-
-        if (is_intersecting && intersection) {
-            *intersection = (CKG_Line2D){
-                (CKG_Point2D){line1.p0.x, y0},
-                (CKG_Point2D){line1.p1.x, y1}
-            };
-        }
-
-        return is_intersecting;
+        return true;
     }
 #endif
 
