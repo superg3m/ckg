@@ -1,7 +1,7 @@
 #include "../../ckg.h"
 
 void linked_list_operations() {
-	CKG_LinkedList* linked_list = ckg_linked_list_create(char*, TRUE);
+	CKG_LinkedList* linked_list = ckg_linked_list_create(char*, true);
 	CKG_Node* address = ckg_linked_list_insert(linked_list, 0, (void*)"hello");
 	ckg_linked_list_push(linked_list, (void*)"hello_sailor1!");
 	ckg_linked_list_push(linked_list, (void*)"hello_sailor2!");
@@ -19,7 +19,7 @@ void linked_list_operations() {
 	CKG_LOG_DEBUG("list value: %s\n", test_str);
 	ckg_linked_list_free(linked_list);
 
-	CKG_LinkedList* linked_list_int = ckg_linked_list_create(u32, FALSE);	
+	CKG_LinkedList* linked_list_int = ckg_linked_list_create(u32, false);	
 	u32 value1[5] = {
 		1,
 		2,

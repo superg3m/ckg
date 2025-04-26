@@ -67,6 +67,16 @@ int main() {
 	CKG_LOG_DEBUG("JUST MAKING SURE THIS IS GOOD!\n");
 
 	ckg_arena_free(&arena);
+	
+	CKG_Line2D line0 = {{1, 2}, {3, 6}};
+    CKG_Line2D line1 = {{1, 6}, {4, 2}};
+	CKG_Point2D intersection = {0};
+
+	if (ckg_line2D_intersection(&intersection, line0, line1)) {
+		char* msg = "Intersection Point: (%f, %f)\n";
+		CKG_LOG_DEBUG(msg, intersection.x,  intersection.y);
+	}
+
 
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 	return 0;

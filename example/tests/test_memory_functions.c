@@ -42,7 +42,7 @@ void test_ckg_memory_operations() {
 	int arr4[] = {1, 2, 3};
 	int arr5[] = {1, 2, 3};
 	int arr6[] = {4, 5, 6};
-	ckg_assert(ckg_memory_compare(arr4, arr5, 3 * sizeof(int), 3 * sizeof(int)) == TRUE);
+	ckg_assert(ckg_memory_compare(arr4, arr5, 3 * sizeof(int), 3 * sizeof(int)) == true);
 	ckg_assert(!ckg_memory_compare(arr4, arr6, 3 * sizeof(int), 3 * sizeof(int)));
 
 	u32 test_data[] = {1, 2, 3, 12, 22, 23, 41, 52, 73};
