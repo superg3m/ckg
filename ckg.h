@@ -539,17 +539,6 @@
     // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
 #endif
 
-#if defined(CKG_INCLUDE_THREADING)
-    typedef void (CKG_Job_T)(void*);
-    typedef struct CKG_JobEntry CKG_JobEntry;
-    typedef struct CKG_WorkQueue CKG_WorkQueue;
-
-    void ckg_work_queue_create(CKG_WorkQueue* queue, int job_capacity);
-    void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job, void* param);
-    void ckg_work_queue_wait_until_done(CKG_WorkQueue* queue);
-    int  ckg_worker_thread(void* param);
-#endif
-
 //
 // ===================================================== CKG_IMPL =====================================================
 //
@@ -1240,7 +1229,7 @@
 #endif
 
 #if defined(CKG_IMPL_MATH)
-    internal int determinate(CKG_Point2D A, CKG_Point2D B) {
+    internal float determinate(CKG_Point2D A, CKG_Point2D B) {
         return (A.x * B.y) - (A.y * B.x);
     }
 
@@ -1568,7 +1557,7 @@
             return (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES);
         }
 
-        u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err); {
+        u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
             ckg_assert(ckg_io_path_exists(file_name));
 
             HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
@@ -1658,78 +1647,4 @@
 
     // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
     // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
-#endif
-
-#if defined(CKG_IMPL_THREADING)
-    typedef struct CKG_JobEntry {
-        CKG_Job_T* job;
-        void* param;
-    } CKG_JobEntry;
-
-    #if defined(PLATFORM_WINDOWS)
-        typedef struct CKG_WorkQueue {
-            SRWLOCK lock;
-            CONDITION_VARIABLE work_ready;
-            CONDITION_VARIABLE work_done;
-            CKG_JobEntry* jobs; // Circular queue
-            int active_thread_count;
-        } CKG_WorkQueue;
-
-        void ckg_work_queue_create(CKG_WorkQueue* queue, int job_capacity) {
-            InitializeSRWLock(&queue->lock);
-            InitializeConditionVariable(&queue->work_ready);
-            InitializeConditionVariable(&queue->work_done);
-            queue->jobs = ckg_ring_buffer_create(job_capacity, sizeof(CKG_JobEntry));
-            queue->active_thread_count = 0;
-        }
-
-        void ckg_work_queue_add_job(CKG_WorkQueue* queue, CKG_Job_T* job, void* param) {
-            AcquireSRWLockExclusive(&queue->lock);
-            
-            CKG_JobEntry job_entry = (CKG_JobEntry){job, param};
-            ckg_ring_buffer_enqueue(queue->jobs, job_entry);
-            WakeConditionVariable(&queue->work_ready);
-        
-            ReleaseSRWLockExclusive(&queue->lock);
-        }
-
-        void ckg_work_queue_wait_until_done(CKG_WorkQueue* queue) {
-            AcquireSRWLockExclusive(&queue->lock);
-        
-            while (!ckg_ring_buffer_empty(queue->jobs) || queue->active_thread_count > 0) {
-                SleepConditionVariableSRW(&queue->work_done, &queue->lock, INFINITE, 0);
-            }
-        
-            ReleaseSRWLockExclusive(&queue->lock);
-        }
-
-        DWORD WINAPI ckg_worker_thread(void* param) {
-            CKG_WorkQueue* q = (CKG_WorkQueue*)param;
-        
-            while (true) {
-                AcquireSRWLockExclusive(&q->lock);
-                while (ckg_ring_buffer_empty(q->jobs)) {
-                    SleepConditionVariableSRW(&q->work_ready, &q->lock, INFINITE, 0);
-                }
-        
-                CKG_JobEntry entry = ckg_ring_buffer_dequeue(q->jobs);
-                ReleaseSRWLockExclusive(&q->lock);
-        
-                entry.job(entry.param);
-        
-                AcquireSRWLockExclusive(&q->lock);
-                if (ckg_ring_buffer_empty(q->jobs)) {
-                    WakeConditionVariable(&q->work_done);
-                }
-                ReleaseSRWLockExclusive(&q->lock);
-            }
-        
-            return 0;
-        }
-    #elif defined(PLATFORM_LINUX)
-    
-
-    #endif
-
-
 #endif
