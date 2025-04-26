@@ -46,18 +46,19 @@ if IS_WINDOWS():
     windows_libs = [GET_LIB_FLAG(cc, "User32"), GET_LIB_FLAG(cc, "Gdi32")]
     executable_procedure_libs += windows_libs
 
+build_postfix = f"build_{cc.compiler_name}/{C_BUILD_BUILD_TYPE()}"
 procedures: Dict[str, ProcedureConfig] = {
     "ckg_lib": ProcedureConfig(
-        build_directory = f"./build_{cc.compiler_name}",
+        build_directory = f"./{build_postfix}",
         output_name = GET_LIB_NAME(cc, 'ckg'),
-        source_files = ["../ckg.c"]
+        source_files = ["../../ckg.c"]
     ),
 
     "test_ckg": ProcedureConfig(
-        build_directory = f"./example/build_{cc.compiler_name}",
+        build_directory = f"./example/{build_postfix}",
         output_name = "test_ckg.exe",
-        source_files = ["../*.c"],
-        additional_libs = [f"../../build_{cc.compiler_name}/{GET_LIB_NAME(cc, 'ckg')}"]
+        source_files = ["../../*.c"],
+        additional_libs = [f"../../../{build_postfix}/{GET_LIB_NAME(cc, 'ckg')}"]
     ),
 }
 
