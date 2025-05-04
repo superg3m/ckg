@@ -15,7 +15,6 @@
     #define CKG_IMPL_ARENA
     #define CKG_IMPL_STRING
     #define CKG_IMPL_CHAR
-    #define CKG_IMPL_MATH
     #define CKG_IMPL_COLLECTIONS
     #define CKG_IMPL_IO
     #define CKG_IMPL_OS
@@ -29,7 +28,6 @@
 #define CKG_INCLUDE_ARENA
 #define CKG_INCLUDE_STRING
 #define CKG_INCLUDE_CHAR
-#define CKG_INCLUDE_MATH
 #define CKG_INCLUDE_COLLECTIONS
 #define CKG_INCLUDE_IO
 #define CKG_INCLUDE_OS
@@ -386,31 +384,6 @@
 
     CKG_API bool ckg_char_is_alpha(char c);
     CKG_API bool ckg_char_is_alpha_numeric(char c);
-#endif
-
-#if defined(CKG_INCLUDE_MATH)
-    #include <math.h>
-    // more here later
-    // round intrinsic
-    // trig fucntion intrinsics or approximations with taylor series
-
-    typedef struct CKG_Point2D {
-        union {
-            struct {
-                float x;
-                float y;
-            };
-            float data[2];
-        };
-    } CKG_Point2D;
-
-
-    typedef struct CKG_Line2D {
-        CKG_Point2D p0;
-        CKG_Point2D p1;
-    } CKG_Line2D;
-
-    bool ckg_line2D_intersection(CKG_Point2D *intersection, CKG_Line2D line0, CKG_Line2D line1);
 #endif
 
 #if defined(CKG_INCLUDE_COLLECTIONS)
@@ -1232,32 +1205,6 @@
 
     bool ckg_char_is_alpha_numeric(char c) {
         return ckg_char_is_alpha(c) || ckg_char_is_digit(c);
-    }
-#endif
-
-#if defined(CKG_IMPL_MATH)
-    internal float determinate(CKG_Point2D A, CKG_Point2D B) {
-        return (A.x * B.y) - (A.y * B.x);
-    }
-
-    bool ckg_line2D_intersection(CKG_Point2D *intersection, CKG_Line2D line0, CKG_Line2D line1) {
-        CKG_Point2D xdiff = {line0.p0.x - line0.p1.x, line1.p0.x - line1.p1.x};
-        CKG_Point2D ydiff = {line0.p0.y - line0.p1.y, line1.p0.y - line1.p1.y};
-
-        float div = determinate(xdiff, ydiff);
-        if (div == 0) {
-            return false;
-        }
-
-        CKG_Point2D d = {determinate(line0.p0, line0.p1), determinate(line1.p0, line1.p1)};
-
-        float x = determinate(d, xdiff) / div;
-        float y = determinate(d, ydiff) / div;
-        if (intersection) {
-            *intersection = (CKG_Point2D){x, y};
-        }
-
-        return true;
     }
 #endif
 
