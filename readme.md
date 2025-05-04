@@ -10,7 +10,7 @@
 
 #### NOTES 
 - I consider CKG almost
-- Thread Safe
+- Not thread safe (because of the allocator I should do something about this, maybe a preprocessor thing)
 
 # How to build using [c-build](https://github.com/superg3m/c-build)
 1. ./bootstrap.ps1
