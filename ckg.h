@@ -18,7 +18,7 @@
     #define CKG_IMPL_MATH
     #define CKG_IMPL_COLLECTIONS
     #define CKG_IMPL_IO
-    #define CKG_IMPL_THREADING
+    #define CKG_IMPL_OS
 #endif
 
 #define CKG_INCLUDE_TYPES
@@ -32,7 +32,7 @@
 #define CKG_INCLUDE_MATH
 #define CKG_INCLUDE_COLLECTIONS
 #define CKG_INCLUDE_IO
-#define CKG_INCLUDE_THREADING
+#define CKG_INCLUDE_OS
 
 // KEY NOTES:
 // - Whenever you see [OPTIONAL] that means you can use NULLPTR for that param
@@ -522,7 +522,6 @@
 #endif 
 
 #if defined(CKG_INCLUDE_IO)
-
     bool ckg_io_path_exists(const char* path);
     /**
      * @brief returns null terminated file data 
@@ -535,8 +534,16 @@
      */
     CKG_API u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err);
 
-    // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
-    // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
+
+#endif
+
+#if defined(CKG_INCLUDE_OS)
+
+    typedef struct CKG_DLL CKG_DLL;
+
+    CKG_DLL* ckg_io_load_dll(char* dll_name, CKG_Error* err);
+    void* ckg_os_get_proc_address(CKG_DLL* dll, char* proc_name, CKG_Error* err);
+    CKG_DLL* ckg_os_free_dll(CKG_DLL* dll);
 #endif
 
 //
