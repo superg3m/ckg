@@ -396,6 +396,7 @@
     typedef struct CKG_VectorHeader {
         size_t count;
         size_t capacity;
+        size_t element_size;
     } CKG_VectorHeader;
 
     CKG_API void* ckg_vector_grow(void* vector, size_t element_size);
@@ -1248,6 +1249,7 @@
             vector = ckg_realloc(ckg_vector_header_base(vector), old_allocation_size, new_allocation_size);
             vector = (u8*)vector + sizeof(CKG_VectorHeader);
 
+            ckg_vector_header_base(vector)->element_size = element_size;
             ckg_vector_header_base(vector)->count = count;
             ckg_vector_header_base(vector)->capacity = new_capactiy;
         }
@@ -1521,6 +1523,83 @@
     //
     // ========== END CKG_LinkedList ==========
     //
+#endif
+
+#if defined(CKG_IMPL_SERIALIZATION)
+    typedef enum CKG_CollectionType {
+        CKG_COLLECTION_VECTOR,
+        CKG_COLLECTION_STACK,
+        CKG_COLLECTION_RING_BUFFER,
+        CKG_COLLECTION_LINKED_LIST
+    } CKG_CollectionType;
+
+    typedef enum CKG_DataType {
+        CKG_ASCII,
+        CKG_BITS
+    } CKG_DataType;
+
+    CKG_API bool  ckg_serialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type) {
+        ckg_assert(file_handle);
+
+        switch (collection_type) {
+            case CKG_COLLECTION_VECTOR: {
+                size_t element_size = 0;
+                fwrite(&element_size, sizeof(size_t), 1, file_handle);
+                u8* vector = ckg_vector_grow(NULL, element_size);
+
+
+            } break;
+
+            case CKG_COLLECTION_RING_BUFFER: {
+
+            } break;
+
+            case CKG_COLLECTION_LINKED_LIST: {
+
+            } break;
+        }
+
+        return true;
+    }
+
+    CKG_API void* ckg_deserialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type) {
+        ckg_assert(file_handle);
+
+        switch (collection_type) {
+            case CKG_COLLECTION_STACK:
+            case CKG_COLLECTION_VECTOR: {
+                size_t element_size = 0;
+                fread(&element_size, sizeof(size_t), 1, file_handle);
+
+                size_t count = 0;
+                fread(&count, sizeof(size_t), 1, file_handle);
+                u8* vector = ckg_vector_grow(NULL, element_size);
+                ckg_vector_header_base(vector)->count = count;
+
+                return ckg_vector_grow(vector, element_size);
+            } break;
+
+            case CKG_COLLECTION_RING_BUFFER: {
+                /*
+                size_t element_size = 0;
+                fread(&element_size, sizeof(size_t), 1, file_handle);
+
+                size_t count = 0;
+                fread(&count, sizeof(size_t), 1, file_handle);
+                u8* ring_buffer = ckg_vector_grow(NULL, element_size);
+                ckg_ring_buffer_header_base(vector)->count = count;
+
+                return ckg_vector_grow(vector, element_size);
+                */
+            } break;
+
+            case CKG_COLLECTION_LINKED_LIST:{
+                // return linked_list;
+            } break;
+        }
+
+        return NULLPTR;
+    }
 #endif
 
 #if defined(CKG_IMPL_IO)
