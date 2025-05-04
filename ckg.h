@@ -436,6 +436,7 @@
         int write;
         int count;
         int capacity;
+        size_t element_size;
     } CKG_RingBufferHeader;
     
     void* ckg_ring_buffer_create(int capacity, size_t element_size);
@@ -507,11 +508,11 @@
     } CKG_CollectionType;
 
     typedef enum CKG_DataType {
-        CKG_ASCII,
-        CKG_BITS
+        CKG_DATA_TYPE_ASCII,
+        CKG_DATA_TYPE_BITS
     } CKG_DataType;
 
-    CKG_API bool  ckg_serialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
+    CKG_API bool  ckg_serialize_collection(void* collection, FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
     CKG_API void* ckg_deserialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
 #endif
 
@@ -925,7 +926,7 @@
         return ret;
     }
 
-    size_t ckg_cstr_length(const char* cstring) {
+    size_t ckg_cstr_length(char* cstring) {
         ckg_assert(cstring);
 
         if (!cstring) {
@@ -1277,11 +1278,11 @@
     // NOTE(Jovanni): Do we actually need this at all because we have a circular arena?
     void* ckg_ring_buffer_create(int capacity, size_t element_size) {
         size_t allocation_size = sizeof(CKG_RingBufferHeader) + (capacity * element_size);
-        void* buffer = ckg_alloc(allocation_size);
-        ckg_memory_zero(buffer, allocation_size);
-        buffer = (char*)buffer + sizeof(CKG_RingBufferHeader);
-        ckg_ring_buffer_capacity(buffer) = capacity;
-    
+        CKG_RingBufferHeader* header = ckg_alloc(allocation_size);
+        header->element_size = element_size;
+        header->capacity = capacity;
+
+        void* buffer = (u8*)header + sizeof(CKG_RingBufferHeader);
         return buffer;
     }
 
@@ -1527,30 +1528,22 @@
 #endif
 
 #if defined(CKG_IMPL_SERIALIZATION)
-    /*
-    typedef enum CKG_CollectionType {
-        CKG_COLLECTION_VECTOR,
-        CKG_COLLECTION_STACK,
-        CKG_COLLECTION_RING_BUFFER,
-        CKG_COLLECTION_LINKED_LIST
-    } CKG_CollectionType;
-
-    typedef enum CKG_DataType {
-        CKG_ASCII,
-        CKG_BITS
-    } CKG_DataType;
-    */
-
-    CKG_API bool  ckg_serialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type) {
+   void ckg_serialize_collection(void* collection, FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type) {
         ckg_assert(file_handle);
 
         switch (collection_type) {
             case CKG_COLLECTION_VECTOR: {
-                size_t element_size = 0;
-                fwrite(&element_size, sizeof(size_t), 1, file_handle);
-                u8* vector = ckg_vector_grow(NULL, element_size);
-
-
+                CKG_VectorHeader* header = ckg_vector_header_base(collection);
+                fwrite(header, sizeof(CKG_VectorHeader), 1, file_handle);
+                if (data_type == CKG_DATA_TYPE_BITS) {
+                    fwrite(collection, (header->element_size * header->count), 1, file_handle);
+                } else if (data_type == CKG_DATA_TYPE_ASCII) {
+                    char** string_vector = (char**)collection;
+                    for (int i = 0; i < header->count; i++) {
+                        char* current_string = string_vector[i];
+                        fwrite(current_string, ckg_cstr_length(current_string), 1, file_handle);
+                    }
+                }
             } break;
 
             case CKG_COLLECTION_RING_BUFFER: {
@@ -1561,11 +1554,9 @@
 
             } break;
         }
-
-        return true;
     }
 
-    CKG_API void* ckg_deserialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type) {
+    void* ckg_deserialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type) {
         ckg_assert(file_handle);
 
         switch (collection_type) {
