@@ -1,4 +1,4 @@
-# builds using c-build with cl/gcc/g++ and on ubuntu(wsl)
+# builds using c_build with cl/gcc/g++ and on ubuntu(wsl)
 # Tested on clang before but not tested on clang++
 
 # CKG's Core Thesis
@@ -9,8 +9,8 @@
 - (CONSTRAINT) ckg can't allocate in string functions or any other functions on its own because if it did the ckit memory tracker would not work
 
 #### NOTES 
-I consider CKG almost done I would like to revist the FileIO section but other than that this is a solid granular library
-I have some tests but, i'm not confident in the validitiy of the string section.
+- I consider CKG almost
+- Thread Safe
 
 # How to build using [c-build](https://github.com/superg3m/c-build)
 1. ./bootstrap.ps1
@@ -19,7 +19,7 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 4. ./run.ps1
 
 # Goals
-- [ ] I need to make a public facing API header file
+- [ ] Collections like ckg_vector that make trivially serializing pretty much impossible because of the pointer data so I think I should make a special serialization section in case you need to seralize and unseralize any of my collections
 
 ### key
 - '[x]': Finished
@@ -109,5 +109,4 @@ I have some tests but, i'm not confident in the validitiy of the string section.
 	- Write a bunch more tests!
 	- ckg_printf()
 	- thead_local (Experiement with this more)
-	- CKG_INCLUDE_THREADING
 

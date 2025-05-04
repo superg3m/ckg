@@ -16,6 +16,8 @@
     #define CKG_IMPL_STRING
     #define CKG_IMPL_CHAR
     #define CKG_IMPL_COLLECTIONS
+    #define CKG_IMPL_SERIALIZATION
+
     #define CKG_IMPL_IO
     #define CKG_IMPL_OS
 #endif
@@ -29,6 +31,7 @@
 #define CKG_INCLUDE_STRING
 #define CKG_INCLUDE_CHAR
 #define CKG_INCLUDE_COLLECTIONS
+#define CKG_INCLUDE_SERIALIZATION
 #define CKG_INCLUDE_IO
 #define CKG_INCLUDE_OS
 
@@ -494,6 +497,22 @@
     //
 #endif 
 
+#if defined(CKG_INCLUDE_SERIALIZATION)
+    typedef enum CKG_CollectionType {
+        CKG_COLLECTION_VECTOR,
+        CKG_COLLECTION_RING_BUFFER,
+        CKG_COLLECTION_LINKED_LIST,
+    } CKG_CollectionType;
+
+    typedef enum CKG_DataType {
+        CKG_ASCII,
+        CKG_BITS
+    } CKG_DataType;
+
+    CKG_API bool  ckg_serialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
+    CKG_API void* ckg_deserialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
+#endif
+
 #if defined(CKG_INCLUDE_IO)
     bool ckg_io_path_exists(const char* path);
     /**
@@ -506,8 +525,6 @@
      * @return u8* 
      */
     CKG_API u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err);
-
-
 #endif
 
 #if defined(CKG_INCLUDE_OS)
@@ -1207,6 +1224,7 @@
         return ckg_char_is_alpha(c) || ckg_char_is_digit(c);
     }
 #endif
+
 
 #if defined(CKG_IMPL_COLLECTIONS)
     //
