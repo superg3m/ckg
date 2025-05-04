@@ -501,8 +501,9 @@
 #if defined(CKG_INCLUDE_SERIALIZATION)
     typedef enum CKG_CollectionType {
         CKG_COLLECTION_VECTOR,
+        CKG_COLLECTION_STACK,
         CKG_COLLECTION_RING_BUFFER,
-        CKG_COLLECTION_LINKED_LIST,
+        CKG_COLLECTION_LINKED_LIST
     } CKG_CollectionType;
 
     typedef enum CKG_DataType {
@@ -1526,6 +1527,7 @@
 #endif
 
 #if defined(CKG_IMPL_SERIALIZATION)
+    /*
     typedef enum CKG_CollectionType {
         CKG_COLLECTION_VECTOR,
         CKG_COLLECTION_STACK,
@@ -1537,6 +1539,7 @@
         CKG_ASCII,
         CKG_BITS
     } CKG_DataType;
+    */
 
     CKG_API bool  ckg_serialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type) {
         ckg_assert(file_handle);
