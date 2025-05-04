@@ -339,7 +339,7 @@
 	 * @return char* 
 	 */
 	CKG_API char* ckg_cstr_alloc(char* s1, size_t length);
-    CKG_API size_t ckg_cstr_length(const char* c_string);
+    CKG_API size_t ckg_cstr_length(char* c_string);
     CKG_API void ckg_cstr_clear(char* s1, size_t length);
     CKG_API void ckg_cstr_copy(char* dest, size_t dest_capacity, const char* source, size_t source_length);
 	CKG_API void ckg_cstr_append(char* str, size_t str_length, size_t str_capacity, const char* to_append, size_t to_append_length);
@@ -512,7 +512,7 @@
         CKG_DATA_TYPE_BITS
     } CKG_DataType;
 
-    CKG_API bool  ckg_serialize_collection(void* collection, FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
+    CKG_API void  ckg_serialize_collection(void* collection, FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
     CKG_API void* ckg_deserialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
 #endif
 

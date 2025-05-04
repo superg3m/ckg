@@ -62,6 +62,10 @@ int main() {
 		CKG_StringView line = split_strings[i];
 		CKG_LOG_SUCCESS("str #%d | %.*s\n", i, line.length, line.data);
 	}
+
+	FILE* file_handle = fopen("../../serialized_data.txt", "wr");
+
+	ckg_serialize_collection(split_strings, file_handle, CKG_COLLECTION_VECTOR, CKG_DATA_TYPE_ASCII);
 	ckg_vector_free(split_strings);
 
 	CKG_LOG_DEBUG("JUST MAKING SURE THIS IS GOOD!\n");
