@@ -212,8 +212,8 @@
     #define CKG_ERROR_IO_MASK (0 << 28)
     #define CKG_ERROR_ARGS_MASK (1 << 28)
     typedef enum CKG_Error {
-        CKG_ERROR_IO_FILE_NOT_FOUND = (CKG_ERROR_IO_MASK | 0),
-        CKG_ERROR_IO_FILE_TOO_BIG,
+        CKG_ERROR_IO_RESOURCE_NOT_FOUND = (CKG_ERROR_IO_MASK | 0),
+        CKG_ERROR_IO_RESOURCE_TOO_BIG,
         CKG_ERROR_IO_COUNT = 2,
 
         CKG_ERROR_ARG_ONE_INVALID = (CKG_ERROR_ARGS_MASK | 0),
@@ -532,6 +532,9 @@
 #if defined(CKG_INCLUDE_OS)
     typedef void* CKG_DLL;
 
+    // Date: May 05, 2025
+    // TODO(Jovanni): ACTUALLY TEST THIS BECUASE NOT SURE IF VOID* will work with HMOUDLE
+
     /**
      * @brief
      * 
@@ -694,8 +697,8 @@
 
 #if defined(CKG_IMPL_ERRORS)
     internal char* CKG_ERROR_IO_STRINGS[CKG_ERROR_IO_COUNT] = {
-        stringify(CKG_ERROR_IO_FILE_NOT_FOUND),
-        stringify(CKG_ERROR_IO_FILE_TOO_BIG)
+        stringify(CKG_ERROR_IO_RESOURCE_NOT_FOUND),
+        stringify(CKG_ERROR_IO_RESOURCE_TOO_BIG)
     };
 
     internal char* CKG_ERROR_ARGS_STRINGS[CKG_ERROR_ARGS_COUNT] = {
@@ -1658,7 +1661,7 @@
             ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
             HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
             if (file_handle == INVALID_HANDLE_VALUE) {
-                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND);
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
 
                 return NULLPTR; // Failed to open file
             }
@@ -1670,7 +1673,7 @@
             size_t file_size = large_int.QuadPart + 1;
             if (file_size > SIZE_MAX) {
                 CloseHandle(file_handle);
-                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_TOO_BIG);
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_TOO_BIG);
 
                 return NULLPTR; // File too large to handle
             }
@@ -1708,7 +1711,7 @@
 
             FILE* file_handle = fopen(file_name, "rb");
             if (file_handle == NULLPTR) {
-                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND)
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND)
 
                 return NULLPTR;
             }
@@ -1744,7 +1747,7 @@
 
             HMODULE library = LoadLibraryA(dll_name);
             if (!library) {
-                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND);
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
 
@@ -1757,7 +1760,7 @@
 
             void* proc = GetProcAddress(dll, proc_name);
             if (!proc) {
-                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND);
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
 
@@ -1766,20 +1769,34 @@
 
         CKG_DLL MACRO_ckg_os_free_dll(CKG_DLL dll) {
             FreeLibrary(dll);
-
             return NULLPTR;
         }
     #else
-        CKG_DLL* ckg_io_load_dll(char* dll_name, CKG_Error* err) {
+        CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
+            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
 
+            void* library = dlopen(dll_name, RTLD_LAZY);
+            if (!library) {
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
+                return NULLPTR;
+            }
+
+            return library;
         }
 
-        void* ckg_os_get_proc_address(CKG_DLL* dll, char* proc_name, CKG_Error* err) {
+        void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err) {
+            void* proc = dlsym(dll, proc_name);
+            if (!proc) {
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
+                return NULLPTR;
+            }
 
+            return proc;
         }
 
-        CKG_DLL* MACRO_ckg_os_free_dll(CKG_DLL* dll) {
-
+        CKG_DLL MACRO_ckg_os_free_dll(CKG_DLL dll) {
+            dlclose(dll);
+            return NULLPTR;
         }
     #endif
 #endif
