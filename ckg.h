@@ -17,7 +17,6 @@
     #define CKG_IMPL_CHAR
     #define CKG_IMPL_COLLECTIONS
     #define CKG_IMPL_SERIALIZATION
-
     #define CKG_IMPL_IO
     #define CKG_IMPL_OS
 #endif
@@ -524,19 +523,43 @@
      * @param file_name 
      * @param file_name_length
      * @param file_size [OPTIONAL]
-     * @param err
+     * @param err [OPTIONAL]
      * @return u8* 
      */
     CKG_API u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err);
 #endif
 
 #if defined(CKG_INCLUDE_OS)
-
     typedef struct CKG_DLL CKG_DLL;
 
-    CKG_DLL* ckg_io_load_dll(char* dll_name, CKG_Error* err);
-    void* ckg_os_get_proc_address(CKG_DLL* dll, char* proc_name, CKG_Error* err);
-    CKG_DLL* ckg_os_free_dll(CKG_DLL* dll);
+    /**
+     * @brief
+     * 
+     * @param dll_name 
+     * @param err [OPTIONAL]
+     * @return CKG_DLL* 
+     */
+    CKG_API CKG_DLL* ckg_io_load_dll(char* dll_name, CKG_Error* err);
+
+    /**
+     * @brief 
+     * 
+     * @param dll 
+     * @param proc_name 
+     * @param err [OPTIONAL]
+     * @return void* 
+     */
+    CKG_API void* ckg_os_get_proc_address(CKG_DLL* dll, char* proc_name, CKG_Error* err);
+
+    /**
+     * @brief 
+     * 
+     * @param dll 
+     * @return CKG_DLL* 
+     */
+    CKG_API CKG_DLL* MACRO_ckg_os_free_dll(CKG_DLL* dll);
+
+    #define ckg_os_free_dll(dll) dll = MACRO_ckg_os_free_dll(dll)
 #endif
 
 //
@@ -671,7 +694,8 @@
 
 #if defined(CKG_IMPL_ERRORS)
     internal char* CKG_ERROR_IO_STRINGS[CKG_ERROR_IO_COUNT] = {
-        stringify(CKG_ERROR_IO_FILE_NOT_FOUND)
+        stringify(CKG_ERROR_IO_FILE_NOT_FOUND),
+        stringify(CKG_ERROR_IO_FILE_TOO_BIG)
     };
 
     internal char* CKG_ERROR_ARGS_STRINGS[CKG_ERROR_ARGS_COUNT] = {
@@ -700,6 +724,12 @@
         }
 
         return NULLPTR; // SHOULD NEVER GET HERE!
+    }
+
+    internal void ckg_error_safe_set(CKG_Error* error, CKG_Error error_code) {
+        if (error) {
+            *error = error_code;
+        }
     }
 #endif 
 
@@ -1572,13 +1602,13 @@
 
 
                 if (data_type == CKG_DATA_TYPE_BITS) {
-                    u8* vector = ckg_vector_grow(NULL, header.element_size, header.capacity);
+                    u8* vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
                     
                     fread(vector, header.element_size, header.count, file_handle);
 
                     return vector;
                 } else if (data_type == CKG_DATA_TYPE_ASCII) {
-                    char** string_vector = ckg_vector_grow(NULL, header.element_size, header.capacity);
+                    char** string_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
 
                     for (int i = 0; i < header.count; i++) {
                         size_t char_count = 0;
@@ -1600,7 +1630,7 @@
 
                 size_t count = 0;
                 fread(&count, sizeof(size_t), 1, file_handle);
-                u8* ring_buffer = ckg_vector_grow(NULL, element_size);
+                u8* ring_buffer = ckg_vector_grow(NULLPTR, element_size);
                 ckg_ring_buffer_header_base(vector)->count = count;
 
                 return ckg_vector_grow(vector, element_size);
@@ -1625,11 +1655,10 @@
         u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
             ckg_assert(ckg_io_path_exists(file_name));
 
+            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
             HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
             if (file_handle == INVALID_HANDLE_VALUE) {
-                if (err) {
-                    *err = CKG_ERROR_IO_FILE_NOT_FOUND;
-                }
+                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND);
 
                 return NULLPTR; // Failed to open file
             }
@@ -1641,9 +1670,7 @@
             size_t file_size = large_int.QuadPart + 1;
             if (file_size > SIZE_MAX) {
                 CloseHandle(file_handle);
-                if (err) {
-                    *err = CKG_ERROR_IO_FILE_TOO_BIG;
-                }
+                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_TOO_BIG);
 
                 return NULLPTR; // File too large to handle
             }
@@ -1666,7 +1693,7 @@
         bool ckg_io_path_exists(const char* path) {
             FILE *fptr = fopen(path, "r");
 
-            if (fptr == NULL) {
+            if (fptr == NULLPTR) {
                 return false;
             }
 
@@ -1677,12 +1704,11 @@
 
         u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
             ckg_assert_msg(ckg_io_path_exists(file_name), "Path doesn't exist\n");
+            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
 
             FILE* file_handle = fopen(file_name, "rb");
             if (file_handle == NULLPTR) {
-                if (err) {
-                    *err = CKG_ERROR_IO_FILE_NOT_FOUND;
-                }
+                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND)
 
                 return NULLPTR;
             }
@@ -1709,7 +1735,63 @@
             return file_data;
         }
     #endif
+#endif
 
-    // void* ckg_io_load_dll(char* dll_name, CKG_Error* err);
-    // void* ckg_io_free_dll(char* dll_name, CKG_Error* err);
+#if defined(CKG_IMPL_OS)
+    #if defined(PLATFORM_WINDOWS)
+        typedef struct CKG_DLL {
+            HMODULE library;
+        } CKG_DLL;
+
+        CKG_DLL* ckg_io_load_dll(char* dll_name, CKG_Error* err) {
+            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
+
+            HMODULE library = LoadLibraryA(dll_name);
+            if (!library) {
+                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND);
+                return NULLPTR;
+            }
+
+            CKG_DLL* dll = ckg_alloc(sizeof(CKG_DLL));
+            dll->library = library;
+
+            return dll;
+        }
+
+        void* ckg_os_get_proc_address(CKG_DLL* dll, char* proc_name, CKG_Error* err) {
+            ckg_assert(dll);
+            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
+
+            void* proc = GetProcAddress(dll->library, proc_name);
+            if (!proc) {
+                ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND);
+                return NULLPTR;
+            }
+
+            return proc;
+        }
+
+        CKG_DLL* MACRO_ckg_os_free_dll(CKG_DLL* dll) {
+            ckg_assert(dll);
+
+            FreeLibrary(dll->library);
+            ckg_free(dll);
+
+            return NULLPTR;
+        }
+    #else
+        CKG_DLL* ckg_io_load_dll(char* dll_name, CKG_Error* err) {
+
+        }
+
+        void* ckg_os_get_proc_address(CKG_DLL* dll, char* proc_name, CKG_Error* err) {
+
+        }
+
+        CKG_DLL* MACRO_ckg_os_free_dll(CKG_DLL* dll) {
+
+        }
+    #endif
+
+
 #endif
