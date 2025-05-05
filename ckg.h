@@ -530,7 +530,7 @@
 #endif
 
 #if defined(CKG_INCLUDE_OS)
-    typedef struct CKG_DLL CKG_DLL;
+    typedef void* CKG_DLL;
 
     /**
      * @brief
@@ -539,7 +539,7 @@
      * @param err [OPTIONAL]
      * @return CKG_DLL* 
      */
-    CKG_API CKG_DLL* ckg_io_load_dll(char* dll_name, CKG_Error* err);
+    CKG_API CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err);
 
     /**
      * @brief 
@@ -549,7 +549,7 @@
      * @param err [OPTIONAL]
      * @return void* 
      */
-    CKG_API void* ckg_os_get_proc_address(CKG_DLL* dll, char* proc_name, CKG_Error* err);
+    CKG_API void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err);
 
     /**
      * @brief 
@@ -557,7 +557,7 @@
      * @param dll 
      * @return CKG_DLL* 
      */
-    CKG_API CKG_DLL* MACRO_ckg_os_free_dll(CKG_DLL* dll);
+    CKG_API CKG_DLL MACRO_ckg_os_free_dll(CKG_DLL dll);
 
     #define ckg_os_free_dll(dll) dll = MACRO_ckg_os_free_dll(dll)
 #endif
@@ -1739,11 +1739,7 @@
 
 #if defined(CKG_IMPL_OS)
     #if defined(PLATFORM_WINDOWS)
-        typedef struct CKG_DLL {
-            HMODULE library;
-        } CKG_DLL;
-
-        CKG_DLL* ckg_io_load_dll(char* dll_name, CKG_Error* err) {
+        CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
             ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
 
             HMODULE library = LoadLibraryA(dll_name);
@@ -1752,17 +1748,14 @@
                 return NULLPTR;
             }
 
-            CKG_DLL* dll = ckg_alloc(sizeof(CKG_DLL));
-            dll->library = library;
-
-            return dll;
+            return library;
         }
 
-        void* ckg_os_get_proc_address(CKG_DLL* dll, char* proc_name, CKG_Error* err) {
+        void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err) {
             ckg_assert(dll);
             ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
 
-            void* proc = GetProcAddress(dll->library, proc_name);
+            void* proc = GetProcAddress(dll, proc_name);
             if (!proc) {
                 ckg_error_safe_set(err, CKG_ERROR_IO_FILE_NOT_FOUND);
                 return NULLPTR;
@@ -1771,11 +1764,8 @@
             return proc;
         }
 
-        CKG_DLL* MACRO_ckg_os_free_dll(CKG_DLL* dll) {
-            ckg_assert(dll);
-
-            FreeLibrary(dll->library);
-            ckg_free(dll);
+        CKG_DLL MACRO_ckg_os_free_dll(CKG_DLL dll) {
+            FreeLibrary(dll);
 
             return NULLPTR;
         }
@@ -1792,6 +1782,4 @@
 
         }
     #endif
-
-
 #endif
