@@ -399,7 +399,7 @@
         size_t element_size;
     } CKG_VectorHeader;
 
-    CKG_API void* ckg_vector_grow(void* vector, size_t element_size);
+    CKG_API void* ckg_vector_grow(void* vector, size_t element_size, size_t capacity);
     CKG_API void* MACRO_ckg_vector_free(void* vector);
 
     #define VECTOR_DEFAULT_CAPACITY 1
@@ -410,12 +410,12 @@
     #define ckg_stack_count(stack) (*ckg_vector_header_base(stack)).count
 
     #ifdef __cplusplus
-        #define ckg_vector_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
-        #define ckg_stack_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
+        #define ckg_vector_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element), 0); vector[ckg_vector_header_base(vector)->count++] = element
+        #define ckg_stack_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(element), 0); vector[ckg_vector_header_base(vector)->count++] = element
 
     #else 
-        #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element)); vector[ckg_vector_header_base(vector)->count++] = element
-        #define ckg_stack_push(stack, element) stack = ckg_vector_grow(stack, sizeof(element)); stack[ckg_vector_header_base(stack)->count++] = element
+        #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(element), 0); vector[ckg_vector_header_base(vector)->count++] = element
+        #define ckg_stack_push(stack, element) stack = ckg_vector_grow(stack, sizeof(element), 0); stack[ckg_vector_header_base(stack)->count++] = element
     #endif
     
     #define ckg_vector_free(vector) vector = MACRO_ckg_vector_free(vector)
@@ -913,6 +913,7 @@
 
     void ckg_arena_end_temp(CKG_Arena* arena) {
         ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
+        ckg_memory_zero(arena->base_address, arena->capacity);
 
         arena->used = arena->used_save_point;
         arena->used_save_point = 0;
@@ -922,7 +923,7 @@
 #if defined(CKG_IMPL_STRING)
     char* ckg_cstr_alloc(char* s1, size_t length) {
         char* ret = ckg_alloc(length + 1) ;
-        ckg_memory_copy(ret, s1, length + 1, length);
+        ckg_memory_copy(s1, ret, length, length);
         return ret;
     }
 
@@ -1233,11 +1234,13 @@
     //
     // ========== START CKG_VECTOR ==========
     //
-    void* ckg_vector_grow(void* vector, size_t element_size) {
+    void* ckg_vector_grow(void* vector, size_t element_size, size_t capacity) {
         if (vector == NULLPTR) {
-            vector = ckg_alloc(sizeof(CKG_VectorHeader) + (VECTOR_DEFAULT_CAPACITY * element_size));
+            size_t real_capacity = (capacity > 0 ? capacity : VECTOR_DEFAULT_CAPACITY);
+            vector = ckg_alloc(sizeof(CKG_VectorHeader) + (real_capacity * element_size));
             vector = (u8*)vector + sizeof(CKG_VectorHeader);
-            ckg_vector_capacity(vector) = VECTOR_DEFAULT_CAPACITY;
+            ckg_vector_header_base(vector)->capacity = real_capacity;
+            ckg_vector_header_base(vector)->element_size = element_size;
         }
 
         size_t count = ckg_vector_count(vector);
@@ -1541,7 +1544,9 @@
                     char** string_vector = (char**)collection;
                     for (int i = 0; i < header->count; i++) {
                         char* current_string = string_vector[i];
-                        fwrite(current_string, ckg_cstr_length(current_string), 1, file_handle);
+                        size_t count = ckg_cstr_length(current_string);
+                        fwrite(&count, sizeof(size_t), 1, file_handle);
+                        fwrite(current_string, count, 1, file_handle);
                     }
                 }
             } break;
@@ -1564,12 +1569,28 @@
             case CKG_COLLECTION_VECTOR: {
                 CKG_VectorHeader header;
                 fread(&header, sizeof(CKG_VectorHeader), 1, file_handle);
-                u8* vector = ckg_vector_grow(NULL, header.element_size);
-                *ckg_vector_header_base(vector) = header;
-                vector = ckg_vector_grow(vector, header.element_size);
-                fread(vector, header.element_size, header.count, file_handle);
 
-                return vector;
+
+                if (data_type == CKG_DATA_TYPE_BITS) {
+                    u8* vector = ckg_vector_grow(NULL, header.element_size, header.capacity);
+                    
+                    fread(vector, header.element_size, header.count, file_handle);
+
+                    return vector;
+                } else if (data_type == CKG_DATA_TYPE_ASCII) {
+                    char** string_vector = ckg_vector_grow(NULL, header.element_size, header.capacity);
+
+                    for (int i = 0; i < header.count; i++) {
+                        size_t char_count = 0;
+                        fread(&char_count, sizeof(size_t), 1, file_handle);
+                        char* current_string = ckg_alloc(char_count + 1); // prob want a way to specify if you should allocate or not
+                        fread(current_string, char_count, 1, file_handle);
+
+                        ckg_vector_push(string_vector, current_string);
+                    }
+
+                    return string_vector;
+                }
             } break;
 
             case CKG_COLLECTION_RING_BUFFER: {

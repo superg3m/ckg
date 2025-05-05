@@ -3,3 +3,4 @@
 #include "./test_vector_functions.c"
 #include "./test_string_functions.c"
 #include "./test_linked_list.c"
+#include "./test_serialization.c"
