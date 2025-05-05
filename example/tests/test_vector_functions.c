@@ -15,6 +15,10 @@ void test_ckg_vector_operations() {
 
 	CKG_LOG_SUCCESS("All vector tests passed!\n"); 
 
+	FILE* file_handle = fopen("../../serialized_data.txt", "rb");
+	int* new_vector = ckg_deserialize_collection(file_handle, CKG_COLLECTION_VECTOR, CKG_DATA_TYPE_BITS);
+	fclose(file_handle);
+
 	ckg_vector_free(int_vector);
 	return;
 }

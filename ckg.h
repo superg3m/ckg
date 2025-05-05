@@ -1562,15 +1562,14 @@
         switch (collection_type) {
             case CKG_COLLECTION_STACK:
             case CKG_COLLECTION_VECTOR: {
-                size_t element_size = 0;
-                fread(&element_size, sizeof(size_t), 1, file_handle);
+                CKG_VectorHeader header;
+                fread(&header, sizeof(CKG_VectorHeader), 1, file_handle);
+                u8* vector = ckg_vector_grow(NULL, header.element_size);
+                *ckg_vector_header_base(vector) = header;
+                vector = ckg_vector_grow(vector, header.element_size);
+                fread(vector, header.element_size, header.count, file_handle);
 
-                size_t count = 0;
-                fread(&count, sizeof(size_t), 1, file_handle);
-                u8* vector = ckg_vector_grow(NULL, element_size);
-                ckg_vector_header_base(vector)->count = count;
-
-                return ckg_vector_grow(vector, element_size);
+                return vector;
             } break;
 
             case CKG_COLLECTION_RING_BUFFER: {
