@@ -913,7 +913,7 @@
 
     void ckg_arena_end_temp(CKG_Arena* arena) {
         ckg_assert_msg(arena_is_valid(arena->flag), "Arena is invalid!\n");
-        ckg_memory_zero(arena->base_address, arena->capacity);
+        ckg_memory_zero(arena->base_address + arena->used_save_point, arena->capacity - arena->used_save_point);
 
         arena->used = arena->used_save_point;
         arena->used_save_point = 0;

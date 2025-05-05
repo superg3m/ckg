@@ -13,7 +13,7 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 	return;
 }
 
-#define TOTAL_MEMORY_SIZE KiloBytes(64)
+#define TOTAL_MEMORY_SIZE KiloBytes(32)
 
 int main() {
 	u8 program_stack_memory[TOTAL_MEMORY_SIZE] = {0};
@@ -25,9 +25,8 @@ int main() {
 		test_ckg_arena_operations();
 		test_ckg_str_operations();
 		test_ckg_vector_operations();
+		test_serialization();
 	});
-
-	test_serialization();
 
 	test_ckg_stack_operations();
 	linked_list_operations();
