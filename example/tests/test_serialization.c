@@ -5,9 +5,9 @@ void test_serialization() {
 
     char** original_vec = NULL;
 
-    ckg_vector_push(original_vec, ckg_cstr_alloc(CKG_LIT_ARG("hello")));
-    ckg_vector_push(original_vec, ckg_cstr_alloc(CKG_LIT_ARG("world")));
-    ckg_vector_push(original_vec, ckg_cstr_alloc(CKG_LIT_ARG("!")));
+    ckg_vector_push(original_vec, "hello");
+    ckg_vector_push(original_vec, "world");
+    ckg_vector_push(original_vec, "!");
 
     FILE* out = fopen(filename, "wb");
     ckg_assert(out);
