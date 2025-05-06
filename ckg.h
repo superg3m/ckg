@@ -338,23 +338,23 @@
 	 * @param s1 
 	 * @return char* 
 	 */
-	CKG_API char* ckg_cstr_alloc(char* s1, size_t length);
+	CKG_API char*  ckg_str_alloc(char* s1, size_t length);
     CKG_API size_t ckg_cstr_length(char* c_string);
-    CKG_API void ckg_cstr_clear(char* s1, size_t length);
-    CKG_API void ckg_cstr_copy(char* dest, size_t dest_capacity, const char* source, size_t source_length);
-	CKG_API void ckg_cstr_append(char* str, size_t str_length, size_t str_capacity, const char* to_append, size_t to_append_length);
-	CKG_API void ckg_cstr_append_char(char* str, size_t str_length, size_t str_capacity, const char to_append);
-	CKG_API void ckg_cstr_insert(char* str, size_t str_length, size_t str_capacity, const char* to_insert, size_t to_insert_length, const size_t index);
-	CKG_API void ckg_cstr_insert_char(char* str, size_t str_length, size_t str_capacity, const char to_insert, const size_t index);
-    CKG_API void ckg_cstr_reverse(const char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
-    CKG_API char* ckg_cstr_va_sprint(size_t* allocation_size_ptr, char* fmt, va_list args);
-    CKG_API char* MACRO_ckg_cstr_sprint(size_t* allocation_size_ptr, char* fmt, ...);
+    CKG_API void   ckg_str_clear(char* s1, size_t length);
+    CKG_API void   ckg_str_copy(char* dest, size_t dest_capacity, const char* source, size_t source_length);
+	CKG_API void   ckg_str_append(char* str, size_t str_length, size_t str_capacity, const char* to_append, size_t to_append_length);
+	CKG_API void   ckg_str_append_char(char* str, size_t str_length, size_t str_capacity, const char to_append);
+	CKG_API void   ckg_str_insert(char* str, size_t str_length, size_t str_capacity, const char* to_insert, size_t to_insert_length, const size_t index);
+	CKG_API void   ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, const char to_insert, const size_t index);
+    CKG_API void   ckg_str_reverse(const char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
+    CKG_API char*  ckg_str_va_sprint(size_t* allocation_size_ptr, char* fmt, va_list args);
+    CKG_API char*  MACRO_ckg_cstr_sprint(size_t* allocation_size_ptr, char* fmt, ...);
     #define ckg_cstr_sprint(allocation_size_ptr, fmt, ...) MACRO_ckg_cstr_sprint(allocation_size_ptr, fmt, ##__VA_ARGS__)
 
     CKG_API bool ckg_str_equal(const char* s1, size_t s1_length, const char* s2, size_t s2_length);
     CKG_API bool ckg_str_contains(const char* s1, size_t s1_length, const char* contains, size_t contains_length);
-	CKG_API s64 ckg_str_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length);
-	CKG_API s64 ckg_str_last_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length);
+	CKG_API s64  ckg_str_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length);
+	CKG_API s64  ckg_str_last_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length);
 	CKG_API bool ckg_str_starts_with(const char* str, size_t str_length, const char* starts_with, size_t starts_with_length);
 	CKG_API bool ckg_str_ends_with(const char* str, size_t str_length, const char* ends_with, size_t ends_with_length);
 
@@ -364,8 +364,8 @@
         size_t length;
     } CKG_StringView;
     
-    CKG_StringView ckg_sv_create(const char* data, size_t length);
-    CKG_StringView ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
+    CKG_StringView  ckg_sv_create(const char* data, size_t length);
+    CKG_StringView  ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
     CKG_StringView* ckg_sv_split(const char* data, size_t length, char* delimitor, size_t delimitor_length);
     
     #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
@@ -1080,12 +1080,12 @@
         return ckg_memory_compare(s1, s2, s1_length, s2_length);
     }
 
-    void ckg_cstr_copy(char* s1, size_t s1_capacity, const char* s2, size_t s2_length) {
+    void ckg_str_copy(char* s1, size_t s1_capacity, const char* s2, size_t s2_length) {
         ckg_memory_zero((void*)s1, s1_capacity);
         ckg_memory_copy(s2, s1, s2_length, s1_capacity);
     }
 
-    void ckg_cstr_insert(char* str, size_t str_length, size_t str_capacity, const char* to_insert, size_t to_insert_length, const size_t index) {
+    void ckg_str_insert(char* str, size_t str_length, size_t str_capacity, const char* to_insert, size_t to_insert_length, const size_t index) {
         ckg_assert(str);
         ckg_assert(to_insert);
 
@@ -1102,7 +1102,7 @@
         ckg_memory_copy(to_insert, copy_dest_ptr, to_insert_length, str_capacity);
     }
 
-    void ckg_cstr_insert_char(char* str, size_t str_length, size_t str_capacity, const char to_insert, const size_t index) {
+    void ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, const char to_insert, const size_t index) {
         ckg_assert(str);
         ckg_assert(to_insert);
         ckg_assert(index >= 0 && index <= str_length);
@@ -1116,20 +1116,20 @@
         str[index] = to_insert;
     }
 
-    void ckg_cstr_append(char* str, size_t str_length, size_t str_capacity, const char* to_append, size_t to_append_length) {
-        ckg_cstr_insert(str, str_length, str_capacity, to_append, to_append_length, str_length);
+    void ckg_str_append(char* str, size_t str_length, size_t str_capacity, const char* to_append, size_t to_append_length) {
+        ckg_str_insert(str, str_length, str_capacity, to_append, to_append_length, str_length);
     }
 
-    void ckg_cstr_append_char(char* str, size_t str_length, size_t str_capacity, const char to_append) {
-        ckg_cstr_insert_char(str, str_length, str_capacity, to_append, str_length);
+    void ckg_str_append_char(char* str, size_t str_length, size_t str_capacity, const char to_append) {
+        ckg_str_insert_char(str, str_length, str_capacity, to_append, str_length);
     }
 
-    void ckg_cstr_reverse(const char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity) {
+    void ckg_str_reverse(const char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity) {
         ckg_assert(str);
         ckg_assert(reversed_buffer_capacity > str_length);
 
         for (s64 i = str_length - 1; i >= 0; i--) {
-            ckg_cstr_append_char(returned_reversed_string_buffer, (str_length - 1) - i, reversed_buffer_capacity, str[i]);
+            ckg_str_append_char(returned_reversed_string_buffer, (str_length - 1) - i, reversed_buffer_capacity, str[i]);
         }
     }
 
@@ -1433,7 +1433,7 @@
         ckg_assert(index >= 0);
 
         size_t old_count = linked_list->count++;
-        if (linked_list->head == NULLPTR) { // there is not head and by definition no tail
+        if (linked_list->head == NULLPTR) { // there is not a head and by definition no tail
             CKG_Node* new_node_to_insert = ckg_node_create(linked_list, data);
             linked_list->head = new_node_to_insert;
             linked_list->tail = new_node_to_insert;
@@ -1743,7 +1743,7 @@
             if (file_handle == INVALID_HANDLE_VALUE) {
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
 
-                return NULLPTR; // Failed to open file
+                return NULLPTR;
             }
 
             LARGE_INTEGER large_int = {0};
@@ -1755,10 +1755,10 @@
                 CloseHandle(file_handle);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_TOO_BIG);
 
-                return NULLPTR; // File too large to handle
+                return NULLPTR;
             }
 
-            u8* file_data = (u8*)ckg_alloc(file_size); // +1 for null-terminator
+            u8* file_data = (u8*)ckg_alloc(file_size + 1); // +1 for null-terminator
 
             DWORD bytes_read = 0;
             success = ReadFile(file_handle, file_data, (DWORD)file_size, &bytes_read, NULLPTR);
