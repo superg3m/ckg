@@ -364,7 +364,7 @@
     } CKG_StringView;
     
     CKG_StringView ckg_sv_create(const char* data, size_t length);
-    CKG_StringView ckg_str_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
+    CKG_StringView ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
     CKG_StringView* ckg_sv_split(const char* data, size_t length, char* delimitor, size_t delimitor_length);
     
     #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
@@ -506,11 +506,33 @@
     } CKG_CollectionType;
 
     typedef enum CKG_DataType {
-        CKG_DATA_TYPE_ASCII,
+        CKG_DATA_TYPE_CSTRING,
+        CKG_DATA_TYPE_STRING_VIEW,
         CKG_DATA_TYPE_BITS
     } CKG_DataType;
 
     CKG_API void  ckg_serialize_collection(void* collection, FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
+    
+    /**
+     * @brief 
+     * REMARKS:  -----------------------------------------------------------------------------------------------------------------------
+     *  CKG_StringView - If you deserialize using CKG_DATA_TYPE_STRING_VIEW the ascii data is allocated inside .data of the stringview
+     *  for (int i = 0; i < ckg_vector_count(sv_vector); i++) {
+     *      CKG_StringView sv = sv_vector[i]
+     *      ckg_free(sv.data);
+     *  }
+     * 
+     *  CString - If you deserialize using CKG_DATA_TYPE_CSTRING the ascii data is allocated
+     *  for (int i = 0; i < ckg_vector_count(str_vector); i++) {
+     *      char* str = str_vector[i]
+     *      ckg_free(str);
+     *  }
+     * 
+     * @param file_handle 
+     * @param collection_type 
+     * @param data_type 
+     * @return CKG_API* 
+     */
     CKG_API void* ckg_deserialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
 #endif
 
@@ -990,7 +1012,7 @@
         return ret;
     }
 
-    CKG_StringView ckg_str_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length) {
+    CKG_StringView ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length) {
         ckg_assert(str);
         ckg_assert(start_delimitor);
         ckg_assert(end_delimitor);
@@ -1572,7 +1594,15 @@
                 fwrite(header, sizeof(CKG_VectorHeader), 1, file_handle);
                 if (data_type == CKG_DATA_TYPE_BITS) {
                     fwrite(collection, (header->element_size * header->count), 1, file_handle);
-                } else if (data_type == CKG_DATA_TYPE_ASCII) {
+                } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
+                    CKG_StringView* sv_vector = (CKG_StringView*)collection;
+                    for (int i = 0; i < header->count; i++) {
+                        CKG_StringView sv = sv_vector[i];
+                        size_t count = sv.length;
+                        fwrite(&count, sizeof(size_t), 1, file_handle);
+                        fwrite(&sv, count, 1, file_handle);
+                    }
+                } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = (char**)collection;
                     for (int i = 0; i < header->count; i++) {
                         char* current_string = string_vector[i];
@@ -1588,7 +1618,14 @@
                 fwrite(header, sizeof(CKG_VectorHeader), 1, file_handle);
                 if (data_type == CKG_DATA_TYPE_BITS) {
                     fwrite(collection, (header->element_size * header->count), 1, file_handle);
-                } else if (data_type == CKG_DATA_TYPE_ASCII) {
+                } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
+                    CKG_StringView* string_vector = (CKG_StringView*)collection;
+                    for (int i = 0; i < header->count; i++) {
+                        CKG_StringView sv = string_vector[i];
+                        fwrite(&sv.length, sizeof(size_t), 1, file_handle);
+                        fwrite(sv.data, sv.length, 1, file_handle);
+                    }
+                } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = (char**)collection;
                     for (int i = 0; i < header->count; i++) {
                         char* current_string = string_vector[i];
@@ -1618,7 +1655,21 @@
                     u8* vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
                     fread(vector, header.element_size, header.count, file_handle);
                     return vector;
-                } else if (data_type == CKG_DATA_TYPE_ASCII) {
+                } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
+                    CKG_StringView* sv_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
+
+                    for (int i = 0; i < header.count; i++) {
+                        CKG_StringView sv;
+                        fread(&sv.length, sizeof(size_t), 1, file_handle);
+
+                        sv.data = ckg_alloc(sv.length + 1);
+                        fread((char*)sv.data, sv.length, 1, file_handle);
+                       
+                        ckg_vector_push(sv_vector, sv);
+                    }
+
+                    return sv_vector;
+                } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
 
                     for (int i = 0; i < header.count; i++) {
@@ -1642,13 +1693,26 @@
                     u8* ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
                     fread(ring_buffer, header.element_size, header.count, file_handle);
                     return ring_buffer;
-                } else if (data_type == CKG_DATA_TYPE_ASCII) {
+                } else if (data_type == CKG_DATA_TYPE_STRING_VIEWs) {
+                    CKG_StringView* sv_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
+
+                    for (int i = 0; i < header.count; i++) {
+                        CKG_StringView sv;
+                        fread(&sv.length, sizeof(size_t), 1, file_handle);
+                        CKG_StringView sv = ckg_alloc(sv.length + 1);
+                        fread(sv.data, sv.length, 1, file_handle);
+
+                        ckg_ring_buffer_enqueue(string_ring_buffer, current_string);
+                    }
+
+                    return string_ring_buffer;
+                } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
 
                     for (int i = 0; i < header.count; i++) {
                         size_t char_count = 0;
                         fread(&char_count, sizeof(size_t), 1, file_handle);
-                        char* current_string = ckg_alloc(char_count + 1); // prob want a way to specify if you should allocate or not
+                        char* current_string = ckg_alloc(char_count + 1);
                         fread(current_string, char_count, 1, file_handle);
 
                         ckg_ring_buffer_enqueue(string_ring_buffer, current_string);
