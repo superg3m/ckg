@@ -1658,7 +1658,6 @@
         u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
             ckg_assert(ckg_io_path_exists(file_name));
 
-            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
             HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
             if (file_handle == INVALID_HANDLE_VALUE) {
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
@@ -1707,7 +1706,6 @@
 
         u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
             ckg_assert_msg(ckg_io_path_exists(file_name), "Path doesn't exist\n");
-            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
 
             FILE* file_handle = fopen(file_name, "rb");
             if (file_handle == NULLPTR) {
@@ -1743,8 +1741,6 @@
 #if defined(CKG_IMPL_OS)
     #if defined(PLATFORM_WINDOWS)
         CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
-            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
-
             HMODULE library = LoadLibraryA(dll_name);
             if (!library) {
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
@@ -1756,7 +1752,6 @@
 
         void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err) {
             ckg_assert(dll);
-            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
 
             void* proc = GetProcAddress(dll, proc_name);
             if (!proc) {
@@ -1773,8 +1768,6 @@
         }
     #else
         CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
-            ckg_error_safe_set(err, CKG_ERROR_SUCCESS);
-
             void* library = dlopen(dll_name, RTLD_LAZY);
             if (!library) {
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
