@@ -26,7 +26,7 @@ void test_serialization() {
     for (size_t i = 0; i < original_size; i++) {
         CKG_StringView orig = original_vec[i];
         CKG_StringView deser = deserialized_vec[i];
-        ckg_assert(ckg_str_equal(orig.data, original_size, deser.data, deserialized_size));
+        ckg_assert(ckg_str_equal(orig.data, orig.length, deser.data, deser.length));
     }
 
     ckg_vector_free(original_vec);

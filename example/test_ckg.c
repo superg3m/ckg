@@ -13,11 +13,11 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 	return;
 }
 
-#define TOTAL_MEMORY_SIZE KiloBytes(32)
+#define TOTAL_MEMORY_SIZE KiloBytes(28)
 
 int main() {
 	u8 program_stack_memory[TOTAL_MEMORY_SIZE] = {0};
-	CKG_Arena arena = ckg_arena_create_fixed(program_stack_memory, TOTAL_MEMORY_SIZE);
+	CKG_Arena arena = ckg_arena_create_fixed(program_stack_memory, TOTAL_MEMORY_SIZE, true);
 	ckg_bind_custom_allocator(custom_alloc_callback, custom_free_callback, &arena);
 
 	ckg_arena_temp(&arena, {
@@ -25,9 +25,9 @@ int main() {
 		test_ckg_arena_operations();
 		test_ckg_str_operations();
 		test_ckg_vector_operations();
-		test_serialization();
 	});
-
+	
+	test_serialization();
 	test_ckg_stack_operations();
 	linked_list_operations();
 
@@ -68,8 +68,8 @@ int main() {
 
 	CKG_LOG_DEBUG("JUST MAKING SURE THIS IS GOOD!\n");
 
-	ckg_arena_free(&arena);
-
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
+
+	ckg_arena_free(&arena);
 	return 0;
 }
