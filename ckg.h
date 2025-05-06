@@ -1598,9 +1598,8 @@
                     CKG_StringView* sv_vector = (CKG_StringView*)collection;
                     for (int i = 0; i < header->count; i++) {
                         CKG_StringView sv = sv_vector[i];
-                        size_t count = sv.length;
-                        fwrite(&count, sizeof(size_t), 1, file_handle);
-                        fwrite(&sv, count, 1, file_handle);
+                        fwrite(&sv.length, sizeof(size_t), 1, file_handle);
+                        fwrite(sv.data, sv.length, 1, file_handle);
                     }
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = (char**)collection;
@@ -1693,19 +1692,19 @@
                     u8* ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
                     fread(ring_buffer, header.element_size, header.count, file_handle);
                     return ring_buffer;
-                } else if (data_type == CKG_DATA_TYPE_STRING_VIEWs) {
+                } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* sv_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
 
                     for (int i = 0; i < header.count; i++) {
                         CKG_StringView sv;
                         fread(&sv.length, sizeof(size_t), 1, file_handle);
-                        CKG_StringView sv = ckg_alloc(sv.length + 1);
-                        fread(sv.data, sv.length, 1, file_handle);
+                        sv.data = ckg_alloc(sv.length + 1);
+                        fread((char*)sv.data, sv.length, 1, file_handle);
 
-                        ckg_ring_buffer_enqueue(string_ring_buffer, current_string);
+                        ckg_ring_buffer_enqueue(sv_ring_buffer, sv);
                     }
 
-                    return string_ring_buffer;
+                    return sv_ring_buffer;
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
 
