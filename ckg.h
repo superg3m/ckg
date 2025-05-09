@@ -985,7 +985,7 @@
         ckg_assert(cstring);
 
         if (!cstring) {
-            return 0; // This should never get here but the compiler want this
+            return 0; // This should never get here but the compiler wants this
         }
 
         size_t length = 0;
