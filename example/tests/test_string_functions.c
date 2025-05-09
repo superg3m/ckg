@@ -1,7 +1,7 @@
 #include "../../ckg.h"
 
 void test_ckg_cstr_length() {
-    const int expected_size = 5;
+    int expected_size = 5;
     char str1[] = "Hello";
     u64 actual_size = ckg_cstr_length(str1);
     ckg_assert_msg(actual_size == expected_size, "Test ckg_str_length failed: expected %d, got %d\n", expected_size, actual_size);
@@ -72,7 +72,7 @@ void test_ckg_cstr_insert_char() {
 void test_ckg_cstr_insert() {
     #define STR_CAP2 16
     char str1[STR_CAP2] = "Hello";
-    const u64 hello_length = sizeof("Hello") - 1;
+    u64 hello_length = sizeof("Hello") - 1;
     u64 str1_length = hello_length;
 
     ckg_str_insert(str1, str1_length, STR_CAP2, CKG_LIT_ARG("|TESTINGS|"), 2);
@@ -208,7 +208,7 @@ void test_ckg_str_starts_with() {
 	ckg_assert(!ckg_str_starts_with(t1, t1_length, CKG_LIT_ARG("")));
 
 
-	const char* t2 = "";
+	char* t2 = "";
     u64 t2_length = 0;
 	ckg_assert(ckg_str_starts_with(t2, t2_length, CKG_LIT_ARG("")));
 
@@ -232,7 +232,7 @@ void test_ckg_str_ends_with() {
 	ckg_assert(ckg_str_ends_with(t1, t1_length, CKG_LIT_ARG("hello")));
 	ckg_assert(ckg_str_ends_with(t1, t1_length, CKG_LIT_ARG("ello")));
 
-	const char* t2 = "";
+	char* t2 = "";
     u64 t2_length = 0;
 	ckg_assert(ckg_str_ends_with(t2, t2_length, CKG_LIT_ARG("")));
 	
@@ -279,7 +279,7 @@ void test_ckg_cstr_reverse() {
 	ckg_free(reversed_string3);
 	ckg_free(reversed_string4);
 
-	const char* t2 = "";
+	char* t2 = "";
     u64 reversed_t2_length = sizeof("") - 1;
     u64 reversed_t2_capacity = reversed_t2_length + 1;
     char* reversed_t2 = (char*)ckg_alloc(reversed_t2_capacity);
@@ -312,7 +312,7 @@ void test_ckg_str_index_of() {
 
 	ckg_assert(ckg_str_index_of(t1, t1_length, CKG_LIT_ARG(" ")) == 5);
 
-	const char* t2 = "";
+	char* t2 = "";
     u64 t2_length = 0;
 	ckg_assert(ckg_str_index_of(t2, t2_length, CKG_LIT_ARG("")) == 0);
 
@@ -336,7 +336,7 @@ void test_ckg_str_last_index_of() {
 	ckg_assert(ckg_str_last_index_of(t1, t1_length, CKG_LIT_ARG("r")) == -1);
 	ckg_assert(ckg_str_last_index_of(t1, t1_length, CKG_LIT_ARG("h")) == 0);
 
-	const char* t2 = "";
+	char* t2 = "";
     u64 t2_length = 0;
 	ckg_assert(ckg_str_last_index_of(t2, t2_length, CKG_LIT_ARG("")) == 0);
 

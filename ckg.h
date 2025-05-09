@@ -157,7 +157,7 @@
     #define LOG_LEVEL_COUNT 6
     typedef u8 CKG_LogLevel;
 
-    CKG_API void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...);
+    CKG_API void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...);
     #define ckg_log_output(log_level, message, ...) MACRO_ckg_log_output(log_level, message, ##__VA_ARGS__)
     #define CKG_LOG_PRINT(message, ...) ckg_log_output(LOG_LEVEL_PRINT, message, ##__VA_ARGS__)
     #define CKG_LOG_SUCCESS(message, ...) ckg_log_output(LOG_LEVEL_SUCCESS, message, ##__VA_ARGS__)
@@ -260,8 +260,8 @@
      * @param b2_allocation_size 
      * @return bool 
      */
-    CKG_API bool ckg_memory_compare(const void* buffer_one, const void* buffer_two, size_t b1_allocation_size, size_t b2_allocation_size);
-    CKG_API void ckg_memory_copy(const void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes);
+    CKG_API bool ckg_memory_compare(void* buffer_one, void* buffer_two, size_t b1_allocation_size, size_t b2_allocation_size);
+    CKG_API void ckg_memory_copy(void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes);
     CKG_API void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
     CKG_API void MACRO_ckg_memory_delete_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, size_t index);
@@ -341,32 +341,32 @@
 	CKG_API char*  ckg_str_alloc(char* s1, size_t length);
     CKG_API size_t ckg_cstr_length(char* c_string);
     CKG_API void   ckg_str_clear(char* s1, size_t length);
-    CKG_API void   ckg_str_copy(char* dest, size_t dest_capacity, const char* source, size_t source_length);
-	CKG_API void   ckg_str_append(char* str, size_t str_length, size_t str_capacity, const char* to_append, size_t to_append_length);
-	CKG_API void   ckg_str_append_char(char* str, size_t str_length, size_t str_capacity, const char to_append);
-	CKG_API void   ckg_str_insert(char* str, size_t str_length, size_t str_capacity, const char* to_insert, size_t to_insert_length, const size_t index);
-	CKG_API void   ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, const char to_insert, const size_t index);
-    CKG_API void   ckg_str_reverse(const char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
+    CKG_API void   ckg_str_copy(char* dest, size_t dest_capacity, char* source, size_t source_length);
+	CKG_API void   ckg_str_append(char* str, size_t str_length, size_t str_capacity, char* to_append, size_t to_append_length);
+	CKG_API void   ckg_str_append_char(char* str, size_t str_length, size_t str_capacity, char to_append);
+	CKG_API void   ckg_str_insert(char* str, size_t str_length, size_t str_capacity, char* to_insert, size_t to_insert_length, size_t index);
+	CKG_API void   ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, char to_insert, size_t index);
+    CKG_API void   ckg_str_reverse(char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
     CKG_API char*  ckg_str_va_sprint(size_t* allocation_size_ptr, char* fmt, va_list args);
     CKG_API char*  MACRO_ckg_cstr_sprint(size_t* allocation_size_ptr, char* fmt, ...);
     #define ckg_cstr_sprint(allocation_size_ptr, fmt, ...) MACRO_ckg_cstr_sprint(allocation_size_ptr, fmt, ##__VA_ARGS__)
 
-    CKG_API bool ckg_str_equal(const char* s1, size_t s1_length, const char* s2, size_t s2_length);
-    CKG_API bool ckg_str_contains(const char* s1, size_t s1_length, const char* contains, size_t contains_length);
-	CKG_API s64  ckg_str_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length);
-	CKG_API s64  ckg_str_last_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length);
-	CKG_API bool ckg_str_starts_with(const char* str, size_t str_length, const char* starts_with, size_t starts_with_length);
-	CKG_API bool ckg_str_ends_with(const char* str, size_t str_length, const char* ends_with, size_t ends_with_length);
+    CKG_API bool ckg_str_equal(char* s1, size_t s1_length, char* s2, size_t s2_length);
+    CKG_API bool ckg_str_contains(char* s1, size_t s1_length, char* contains, size_t contains_length);
+	CKG_API s64  ckg_str_index_of(char* str, size_t str_length, char* substring, size_t substring_length);
+	CKG_API s64  ckg_str_last_index_of(char* str, size_t str_length, char* substring, size_t substring_length);
+	CKG_API bool ckg_str_starts_with(char* str, size_t str_length, char* starts_with, size_t starts_with_length);
+	CKG_API bool ckg_str_ends_with(char* str, size_t str_length, char* ends_with, size_t ends_with_length);
 
 
     typedef struct CKG_StringView {
-        const char* data;
+        char* data;
         size_t length;
     } CKG_StringView;
     
-    CKG_StringView  ckg_sv_create(const char* data, size_t length);
-    CKG_StringView  ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
-    CKG_StringView* ckg_sv_split(const char* data, size_t length, char* delimitor, size_t delimitor_length);
+    CKG_StringView  ckg_sv_create(char* data, size_t length);
+    CKG_StringView  ckg_sv_between_delimiters(char* str, u64 str_length, char* start_delimitor, u64 start_delimitor_length, char* end_delimitor, u64 end_delimitor_length);
+    CKG_StringView* ckg_sv_split(char* data, size_t length, char* delimitor, size_t delimitor_length);
     
     #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
     #define CKG_SV_EMPTY() (CKG_StringView){"", 0}
@@ -538,7 +538,7 @@
 #endif
 
 #if defined(CKG_INCLUDE_IO)
-    bool ckg_io_path_exists(const char* path);
+    bool ckg_io_path_exists(char* path);
     /**
      * @brief returns null terminated file data 
      * 
@@ -667,7 +667,7 @@
 #endif
 
 #if defined(CKG_IMPL_LOGGER)
-    void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
+    void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...) {
         char log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
             "[FATAL]  : ",
             "[ERROR]  : ",
@@ -677,7 +677,7 @@
             "",
         };
 
-        const char* log_level_format[LOG_LEVEL_COUNT] = {
+        char* log_level_format[LOG_LEVEL_COUNT] = {
             CKG_RED_BACKGROUND,
             CKG_RED,
             CKG_PURPLE,
@@ -808,7 +808,7 @@
         return ret;
     }
 
-    bool ckg_memory_compare(const void* buffer_one, const void* buffer_two, size_t buffer_one_size, size_t buffer_two_size) {
+    bool ckg_memory_compare(void* buffer_one, void* buffer_two, size_t buffer_one_size, size_t buffer_two_size) {
         ckg_assert(buffer_one);
         ckg_assert(buffer_two);
 
@@ -827,7 +827,7 @@
         return true;
     }
 
-    void ckg_memory_copy(const void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes) {
+    void ckg_memory_copy(void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes) {
         ckg_assert(source);
         ckg_assert(destination);
         ckg_assert(source_size_in_bytes <= destination_size_in_bytes);
@@ -1001,7 +1001,7 @@
         ckg_memory_zero(s1, length);
     }
 
-    CKG_StringView ckg_sv_create(const char* data, size_t length) {
+    CKG_StringView ckg_sv_create(char* data, size_t length) {
         ckg_assert(data);
         ckg_assert(length >= 0);
 
@@ -1012,7 +1012,7 @@
         return ret;
     }
 
-    CKG_StringView ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length) {
+    CKG_StringView ckg_sv_between_delimiters(char* str, u64 str_length, char* start_delimitor, u64 start_delimitor_length, char* end_delimitor, u64 end_delimitor_length) {
         ckg_assert(str);
         ckg_assert(start_delimitor);
         ckg_assert(end_delimitor);
@@ -1040,7 +1040,7 @@
         return ret;
     }
 
-    CKG_StringView* ckg_sv_split(const char* data, size_t length, char* delimitor, size_t delimitor_length) {
+    CKG_StringView* ckg_sv_split(char* data, size_t length, char* delimitor, size_t delimitor_length) {
         ckg_assert(data);
         ckg_assert(delimitor);
         ckg_assert_msg(delimitor_length > 0, "delimitor can not be a empty string!\n");
@@ -1076,20 +1076,20 @@
         return ret_vector;
     }
 
-    bool ckg_str_equal(const char* s1, size_t s1_length, const char* s2, size_t s2_length) {
+    bool ckg_str_equal(char* s1, size_t s1_length, char* s2, size_t s2_length) {
         return ckg_memory_compare(s1, s2, s1_length, s2_length);
     }
 
-    void ckg_str_copy(char* s1, size_t s1_capacity, const char* s2, size_t s2_length) {
+    void ckg_str_copy(char* s1, size_t s1_capacity, char* s2, size_t s2_length) {
         ckg_memory_zero((void*)s1, s1_capacity);
         ckg_memory_copy(s2, s1, s2_length, s1_capacity);
     }
 
-    void ckg_str_insert(char* str, size_t str_length, size_t str_capacity, const char* to_insert, size_t to_insert_length, const size_t index) {
+    void ckg_str_insert(char* str, size_t str_length, size_t str_capacity, char* to_insert, size_t to_insert_length, size_t index) {
         ckg_assert(str);
         ckg_assert(to_insert);
 
-        const size_t new_length = str_length + to_insert_length;
+        size_t new_length = str_length + to_insert_length;
 
         ckg_assert(index >= 0 && index <= str_length);
         ckg_assert_msg(new_length < str_capacity, "string_insert: str_capacity is %lld but new valid cstring length is %d + %d + 1(null_term)= %d\n", str_capacity, str_length, to_insert_length, new_length + 1);
@@ -1102,7 +1102,7 @@
         ckg_memory_copy(to_insert, copy_dest_ptr, to_insert_length, str_capacity);
     }
 
-    void ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, const char to_insert, const size_t index) {
+    void ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, char to_insert, size_t index) {
         ckg_assert(str);
         ckg_assert(to_insert);
         ckg_assert(index >= 0 && index <= str_length);
@@ -1116,15 +1116,15 @@
         str[index] = to_insert;
     }
 
-    void ckg_str_append(char* str, size_t str_length, size_t str_capacity, const char* to_append, size_t to_append_length) {
+    void ckg_str_append(char* str, size_t str_length, size_t str_capacity, char* to_append, size_t to_append_length) {
         ckg_str_insert(str, str_length, str_capacity, to_append, to_append_length, str_length);
     }
 
-    void ckg_str_append_char(char* str, size_t str_length, size_t str_capacity, const char to_append) {
+    void ckg_str_append_char(char* str, size_t str_length, size_t str_capacity, char to_append) {
         ckg_str_insert_char(str, str_length, str_capacity, to_append, str_length);
     }
 
-    void ckg_str_reverse(const char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity) {
+    void ckg_str_reverse(char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity) {
         ckg_assert(str);
         ckg_assert(reversed_buffer_capacity > str_length);
 
@@ -1133,7 +1133,7 @@
         }
     }
 
-    s64 ckg_str_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length) {
+    s64 ckg_str_index_of(char* str, size_t str_length, char* substring, size_t substring_length) {
         ckg_assert(str);
         ckg_assert(substring);
 
@@ -1171,14 +1171,14 @@
         return ret_index; // returns -1 if not found
     }
 
-    bool ckg_str_contains(const char* str, size_t str_length, const char* contains, size_t contains_length) {
+    bool ckg_str_contains(char* str, size_t str_length, char* contains, size_t contains_length) {
         ckg_assert(str);
         ckg_assert(contains);
 
         return ckg_str_index_of(str, str_length, contains, contains_length) != -1;
     }
 
-    s64 ckg_str_last_index_of(const char* str, size_t str_length, const char* substring, size_t substring_length) {
+    s64 ckg_str_last_index_of(char* str, size_t str_length, char* substring, size_t substring_length) {
         ckg_assert(str);
         ckg_assert(substring);
 
@@ -1211,7 +1211,7 @@
         return ret_index;
     }
 
-    bool ckg_str_starts_with(const char* str, size_t str_length, const char* starts_with, size_t starts_with_length) {
+    bool ckg_str_starts_with(char* str, size_t str_length, char* starts_with, size_t starts_with_length) {
         ckg_assert(str);
         ckg_assert(starts_with);
 
@@ -1228,7 +1228,7 @@
         return false;
     }
 
-    bool ckg_str_ends_with(const char* str, size_t str_length, const char* ends_with, size_t ends_with_length) {
+    bool ckg_str_ends_with(char* str, size_t str_length, char* ends_with, size_t ends_with_length) {
         ckg_assert(str);
         ckg_assert(ends_with);
 
@@ -1732,7 +1732,7 @@
 
 #if defined(CKG_IMPL_IO)
     #if defined(PLATFORM_WINDOWS)
-        bool ckg_io_path_exists(const char* path) {
+        bool ckg_io_path_exists(char* path) {
             return (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES);
         }
 
@@ -1773,7 +1773,7 @@
             return file_data;
         }
     #else
-        bool ckg_io_path_exists(const char* path) {
+        bool ckg_io_path_exists(char* path) {
             FILE *fptr = fopen(path, "r");
 
             if (fptr == NULLPTR) {
