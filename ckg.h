@@ -915,7 +915,7 @@
             ckg_free(arena->base_address);
         }
 
-        arena->flags = CKG_ARENA_FLAG_INVALID;
+        arena->flags = (u32)CKG_ARENA_FLAG_INVALID;
     }
 
     void ckg_arena_zero(CKG_Arena* arena) {
@@ -1834,7 +1834,7 @@
         void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err) {
             ckg_assert(dll);
 
-            void* proc = GetProcAddress(dll, proc_name);
+            void* proc = (void*)GetProcAddress(dll, proc_name);
             if (!proc) {
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
