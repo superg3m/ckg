@@ -68,6 +68,9 @@ int main() {
 
 	CKG_LOG_DEBUG("JUST MAKING SURE THIS IS GOOD!\n");
 
+	CKG_StringView str_between_test = ckg_sv_between_delimiters(CKG_LIT_ARG("WOW - ${Hello!}"), CKG_LIT_ARG("${"), CKG_LIT_ARG("}"));
+	CKG_LOG_DEBUG("String_Between: %.*s | %d\n", str_between_test.length, str_between_test.data, (int)str_between_test.length);
+
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 
 	ckg_arena_free(&arena);

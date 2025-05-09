@@ -1031,11 +1031,9 @@
         }
 
         CKG_StringView ret = CKG_SV_EMPTY();
-        u64 i = (u64)(start_delimitor_index + start_delimitor_length);
-        ret.data = str + i;
-        while (i < (u64)end_delimitor_index) {
-            ret.length++;
-        }
+        u64 start_str_index = (u64)(start_delimitor_index + start_delimitor_length);
+        ret.data = str + start_str_index;
+        ret.length = end_delimitor_index - start_str_index;
 
         return ret;
     }
@@ -1092,7 +1090,7 @@
         size_t new_length = str_length + to_insert_length;
 
         ckg_assert(index >= 0 && index <= str_length);
-        ckg_assert_msg(new_length < str_capacity, "string_insert: str_capacity is %lld but new valid cstring length is %d + %d + 1(null_term)= %d\n", str_capacity, str_length, to_insert_length, new_length + 1);
+        ckg_assert_msg(new_length < str_capacity, "ckg_str_insert: str_capacity is %lld but new valid cstring length is %d + %d + 1(null_term)= %d\n", str_capacity, str_length, to_insert_length, new_length + 1);
         u8* move_source_ptr = (u8*)(str + index);
         u8* move_dest_ptr = (u8*)(move_source_ptr + to_insert_length);
 
@@ -1109,7 +1107,7 @@
 
         size_t to_insert_length = 1;
         bool expression = (str_length + to_insert_length) < str_capacity;
-        ckg_assert_msg(expression, "ckg_cstr_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  str_length + to_insert_length, str_capacity);
+        ckg_assert_msg(expression, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  str_length + to_insert_length, str_capacity);
 
         char* source_ptr = str + index;
         ckg_memory_copy(source_ptr, source_ptr + 1, str_length - index, str_capacity - (index + 1));
