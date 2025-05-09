@@ -1189,8 +1189,6 @@
         if (substring_length > str_length) {
             return -1;
         }
-
-        CKG_StringView substring_view = ckg_sv_create(substring, substring_length);
         
         s64 ret_index = -1;
         for (size_t i = 0; i <= (str_length - substring_length); i++) {
@@ -1199,7 +1197,7 @@
             }
 
             CKG_StringView current_view = ckg_sv_create(str + i, substring_length);
-            if (ckg_str_equal(current_view.data, current_view.length, substring_view.data, substring_view.length)) {
+            if (ckg_str_equal(current_view.data, current_view.length, substring, substring_length)) {
                 ret_index = i;
             }
         }
