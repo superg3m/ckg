@@ -57,6 +57,8 @@
 
     #define NULLPTR 0
     #define PI 3.14159265359
+    #define DEGREES_TO_RAD(degrees) ((degrees)*(PI/180))
+    #define RAD_TO_DEGREES(rad) ((rad)*(180/PI))
 
     #define stringify(entry) #entry
     #define glue(a, b) a##b
