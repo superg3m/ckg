@@ -146,7 +146,7 @@
     #define CKG_CYAN_BACKGROUND "\033[46m"
     #define CKG_COLOR_RESET "\033[0m"
 
-    #define CKG_LOG_LEVEL_CHARACTER_LIMIT 12
+    #define CKG_LOG_LEVEL_CHARACTER_LIMIT 13
     #define CKG_PLATFORM_CHARACTER_LIMIT 512
 
     // Log Levels
@@ -158,6 +158,24 @@
     #define LOG_LEVEL_PRINT 5
     #define LOG_LEVEL_COUNT 6
     typedef u8 CKG_LogLevel;
+
+    internal char __ckg_log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
+        "[ FATAL ] : ",
+        "[ ERROR ] : ",
+        "[WARNING] : ",
+        "[ DEBUG ] : ",
+        "[SUCCESS] : ",
+        "",
+    };
+
+    internal char* __ckg_log_level_format[LOG_LEVEL_COUNT] = {
+        CKG_RED_BACKGROUND,
+        CKG_RED,
+        CKG_PURPLE,
+        CKG_BLUE,
+        CKG_GREEN,
+        CKG_COLOR_RESET
+    };
 
     CKG_API void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...);
     #define ckg_log_output(log_level, message, ...) MACRO_ckg_log_output(log_level, message, ##__VA_ARGS__)
@@ -670,24 +688,6 @@
 
 #if defined(CKG_IMPL_LOGGER)
     void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...) {
-        char log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
-            "[FATAL]  : ",
-            "[ERROR]  : ",
-            "[WARN]   : ",
-            "[DEBUG]  : ",
-            "[SUCCESS]: ",
-            "",
-        };
-
-        char* log_level_format[LOG_LEVEL_COUNT] = {
-            CKG_RED_BACKGROUND,
-            CKG_RED,
-            CKG_PURPLE,
-            CKG_BLUE,
-            CKG_GREEN,
-            CKG_COLOR_RESET
-        };
-
         char out_message[CKG_PLATFORM_CHARACTER_LIMIT];
         ckg_memory_zero(out_message, sizeof(out_message));
 
@@ -699,7 +699,7 @@
         vsnprintf(out_message, CKG_PLATFORM_CHARACTER_LIMIT, message, args_list);
         va_end(args_list);
 
-        sprintf(out_message2, "%s%s", log_level_strings[log_level], out_message);
+        sprintf(out_message2, "%s%s", __ckg_log_level_strings[log_level], out_message);
 
         size_t out_message2_length = ckg_cstr_length(out_message2);
 
@@ -712,9 +712,9 @@
         #endif
 
         if (out_message2[out_message2_length - 1] == '\n') {
-            printf("%s%.*s%s\n", log_level_format[log_level], (int)(out_message2_length - 1), out_message2, CKG_COLOR_RESET);
+            printf("%s%.*s%s\n", __ckg_log_level_format[log_level], (int)(out_message2_length - 1), out_message2, CKG_COLOR_RESET);
         } else {
-            printf("%s%.*s%s", log_level_format[log_level], (int)(out_message2_length), out_message2, CKG_COLOR_RESET);
+            printf("%s%.*s%s", __ckg_log_level_format[log_level], (int)(out_message2_length), out_message2, CKG_COLOR_RESET);
         }
     }
 #endif
