@@ -146,7 +146,7 @@
     #define CKG_CYAN_BACKGROUND "\033[46m"
     #define CKG_COLOR_RESET "\033[0m"
 
-    #define CKG_LOG_LEVEL_CHARACTER_LIMIT 13
+    #define CKG_LOG_LEVEL_CHARACTER_LIMIT 12
     #define CKG_PLATFORM_CHARACTER_LIMIT 512
 
     // Log Levels
@@ -160,11 +160,11 @@
     typedef u8 CKG_LogLevel;
 
     internal char __ckg_log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
-        "[ FATAL ] : ",
-        "[ ERROR ] : ",
-        "[WARNING] : ",
-        "[ DEBUG ] : ",
-        "[SUCCESS] : ",
+        "[ FATAL ]: ",
+        "[ ERROR ]: ",
+        "[WARNING]: ",
+        "[ DEBUG ]: ",
+        "[SUCCESS]: ",
         "",
     };
 
