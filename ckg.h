@@ -697,29 +697,25 @@
         return start_delimitor_index && end_delimitor_index;
     }
 
-    internal void __ckg_special_print_helper(const String message, u64 message_length, CKIT_LogLevel log_level) {
+    internal void __ckg_special_print_helper(char* message, u64 message_length, CKG_LogLevel log_level) {
         CKG_StringView middle_to_color = ckg_sv_between_delimiters(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
-        if (!middle_to_color == CKG_SV_EMPTY()) {
-            Boolean found = message[message_length - 1] == '\n';
+        if (middle_to_color.length == 0) {
+            bool found = message[message_length - 1] == '\n';
             printf("%.*s", (int)(message_length - found), message);
+
             return;
         }
 
-        u64 start_delimitor_index = ckg_str_index_of(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1);
-        u64 end_delimitor_index = ckg_str_index_of(message, message_length, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
+        s64 start_delimitor_index = ckg_str_index_of(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1);
+        s64 end_delimitor_index = ckg_str_index_of(message, message_length, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
 
-        CKG_StringView left_side_view = ckg_sv_create(message, 0, start_delimitor_index);
-        CKG_StringView right_side_view = ckg_sv_create(message, end_delimitor_index + (sizeof(LOGGER_END_DELIM) - 1), message_length);
-        String left_side = ckit_str_create_custom(CKG_SV_ARG(left_side_view), 0);
-        String right_side = ckit_str_create_custom(CKG_SV_ARG(right_side_view), 0);
+        CKG_StringView left_side_view = ckg_sv_create(message, start_delimitor_index);
+        CKG_StringView right_side_view = ckg_sv_create(message + (end_delimitor_index + (sizeof(LOGGER_END_DELIM) - 1)), message_length);
 
-        printf("%s%s%s%s", left_side, log_level_format[log_level], middle_to_color, CKG_COLOR_RESET);
+        printf("%.*s%s%.*s%s", (int)left_side_view.length, left_side_view.data, __ckg_log_level_format[log_level], (int)middle_to_color.length, middle_to_color.data, CKG_COLOR_RESET);
 
-        special_print_helper(right_side, ckg_strview_length(right_side_view), log_level);
-
-        return;
+        __ckg_special_print_helper(right_side_view.data, right_side_view.length, log_level);
     }
-
 
     void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...) {
         va_list args_list;
@@ -731,13 +727,11 @@
         printf("%s%s%s", __ckg_log_level_format[log_level], __ckg_log_level_strings[log_level], CKG_COLOR_RESET);
 
         if (__ckg_message_has_special_delmitor(out_message, out_message_length)) {
-            special_print_helper(out_message, out_message_length, log_level);
+            __ckg_special_print_helper(out_message, out_message_length, log_level);
         } else {
-            
+            bool found = out_message[out_message_length - 1] == '\n';
+            printf("%s%.*s%s", __ckg_log_level_format[log_level], (int)(out_message_length - found), out_message, CKG_COLOR_RESET);
         }
-
-        bool found = out_message[out_message_length - 1] == '\n';
-        printf("%s%.*s%s", __ckg_log_level_format[log_level], (int)(out_message_length - found), out_message, CKG_COLOR_RESET);
 
         if (out_message[out_message_length - 1] == '\n') {
             printf("\n");
