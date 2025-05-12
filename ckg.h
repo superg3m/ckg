@@ -368,8 +368,8 @@
 	CKG_API void   ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, char to_insert, size_t index);
     CKG_API void   ckg_str_reverse(char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
     CKG_API char*  ckg_str_va_sprint(size_t* allocation_size_ptr, char* fmt, va_list args);
-    CKG_API char*  MACRO_ckg_cstr_sprint(size_t* allocation_size_ptr, char* fmt, ...);
-    #define ckg_cstr_sprint(allocation_size_ptr, fmt, ...) MACRO_ckg_cstr_sprint(allocation_size_ptr, fmt, ##__VA_ARGS__)
+    CKG_API char*  MACRO_ckg_str_sprint(size_t* allocation_size_ptr, char* fmt, ...);
+    #define ckg_str_sprint(allocation_size_ptr, fmt, ...) MACRO_ckg_str_sprint(allocation_size_ptr, fmt, ##__VA_ARGS__)
 
     CKG_API bool ckg_str_equal(char* s1, size_t s1_length, char* s2, size_t s2_length);
     CKG_API bool ckg_str_contains(char* s1, size_t s1_length, char* contains, size_t contains_length);
@@ -687,34 +687,60 @@
 #endif
 
 #if defined(CKG_IMPL_LOGGER)
-    void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...) {
-        char out_message[CKG_PLATFORM_CHARACTER_LIMIT];
-        ckg_memory_zero(out_message, sizeof(out_message));
+    #define LOGGER_START_DELIM "${"
+    #define LOGGER_END_DELIM "}"
 
-        char out_message2[CKG_PLATFORM_CHARACTER_LIMIT + CKG_LOG_LEVEL_CHARACTER_LIMIT];
-        ckg_memory_zero(out_message2, sizeof(out_message2));  
-        
+    internal bool __ckg_message_has_special_delmitor(char* message, u64 message_length) {
+        bool start_delimitor_index = ckg_str_contains(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1);
+        bool end_delimitor_index = ckg_str_contains(message, message_length, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
+
+        return start_delimitor_index && end_delimitor_index;
+    }
+
+    internal void __ckg_special_print_helper(const String message, u64 message_length, CKIT_LogLevel log_level) {
+        CKG_StringView middle_to_color = ckg_sv_between_delimiters(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
+        if (!middle_to_color == CKG_SV_EMPTY()) {
+            Boolean found = message[message_length - 1] == '\n';
+            printf("%.*s", (int)(message_length - found), message);
+            return;
+        }
+
+        u64 start_delimitor_index = ckg_str_index_of(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1);
+        u64 end_delimitor_index = ckg_str_index_of(message, message_length, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
+
+        CKG_StringView left_side_view = ckg_sv_create(message, 0, start_delimitor_index);
+        CKG_StringView right_side_view = ckg_sv_create(message, end_delimitor_index + (sizeof(LOGGER_END_DELIM) - 1), message_length);
+        String left_side = ckit_str_create_custom(CKG_SV_ARG(left_side_view), 0);
+        String right_side = ckit_str_create_custom(CKG_SV_ARG(right_side_view), 0);
+
+        printf("%s%s%s%s", left_side, log_level_format[log_level], middle_to_color, CKG_COLOR_RESET);
+
+        special_print_helper(right_side, ckg_strview_length(right_side_view), log_level);
+
+        return;
+    }
+
+
+    void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...) {
         va_list args_list;
         va_start(args_list, message);
-        vsnprintf(out_message, CKG_PLATFORM_CHARACTER_LIMIT, message, args_list);
+        u64 out_message_length = 0; 
+        char* out_message = ckg_str_va_sprint(&out_message_length, message, args_list);
         va_end(args_list);
 
-        sprintf(out_message2, "%s%s", __ckg_log_level_strings[log_level], out_message);
+        printf("%s%s%s", __ckg_log_level_format[log_level], __ckg_log_level_strings[log_level], CKG_COLOR_RESET);
 
-        size_t out_message2_length = ckg_cstr_length(out_message2);
-
-        #if defined(PLATFORM_WINDOWS)
-            HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-            DWORD dwMode = 0;
-            GetConsoleMode(hOut, &dwMode);
-            dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-            SetConsoleMode(hOut, dwMode);
-        #endif
-
-        if (out_message2[out_message2_length - 1] == '\n') {
-            printf("%s%.*s%s\n", __ckg_log_level_format[log_level], (int)(out_message2_length - 1), out_message2, CKG_COLOR_RESET);
+        if (__ckg_message_has_special_delmitor(out_message, out_message_length)) {
+            special_print_helper(out_message, out_message_length, log_level);
         } else {
-            printf("%s%.*s%s", __ckg_log_level_format[log_level], (int)(out_message2_length), out_message2, CKG_COLOR_RESET);
+            
+        }
+
+        bool found = out_message[out_message_length - 1] == '\n';
+        printf("%s%.*s%s", __ckg_log_level_format[log_level], (int)(out_message_length - found), out_message, CKG_COLOR_RESET);
+
+        if (out_message[out_message_length - 1] == '\n') {
+            printf("\n");
         }
     }
 #endif
@@ -1246,22 +1272,29 @@
         return false;
     }
 
-    char* MACRO_ckg_cstr_va_sprint(size_t* allocation_size_ptr, char* fmt, va_list args) {
-        size_t allocation_size = vsnprintf(NULLPTR, 0, fmt, args) + 1; // + 1 because null terminator
-        char* ret = ckg_alloc(allocation_size);
-        vsnprintf(ret, allocation_size, fmt, args);
+    char* ckg_str_va_sprint(size_t* allocation_size_ptr, char* fmt, va_list args) {
+        va_list args_copy;
+        va_copy(args_copy, args);
+        u64 allocation_ret = vsnprintf(NULLPTR, 0, fmt, args_copy) + 1; // +1 for null terminator
+        va_end(args_copy);
+
+        char* buffer = ckg_alloc(allocation_ret);
+
+        va_copy(args_copy, args);
+        vsnprintf(buffer, allocation_ret, fmt, args_copy);
+        va_end(args_copy);
 
         if (allocation_size_ptr != NULLPTR) {
-            *allocation_size_ptr = allocation_size;
+            *allocation_size_ptr = allocation_ret;
         } 
 
-        return ret;
+        return buffer;
     }
 
-    char* MACRO_ckg_cstr_sprint(size_t* allocation_size_ptr, char* fmt, ...) {
+    char* MACRO_ckg_str_sprint(size_t* allocation_size_ptr, char* fmt, ...) {
         va_list args;
         va_start(args, fmt);
-        char* ret = MACRO_ckg_cstr_va_sprint(allocation_size_ptr, fmt, args);
+        char* ret = ckg_str_va_sprint(allocation_size_ptr, fmt, args);
         va_end(args);
 
         return ret;
