@@ -225,13 +225,13 @@
     +------------+----------------------------+
     */
 
-    #define CKG_ERROR_SUCCESS 0
     #define CKG_ERROR_TYPE_COUNT 2
     #define CKG_ERROR_TYPE_MASK (0b1111 << 28)
 
     #define CKG_ERROR_IO_MASK (0 << 28)
     #define CKG_ERROR_ARGS_MASK (1 << 28)
     typedef enum CKG_Error {
+        CKG_ERROR_SUCCESS = -1,
         CKG_ERROR_IO_RESOURCE_NOT_FOUND = (CKG_ERROR_IO_MASK | 0),
         CKG_ERROR_IO_RESOURCE_TOO_BIG,
         CKG_ERROR_IO_COUNT = 2,
