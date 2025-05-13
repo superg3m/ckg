@@ -720,22 +720,25 @@
     void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...) {
         va_list args_list;
         va_start(args_list, message);
-        u64 out_message_length = 0; 
+        
+        u64 out_message_length = 0;
         char* out_message = ckg_str_va_sprint(&out_message_length, message, args_list);
         va_end(args_list);
-
+        
         printf("%s%s%s", __ckg_log_level_format[log_level], __ckg_log_level_strings[log_level], CKG_COLOR_RESET);
-
+        
         if (__ckg_message_has_special_delmitor(out_message, out_message_length)) {
             __ckg_special_print_helper(out_message, out_message_length, log_level);
         } else {
             bool found = out_message[out_message_length - 1] == '\n';
             printf("%s%.*s%s", __ckg_log_level_format[log_level], (int)(out_message_length - found), out_message, CKG_COLOR_RESET);
         }
-
+        
         if (out_message[out_message_length - 1] == '\n') {
             printf("\n");
         }
+        
+        ckg_free(out_message);
     }
 #endif
 
