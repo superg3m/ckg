@@ -761,7 +761,6 @@
     };
 
     char* ckg_error_str(CKG_Error error_code) {
-        //Ttes
         if (error_code == CKG_ERROR_SUCCESS) {
             return stringify(CKG_ERROR_SUCCESS);
         }
