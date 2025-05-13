@@ -1774,7 +1774,7 @@
             BOOL success = GetFileSizeEx(file_handle, &large_int);
             ckg_assert(success);
 
-            size_t file_size = large_int.QuadPart + 1;
+            size_t file_size = large_int.QuadPart;
             if (file_size > SIZE_MAX) {
                 CloseHandle(file_handle);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_TOO_BIG);
@@ -1788,7 +1788,7 @@
             success = ReadFile(file_handle, file_data, (DWORD)file_size, &bytes_read, NULLPTR);
             CloseHandle(file_handle);
 
-            ckg_assert(success && bytes_read == (file_size - 1));
+            ckg_assert(success && bytes_read == file_size);
 
             if (returned_file_size) {
                 *returned_file_size = (size_t)file_size;
