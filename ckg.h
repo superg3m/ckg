@@ -723,6 +723,7 @@
         
         u64 out_message_length = 0;
         char* out_message = ckg_str_va_sprint(&out_message_length, message, args_list);
+        
         va_end(args_list);
         
         printf("%s%s%s", __ckg_log_level_format[log_level], __ckg_log_level_strings[log_level], CKG_COLOR_RESET);
@@ -1276,17 +1277,14 @@
     char* ckg_str_va_sprint(size_t* allocation_size_ptr, char* fmt, va_list args) {
         va_list args_copy;
         va_copy(args_copy, args);
-
         u64 allocation_ret = vsnprintf(NULLPTR, 0, fmt, args_copy) + 1; // +1 for null terminator
-
         va_end(args_copy);
 
         char* buffer = ckg_alloc(allocation_ret);
 
-        va_list args_copy2;
-        va_copy(args_copy2, args);
-        vsnprintf(buffer, allocation_ret, fmt, args_copy2);
-        va_end(args_copy2);
+        va_copy(args_copy, args);
+        vsnprintf(buffer, allocation_ret, fmt, args_copy);
+        va_end(args_copy);
 
         if (allocation_size_ptr != NULLPTR) {
             *allocation_size_ptr = allocation_ret;
