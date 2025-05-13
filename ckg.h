@@ -1276,14 +1276,17 @@
     char* ckg_str_va_sprint(size_t* allocation_size_ptr, char* fmt, va_list args) {
         va_list args_copy;
         va_copy(args_copy, args);
+
         u64 allocation_ret = vsnprintf(NULLPTR, 0, fmt, args_copy) + 1; // +1 for null terminator
+
         va_end(args_copy);
 
         char* buffer = ckg_alloc(allocation_ret);
 
-        va_copy(args_copy, args);
-        vsnprintf(buffer, allocation_ret, fmt, args_copy);
-        va_end(args_copy);
+        va_list args_copy2;
+        va_copy(args_copy2, args);
+        vsnprintf(buffer, allocation_ret, fmt, args_copy2);
+        va_end(args_copy2);
 
         if (allocation_size_ptr != NULLPTR) {
             *allocation_size_ptr = allocation_ret;
