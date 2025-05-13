@@ -1782,7 +1782,6 @@
                 return NULLPTR;
             }
 
-            // test
             u8* file_data = (u8*)ckg_alloc(file_size + 1); // +1 for null-terminator
 
             DWORD bytes_read = 0;
