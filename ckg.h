@@ -761,6 +761,10 @@
     };
 
     char* ckg_error_str(CKG_Error error_code) {
+        if (error_code == CKG_ERROR_SUCCESS) {
+            return stringify(CKG_ERROR_SUCCESS);
+        }
+
         int error_type = CKG_ERROR_TYPE_MASK & error_code;
         int error_index = (~CKG_ERROR_TYPE_MASK) & error_code;
             
