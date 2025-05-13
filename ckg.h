@@ -1760,12 +1760,9 @@
         }
 
         u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
-            ckg_assert(ckg_io_path_exists(file_name));
-
             HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
             if (file_handle == INVALID_HANDLE_VALUE) {
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
-
                 return NULLPTR;
             }
 
