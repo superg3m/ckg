@@ -395,8 +395,8 @@
 	CKG_API void   ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, char to_insert, size_t index);
     CKG_API void   ckg_str_reverse(char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
     CKG_API char*  ckg_str_va_sprint(u64* str_length, char* fmt, va_list args);
-    CKG_API char*  MACRO_ckg_str_sprint(u64* str_length, char* fmt, ...);
-    #define ckg_str_sprint(str_length, fmt, ...) MACRO_ckg_str_sprint(str_length, fmt, ##__VA_ARGS__)
+    CKG_API char*  MACRO_ckg_str_sprint(u64* str_length_ptr_back, char* fmt, ...);
+    #define ckg_str_sprint(str_length_ptr_back, fmt, ...) MACRO_ckg_str_sprint(str_length_ptr_back, fmt, ##__VA_ARGS__)
 
     CKG_API bool ckg_str_equal(char* s1, size_t s1_length, char* s2, size_t s2_length);
     CKG_API bool ckg_str_contains(char* s1, size_t s1_length, char* contains, size_t contains_length);
@@ -1297,7 +1297,7 @@
         return false;
     }
 
-    char* ckg_str_va_sprint(u64* str_length, char* fmt, va_list args) {
+    char* ckg_str_va_sprint(u64* str_length_ptr_back, char* fmt, va_list args) {
         va_list args_copy;
         va_copy(args_copy, args);
         u64 allocation_ret = vsnprintf(NULLPTR, 0, fmt, args_copy) + 1; // +1 for null terminator
@@ -1309,17 +1309,17 @@
         vsnprintf(buffer, allocation_ret, fmt, args_copy);
         va_end(args_copy);
 
-        if (str_length != NULLPTR) {
-            *str_length = allocation_ret - 1;
-        } 
+        if (str_length_ptr_back != NULLPTR) {
+            *str_length_ptr_back = allocation_ret - 1;
+        }
 
         return buffer;
     }
 
-    char* MACRO_ckg_str_sprint(u64* str_length, char* fmt, ...) {
+    char* MACRO_ckg_str_sprint(u64* str_length_ptr_back, char* fmt, ...) {
         va_list args;
         va_start(args, fmt);
-        char* ret = ckg_str_va_sprint(str_length, fmt, args);
+        char* ret = ckg_str_va_sprint(str_length_ptr_back, fmt, args);
         va_end(args);
 
         return ret;
