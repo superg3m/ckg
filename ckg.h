@@ -1840,7 +1840,7 @@
 
             FILE* file_handle = fopen(file_name, "rb");
             if (file_handle == NULLPTR) {
-                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND)
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
 
                 return NULLPTR;
             }
