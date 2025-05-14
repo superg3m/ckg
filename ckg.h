@@ -128,6 +128,7 @@
         #define OS_DELIMITER '/'
         #define CRASH __builtin_trap()
     #elif defined(__linux__) || defined(__unix__) || defined(__POSIX__)
+        #include <dlfcn.h>
         #define PLATFORM_LINUX
         #define OS_DELIMITER '/'
         #define CRASH __builtin_trap()
