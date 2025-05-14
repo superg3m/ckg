@@ -1844,11 +1844,26 @@
                 return NULLPTR;
             }
 
-            fseek(file_handle, 0L, SEEK_END);
-            size_t file_size = ftell(file_handle);
-            rewind(file_handle);
+            if (fseek(file_handle, 0L, SEEK_END) != 0) {
+                CKG_LOG_ERROR("Error: fseek failed\n");
+                fclose(file_handle);
+                return NULL;
+            }
 
-            u8* file_data = ckg_alloc(file_size + 1); // +1 for null terminator
+            long file_size = ftell(file_handle);
+            if (file_size == -1L) {
+                CKG_LOG_ERROR("Error: ftell failed\n");
+                fclose(file_handle);
+                return NULL;
+            }
+
+            if (rewind(file_handle), ferror(file_handle)) {
+                CKG_LOG_ERROR("Error: rewind failed\n");
+                fclose(file_handle);
+                return NULL;
+            }
+
+            u8* file_data = ckg_alloc((size_t)file_size + 1); // +1 for null terminator
 
             if (fread(file_data, file_size, 1, file_handle) != 1) {
                 fclose(file_handle);
