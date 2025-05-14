@@ -216,26 +216,26 @@
 #if defined(CKG_INCLUDE_ASSERT)
     #define CKG_ASSERT_ENABLED true
     #if CKG_ASSERT_ENABLED == true 
-        #define ckg_assert(expression)                                    \
-            do {                                                          \
-                if (!(expression)) {                                      \
-                    ckg_stack_trace_dump();                               \
-                    char msg[] = "Func: %s, File: %s:%d\n";               \
-                    CKG_LOG_FATAL(msg, __func__, __FILE__, __LINE__);     \
-                    CRASH;                                                \
-                }                                                         \
-            } while (false)                                               \
+        #define ckg_assert(expression)                                     \
+            do {                                                           \
+                if (!(expression)) {                                       \
+                    ckg_stack_trace_dump();                                \
+                    char ckg__msg[] = "Func: %s, File: %s:%d\n";           \
+                    CKG_LOG_FATAL(ckg__msg, __func__, __FILE__, __LINE__); \
+                    CRASH;                                                 \
+                }                                                          \
+            } while (false)                                                \
 
-        #define ckg_assert_msg(expression, message, ...)	              \
-            do {                                                          \
-                if (!(expression)) {                                      \
-                    ckg_stack_trace_dump();                               \
-                    char msg[] = "Func: %s, File: %s:%d\n";               \
-                    CKG_LOG_FATAL(msg, __func__, __FILE__, __LINE__);     \
-                    CKG_LOG_FATAL(message, ##__VA_ARGS__);                \
-                    CRASH;                                                \
-                }                                                         \
-            } while (false)                                               \
+        #define ckg_assert_msg(expression, message, ...)	               \
+            do {                                                           \
+                if (!(expression)) {                                       \
+                    ckg_stack_trace_dump();                                \
+                    char ckg__msg[] = "Func: %s, File: %s:%d\n";           \
+                    CKG_LOG_FATAL(ckg__msg, __func__, __FILE__, __LINE__); \
+                    CKG_LOG_FATAL(message, ##__VA_ARGS__);                 \
+                    CRASH;                                                 \
+                }                                                          \
+            } while (false)                                                \
 
     #else
             #define ckg_assert(expression)
