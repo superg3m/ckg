@@ -185,7 +185,7 @@
     #define LOG_LEVEL_COUNT 6
     typedef u8 CKG_LogLevel;
 
-    internal char __ckg_log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
+    internal char ckg_log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
         "[ FATAL ]: ",
         "[ ERROR ]: ",
         "[WARNING]: ",
@@ -194,7 +194,7 @@
         "",
     };
 
-    internal char* __ckg_log_level_format[LOG_LEVEL_COUNT] = {
+    internal char* ckg_log_level_format[LOG_LEVEL_COUNT] = {
         CKG_RED_BACKGROUND,
         CKG_RED,
         CKG_PURPLE,
@@ -738,7 +738,7 @@
         CKG_StringView left_side_view = ckg_sv_create(message, start_delimitor_index);
         CKG_StringView right_side_view = ckg_sv_create(message + (end_delimitor_index + (sizeof(LOGGER_END_DELIM) - 1)), message_length);
 
-        printf("%.*s%s%.*s%s", (int)left_side_view.length, left_side_view.data, __ckg_log_level_format[log_level], (int)middle_to_color.length, middle_to_color.data, CKG_COLOR_RESET);
+        printf("%.*s%s%.*s%s", (int)left_side_view.length, left_side_view.data, ckg_log_level_format[log_level], (int)middle_to_color.length, middle_to_color.data, CKG_COLOR_RESET);
 
         __ckg_special_print_helper(right_side_view.data, right_side_view.length, log_level);
     }
@@ -752,13 +752,13 @@
         
         va_end(args_list);
         
-        printf("%s%s%s", __ckg_log_level_format[log_level], __ckg_log_level_strings[log_level], CKG_COLOR_RESET);
+        printf("%s%s%s", ckg_log_level_format[log_level], ckg_log_level_strings[log_level], CKG_COLOR_RESET);
         
         if (__ckg_message_has_special_delmitor(out_message, out_message_length)) {
             __ckg_special_print_helper(out_message, out_message_length, log_level);
         } else {
             bool found = out_message[out_message_length - 1] == '\n';
-            printf("%s%.*s%s", __ckg_log_level_format[log_level], (int)(out_message_length - found), out_message, CKG_COLOR_RESET);
+            printf("%s%.*s%s", ckg_log_level_format[log_level], (int)(out_message_length - found), out_message, CKG_COLOR_RESET);
         }
         
         if (out_message[out_message_length - 1] == '\n') {
@@ -945,10 +945,6 @@
 #endif
 
 #if defined(CKG_IMPL_ARENA)
-    internal bool ckg_arena_flag_is_set(CKG_Arena* arena, CKG_ArenaFlag flag) {
-        return arena->flags & flag;
-    }
-
     CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, u32 flags, u8 alignment) {
         ckg_assert_msg(memory, "Memory can't be a null pointer!\n");
         ckg_assert_msg(allocation_size != 0, "Can't have a zero allocation size!\n");
