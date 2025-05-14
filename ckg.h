@@ -1837,8 +1837,6 @@
         }
 
         u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
-            ckg_assert_msg(ckg_io_path_exists(file_name), "Path doesn't exist\n");
-
             FILE* file_handle = fopen(file_name, "rb");
             if (file_handle == NULLPTR) {
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
