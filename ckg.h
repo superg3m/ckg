@@ -187,15 +187,6 @@
     #define LOG_LEVEL_COUNT 6
     typedef u8 CKG_LogLevel;
 
-    internal char ckg_log_level_strings[LOG_LEVEL_COUNT][CKG_LOG_LEVEL_CHARACTER_LIMIT] = {
-        "[ FATAL ]: ",
-        "[ ERROR ]: ",
-        "[WARNING]: ",
-        "[ DEBUG ]: ",
-        "[SUCCESS]: ",
-        "",
-    };
-
     internal char* ckg_log_level_format[LOG_LEVEL_COUNT] = {
         CKG_RED_BACKGROUND,
         CKG_RED,
@@ -840,7 +831,7 @@
         
         va_end(args_list);
         
-        printf("%s%s%s", ckg_log_level_format[log_level], ckg_log_level_strings[log_level], CKG_COLOR_RESET);
+        printf("%s%s", ckg_log_level_format[log_level], CKG_COLOR_RESET);
         
         if (__ckg_message_has_special_delmitor(out_message, out_message_length)) {
             __ckg_special_print_helper(out_message, out_message_length, log_level);
