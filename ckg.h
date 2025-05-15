@@ -1905,7 +1905,7 @@
         CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
             HMODULE library = LoadLibraryA(dll_name);
             if (!library) {
-                CKG_LOG_ERROR(false, "LoadLibraryA() failed: ckg_io_load_dll()\n");
+                CKG_LOG_ERROR(false, "LoadLibraryA() failed: ckg_io_load_dll(%s)\n", dll_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
 
                 return NULLPTR;
@@ -1919,7 +1919,7 @@
 
             void* proc = (void*)GetProcAddress(dll, proc_name);
             if (!proc) {
-                CKG_LOG_ERROR(false, "GetProcAddress() failed: ckg_os_get_proc_address()\n");
+                CKG_LOG_ERROR(false, "GetProcAddress() failed: ckg_os_get_proc_address(%s)\n", proc_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
@@ -1937,7 +1937,7 @@
         CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
             void* library = dlopen(dll_name, RTLD_LAZY);
             if (!library) {
-                CKG_LOG_ERROR(false, "dlopen() failed: ckg_io_load_dll()\n");
+                CKG_LOG_ERROR(false, "dlopen() failed: ckg_io_load_dll(%s)\n", dll_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
@@ -1948,7 +1948,7 @@
         void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err) {
             void* proc = dlsym(dll, proc_name);
             if (!proc) {
-                CKG_LOG_ERROR(false, "dlsym() failed: ckg_os_get_proc_address()\n");
+                CKG_LOG_ERROR(false, "dlsym() failed: ckg_os_get_proc_address(%s)\n", proc_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
