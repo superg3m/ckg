@@ -1794,7 +1794,7 @@
         u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
             HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
             if (file_handle == INVALID_HANDLE_VALUE) {
-                CKG_LOG_ERROR("CreateFileA() returned an INVALID_HANDLE_VALUE, the file_name/path is likely wrong: ckg_io_read_entire_file()\n");
+                CKG_LOG_ERROR("CreateFileA() returned an INVALID_HANDLE_VALUE, the file_name/path is likely wrong: ckg_io_read_entire_file(%s)\n", file_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
@@ -1802,7 +1802,7 @@
             LARGE_INTEGER large_int = {0};
             BOOL success = GetFileSizeEx(file_handle, &large_int);
             if (!success) {
-                CKG_LOG_ERROR("GetFileSizeEx() Failed to get size from file_handle: ckg_io_read_entire_file()\n");
+                CKG_LOG_ERROR("GetFileSizeEx() Failed to get size from file_handle: ckg_io_read_entire_file(%s)\n", file_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 CloseHandle(file_handle);
                 return NULLPTR;
@@ -1810,7 +1810,7 @@
 
             size_t file_size = large_int.QuadPart;
             if (file_size > SIZE_MAX) {
-                CKG_LOG_ERROR("File size is bigger than max size: ckg_io_read_entire_file()\n");
+                CKG_LOG_ERROR("File size is bigger than max size: ckg_io_read_entire_file(%s)\n", file_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_TOO_BIG);
                 CloseHandle(file_handle);
 
@@ -1823,7 +1823,7 @@
             success = ReadFile(file_handle, file_data, (DWORD)file_size, &bytes_read, NULLPTR);
             CloseHandle(file_handle);
             if (!success && bytes_read == file_size) {
-                CKG_LOG_ERROR("ReadFile() Failed to get the file data or bytes read doesn't match file_size: ckg_io_read_entire_file()\n");
+                CKG_LOG_ERROR("ReadFile() Failed to get the file data or bytes read doesn't match file_size: ckg_io_read_entire_file(%s)\n", file_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 ckg_free(file_data);
                 return NULLPTR;
@@ -1851,36 +1851,41 @@
         u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
             FILE* file_handle = fopen(file_name, "rb");
             if (file_handle == NULLPTR) {
-                CKG_LOG_ERROR("Invalid file_handle, the file_name/path is likely wrong: ckg_io_read_entire_file()\n");
+                CKG_LOG_ERROR("Invalid file_handle, the file_name/path is likely wrong: ckg_io_read_entire_file(%s)\n", file_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
 
                 return NULLPTR;
             }
 
             if (fseek(file_handle, 0L, SEEK_END) != 0) {
-                CKG_LOG_ERROR("fseek failed: ckg_io_read_entire_file()\n");
+                CKG_LOG_ERROR("fseek failed: ckg_io_read_entire_file(%s)\n", file_name);
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 fclose(file_handle);
                 return NULL;
             }
 
             long file_size = ftell(file_handle);
             if (file_size == -1L) {
-                CKG_LOG_ERROR("ftell failed: ckg_io_read_entire_file()\n");
+                CKG_LOG_ERROR("ftell failed: ckg_io_read_entire_file(%s)\n", file_name);
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 fclose(file_handle);
                 return NULL;
             }
 
             if (rewind(file_handle) || ferror(file_handle)) {
-                CKG_LOG_ERROR("rewind() failed: ckg_io_read_entire_file()\n");
+                CKG_LOG_ERROR("rewind() failed: ckg_io_read_entire_file(%s)\n", file_name);
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 fclose(file_handle);
                 return NULL;
             }
 
             u8* file_data = ckg_alloc((size_t)file_size + 1); // +1 for null terminator
             if (fread(file_data, file_size, 1, file_handle) != 1) {
-                fclose(file_handle);
+                CKG_LOG_ERROR(false, "fread() failed: ckg_io_read_entire_file(%s)\n", file_name);
+                ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 ckg_free(file_data);
-                CKG_LOG_ERROR(false, "fread() failed: ckg_io_read_entire_file()\n");
+                fclose(file_handle);
+
                 return NULLPTR;
             }
 
