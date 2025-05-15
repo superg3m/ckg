@@ -216,32 +216,16 @@
 #endif
 
 #if defined(CKG_INCLUDE_ASSERT)
+    CKG_API void MACRO_ckg_assert(bool expression, char* function, char* file, u32 line);
+    CKG_API void MACRO_ckg_assert_msg(bool expression, char* function, char* file, u32 line, char* msg, ...);
+
     #define CKG_ASSERT_ENABLED true
     #if CKG_ASSERT_ENABLED == true 
-        #define ckg_assert(expression)                                     \
-            do {                                                           \
-                if (!(expression)) {                                       \
-                    ckg_stack_trace_dump();                                \
-                    char ckg__msg[] = "Func: %s, File: %s:%d\n";           \
-                    CKG_LOG_FATAL(ckg__msg, __func__, __FILE__, __LINE__); \
-                    CRASH;                                                 \
-                }                                                          \
-            } while (false)                                                \
-
-        #define ckg_assert_msg(expression, message, ...)	               \
-            do {                                                           \
-                if (!(expression)) {                                       \
-                    ckg_stack_trace_dump();                                \
-                    char ckg__msg[] = "Func: %s, File: %s:%d\n";           \
-                    CKG_LOG_FATAL(ckg__msg, __func__, __FILE__, __LINE__); \
-                    CKG_LOG_FATAL(message, ##__VA_ARGS__);                 \
-                    CRASH;                                                 \
-                }                                                          \
-            } while (false)                                                \
-
+        #define ckg_assert(expression) MACRO_ckg_assert((expression), __func__, __FILE__, __LINE__)
+        #define ckg_assert_msg(expression, message, ...) MACRO_ckg_assert_msg((expression), __func__, __FILE__, __LINE__, message)
     #else
-            #define ckg_assert(expression)
-            #define ckg_assert_msg(expression, message, ...)
+        #define ckg_assert(expression)
+        #define ckg_assert_msg(expression, message, ...)
     #endif
 #endif
 
@@ -452,10 +436,10 @@
 
     #define VECTOR_DEFAULT_CAPACITY 1
     #define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
-    #define ckg_vector_count(vector) (*ckg_vector_header_base(vector)).count
-    #define ckg_vector_capacity(vector) (*ckg_vector_header_base(vector)).capacity
+    #define ckg_vector_count(vector) (ckg_assert(vector != NULLPTR), (*ckg_vector_header_base(vector)).count)
+    #define ckg_vector_capacity(vector) (ckg_assert(vector != NULLPTR), (*ckg_vector_header_base(vector)).capacity)
 
-    #define ckg_stack_count(stack) (*ckg_vector_header_base(stack)).count
+    #define ckg_stack_count(stack) (ckg_assert(stack != NULLPTR), (*ckg_vector_header_base(stack)).count)
 
     #ifdef __cplusplus
         #define ckg_vector_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(vector[0]), 0); vector[ckg_vector_header_base(vector)->count++] = element
@@ -467,9 +451,9 @@
     
     #define ckg_vector_free(vector) vector = MACRO_ckg_vector_free(vector)
     #define ckg_stack_free(stack) stack = MACRO_ckg_vector_free(stack)
-    #define ckg_stack_pop(stack) stack[--ckg_vector_header_base(stack)->count]
-    #define ckg_stack_peek(stack) stack[ckg_stack_count(stack) - 1]
-    #define ckg_stack_empty(stack) (ckg_stack_count(stack) == 0)
+    #define ckg_stack_pop(stack) (ckg_assert(stack != NULLPTR), stack[--ckg_vector_header_base(stack)->count])
+    #define ckg_stack_peek(stack) (ckg_assert(stack != NULLPTR), stack[ckg_stack_count(stack) - 1])
+    #define ckg_stack_empty(stack) (ckg_assert(stack != NULLPTR), (ckg_stack_count(stack) == 0))
     //
     // ========== END CKG_VECTOR ==========
     //
@@ -492,13 +476,13 @@
     #define ckg_ring_buffer_header_base(buffer) ((CKG_RingBufferHeader*)(((char*)buffer) - sizeof(CKG_RingBufferHeader)))
     #define ckg_ring_buffer_read(buffer) (*ckg_ring_buffer_header_base(buffer)).read
     #define ckg_ring_buffer_write(buffer) (*ckg_ring_buffer_header_base(buffer)).write
-    #define ckg_ring_buffer_count(buffer) (*ckg_ring_buffer_header_base(buffer)).count
-    #define ckg_ring_buffer_capacity(buffer) (*ckg_ring_buffer_header_base(buffer)).capacity
+    #define ckg_ring_buffer_count(buffer) (ckg_assert(buffer != NULLPTR), (*ckg_ring_buffer_header_base(buffer)).count)
+    #define ckg_ring_buffer_capacity(buffer) (ckg_assert(buffer != NULLPTR), (*ckg_ring_buffer_header_base(buffer)).capacity)
 
-    #define ckg_ring_buffer_full(buffer) (ckg_ring_buffer_count(buffer) == ckg_ring_buffer_capacity(buffer))
-    #define ckg_ring_buffer_empty(buffer) (ckg_ring_buffer_count(buffer) == 0)
+    #define ckg_ring_buffer_full(buffer) (ckg_assert(buffer != NULLPTR), (ckg_ring_buffer_count(buffer) == ckg_ring_buffer_capacity(buffer)))
+    #define ckg_ring_buffer_empty(buffer) (ckg_assert(buffer != NULLPTR), (ckg_ring_buffer_count(buffer) == 0))
     #define ckg_ring_buffer_enqueue(buffer, element) ckg_assert_msg(!ckg_ring_buffer_full(buffer), "Ring buffer is full!\n"); buffer[ckg_ring_buffer_write(buffer)] = element; ckg_ring_buffer_header_base(buffer)->count++; ckg_ring_buffer_header_base(buffer)->write = (ckg_ring_buffer_write(buffer) + 1) % ckg_ring_buffer_capacity(buffer);
-    #define ckg_ring_buffer_dequeue(buffer) buffer[ckg_ring_buffer_read(buffer)]; --ckg_ring_buffer_header_base(buffer)->count; ckg_ring_buffer_header_base(buffer)->read = (ckg_ring_buffer_read(buffer) + 1) % ckg_ring_buffer_capacity(buffer); ckg_assert_msg(ckg_ring_buffer_count(buffer) > -1, "Ring buffer is empty!\n");    
+    #define ckg_ring_buffer_dequeue(buffer) buffer[ckg_ring_buffer_read(buffer)]; --ckg_ring_buffer_header_base(buffer)->count; ckg_assert_msg(ckg_ring_buffer_count(buffer) > -1, "Ring buffer is empty!\n"); ckg_ring_buffer_header_base(buffer)->read = (ckg_ring_buffer_read(buffer) + 1) % ckg_ring_buffer_capacity(buffer);  
     //
     // ========== END CKG_CircularBuffer ==========
     //
@@ -557,10 +541,15 @@
         bool filled;                             \
     }                                            \
 
-    #define CKG_HashMap(KeyType, ValueType)       \
+    // Date: May 15, 2025
+    // NOTE(Jovanni): Its important to note that temp_key and temp_value are used on:
+    // insert to act as a stack container for the value or key literal
+    #define CKG_HashMap(KeyType, ValueType)         \
     struct {                                        \
         size_t key_size;                            \
+        KeyType temp_key;                           \
         size_t value_size;                          \
+        ValueType temp_value;                       \
         u64 capacity;                               \
         u64 count;                                  \
         CKG_HashMapEntry(KeyType, ValueType)* data; \
@@ -857,6 +846,32 @@
     }
 #endif
 
+#if defined(CKG_IMPL_ASSERT)
+    void MACRO_ckg_assert(bool expression, char* function, char* file, u32 line) {
+        if (!expression) {                                      
+            ckg_stack_trace_dump();                               
+            char ckg__msg[] = "Func: %s, File: %s:%d\n";          
+            CKG_LOG_FATAL(ckg__msg, function, file, line);
+            CRASH;                   
+        }                                                         
+    }
+
+    void MACRO_ckg_assert_msg(bool expression, char* function, char* file, u32 line, char* msg, ...) {  
+        va_list args;
+        va_start(args, msg);
+
+        if (!(expression)) {                                      
+            ckg_stack_trace_dump();                               
+            char ckg__msg[] = "Func: %s, File: %s:%d\n";          
+            CKG_LOG_FATAL(ckg__msg, function, file, line);
+            CKG_LOG_FATAL("%s", ckg_str_va_sprint(NULLPTR, msg, args));                
+            CRASH;                                                
+        }   
+
+        va_end(args);                                                                                             
+    }
+#endif
+
 #if defined(CKG_IMPL_ERRORS)
     internal char* CKG_ERROR_IO_STRINGS[CKG_ERROR_IO_COUNT] = {
         stringify(CKG_ERROR_IO_RESOURCE_NOT_FOUND),
@@ -916,8 +931,8 @@
     internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free, 0};
 
     void ckg_bind_custom_allocator(CKG_Alloc_T* a, CKG_Free_T* f, void* ctx) {
-        ckg_assert_msg(a, "Alloc function is nullptr\n");
-        ckg_assert_msg(f, "Free function is nullptr\n");
+        ckg_assert_msg(a != NULLPTR, "Alloc function is nullptr\n");
+        ckg_assert_msg(f != NULLPTR, "Free function is nullptr\n");
         
         allocator.allocate = a;
         allocator.free = f;

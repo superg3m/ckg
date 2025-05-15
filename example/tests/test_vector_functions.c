@@ -39,3 +39,31 @@ void test_ckg_stack_operations() {
 	CKG_LOG_SUCCESS("All vector tests passed!\n"); 
 	return;
 }
+
+void test_ckg_ring_buffer_overwrite_behavior() {
+    const int cap = 8;
+    int* ring = ckg_ring_buffer_create(sizeof(int), cap);
+
+    for (int i = 0; i < cap; i++) {
+        ckg_ring_buffer_enqueue(ring, i + 1);
+    }
+
+    for (int i = 0; i < cap; i++) {
+        if (ckg_ring_buffer_full(ring)) {
+            ckg_ring_buffer_header_base(ring)->read = (ckg_ring_buffer_read(ring) + 1) % ckg_ring_buffer_capacity(ring);
+            --ckg_ring_buffer_header_base(ring)->count;
+        }
+
+        ckg_ring_buffer_enqueue(ring, cap + i + 1);
+    }
+
+    for (int i = 0; i < cap; i++) {
+        int val = ckg_ring_buffer_dequeue(ring);
+        ckg_assert(val == (cap + i + 1));
+    }
+
+    ckg_assert(ckg_ring_buffer_empty(ring));
+    ckg_ring_buffer_free(ring);
+
+    CKG_LOG_SUCCESS("Ring buffer overwrite test passed!\n");
+}

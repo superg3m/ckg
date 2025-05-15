@@ -31,5 +31,5 @@ void test_serialization() {
 
     ckg_vector_free(original_vec);
     ckg_vector_free(deserialized_vec);
-    printf("✅ test_serialization passed\n");
+    CKG_LOG_SUCCESS("test_serialization passed\n");
 }

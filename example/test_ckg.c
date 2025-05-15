@@ -25,6 +25,7 @@ int main() {
 		test_ckg_arena_operations();
 		test_ckg_str_operations();
 		test_ckg_vector_operations();
+		test_ckg_ring_buffer_overwrite_behavior();
 	});
 	
 	test_serialization();
