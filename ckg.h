@@ -544,6 +544,92 @@
     //
     // ========== END CKG_LinkedList ==========
     //
+
+
+    //
+    // ========== START CKG_HashMap ==========
+    //
+
+    #define CKG_HashMapEntry(KeyType, ValueType) \
+    struct {                                     \
+        KeyType key;                             \
+        ValueType val;                           \
+        bool filled;                             \
+    }                                            \
+
+    #define CKG_HashMap(KeyType, ValueType)       \
+    struct {                                        \
+        size_t key_size;                            \
+        size_t value_size;                          \
+        u64 capacity;                               \
+        u64 count;                                  \
+        CKG_HashMapEntry(KeyType, ValueType)* data; \
+    }*                                              \
+
+
+    #define ckg_hashmap_init(map, key, value)         \
+    {                                                 \
+        size_t entry_size = sizeof(*((map)->data));   \
+        map = ckg_alloc(sizeof(*(map)));              \
+        ckg_vector_grow((map)->data, entry_size, 2);  \
+        map->data[0].state = false;                   \
+        map->data[1].state = false;                   \
+        uintptr_t d0 = (uintptr_t)&((map)->data[0]);  \
+        uintptr_t d1 = (uintptr_t)&((map)->data[1]);  \
+        ptrdiff_t diff = (d1 - d0);\
+        ptrdiff_t klpvl = (uintptr_t)&(map->data[0].state) - (uintptr_t)(&((map)->data[0]));\
+        (map)->stride = (size_t)(diff);\
+        (map)->klpvl = (size_t)(klpvl);\
+    } \
+
+    #define ckg_hashmap_insert(hashmap, key, value)             \
+    do {                                                        \
+        if ((hashmap) == NULLPTR) {                             \
+            gs_hash_table_init((hashmap), (key), (value));      \
+        }\
+    \
+        /* Grow table if necessary */\
+        uint32_t __CAP = gs_hash_table_capacity(hashmap);\
+        float __LF = gs_hash_table_load_factor(hashmap);\
+        if (__LF >= 0.5f || !__CAP) {\
+            uint32_t NEW_CAP = __CAP ? __CAP * 2 : 2;\
+            size_t ENTRY_SZ = sizeof((hashmap)->tmp_key) + sizeof((hashmap)->tmp_val) + sizeof(gs_hash_table_entry_state);\
+            gs_dyn_array_reserve((hashmap)->data, NEW_CAP);\
+            /**((void **)&(hashmap->data)) = gs_dyn_array_resize_impl(hashmap->data, ENTRY_SZ, NEW_CAP);*/\
+            /* Iterate through data and set state to null, from __CAP -> __CAP * 2 */\
+            /* Memset here instead */\
+            for (uint32_t __I = __CAP; __I < NEW_CAP; ++__I) {\
+                (hashmap)->data[__I].state = GS_HASH_TABLE_ENTRY_INACTIVE;\
+            }\
+            __CAP = gs_hash_table_capacity(hashmap);\
+        }\
+    \
+        /* Get hash of key */\
+        (hashmap)->tmp_key = (key);\
+        size_t __HSH = gs_hash_bytes((void*)&((hashmap)->tmp_key), sizeof((hashmap)->tmp_key), GS_HASH_TABLE_HASH_SEED);\
+        size_t __HSH_IDX = __HSH % __CAP;\
+        (hashmap)->tmp_key = (hashmap)->data[__HSH_IDX].key;\
+        uint32_t c = 0;\
+    \
+        /* Find valid idx and place data */\
+        while (\
+            c < __CAP\
+            && __HSH != gs_hash_bytes((void*)&(hashmap)->tmp_key, sizeof((hashmap)->tmp_key), GS_HASH_TABLE_HASH_SEED)\
+            && (hashmap)->data[__HSH_IDX].state == GS_HASH_TABLE_ENTRY_ACTIVE)\
+        {\
+            __HSH_IDX = ((__HSH_IDX + 1) % __CAP);\
+            (hashmap)->tmp_key = (hashmap)->data[__HSH_IDX].key;\
+            ++c;\
+        }\
+        (hashmap)->data[__HSH_IDX].key = (key);\
+        (hashmap)->data[__HSH_IDX].val = (value);\
+        (hashmap)->data[__HSH_IDX].state = GS_HASH_TABLE_ENTRY_ACTIVE;\
+        gs_dyn_array_head((hashmap)->data)->size++;\
+    } while (0)
+
+    //
+    // ========== END CKG_HashMap ==========
+    //
 #endif 
 
 #if defined(CKG_INCLUDE_SERIALIZATION)
@@ -1636,6 +1722,90 @@
     }
     //
     // ========== END CKG_LinkedList ==========
+    //
+
+
+    //
+    // ========== Start CKG_HashMap ==========
+    //
+    // Original location:
+    // https://github.com/majek/csiphash/1
+
+    #if defined(_WIN32)
+        #define _le64toh(x) ((uint64_t)(x))
+    #elif defined(__APPLE__)
+        #include <libkern/OSByteOrder.h>
+        #define _le64toh(x) OSSwapLittleToHostInt64(x)
+    #else
+        #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+            #include <sys/endian.h>
+        #else
+            #include <endian.h>
+        #endif
+
+        #if defined(__BYTE_ORDER) && defined(__LITTLE_ENDIAN) && __BYTE_ORDER == __LITTLE_ENDIAN   
+            #define _le64toh(x) ((uint64_t)(x))
+        #else
+            #define _le64toh(x) le64toh(x)
+        #endif
+    #endif
+
+    #define ROTATE(x, b) (uint64_t)( ((x) << (b)) | ( (x) >> (64 - (b))) )
+
+    #define HALF_ROUND(a,b,c,d,s,t)	\
+        a += b; c += d;			    \
+        b = ROTATE(b, s) ^ a;		\
+        d = ROTATE(d, t) ^ c;		\
+        a = ROTATE(a, 32);          \
+
+    #define DOUBLE_ROUND(v0,v1,v2,v3)  \
+        HALF_ROUND(v0,v1,v2,v3,13,16); \
+        HALF_ROUND(v2,v1,v0,v3,17,21); \
+        HALF_ROUND(v0,v1,v2,v3,13,16); \
+        HALF_ROUND(v2,v1,v0,v3,17,21)
+
+    internal uint64_t siphash24(const void *src, unsigned long src_sz, const char key[16]) {
+        const uint64_t *_key = (uint64_t *)key;
+        uint64_t k0 = _le64toh(_key[0]);
+        uint64_t k1 = _le64toh(_key[1]);
+        uint64_t b = (uint64_t)src_sz << 56;
+        const uint64_t *in = (uint64_t*)src;
+
+        uint64_t v0 = k0 ^ 0x736f6d6570736575ULL;
+        uint64_t v1 = k1 ^ 0x646f72616e646f6dULL;
+        uint64_t v2 = k0 ^ 0x6c7967656e657261ULL;
+        uint64_t v3 = k1 ^ 0x7465646279746573ULL;
+
+        while (src_sz >= 8) {
+            uint64_t mi = _le64toh(*in);
+            in += 1; src_sz -= 8;
+            v3 ^= mi;
+            DOUBLE_ROUND(v0,v1,v2,v3);
+            v0 ^= mi;
+        }
+
+        uint64_t t = 0; uint8_t *pt = (uint8_t *)&t; uint8_t *m = (uint8_t *)in;
+        switch (src_sz) {
+        case 7: pt[6] = m[6];
+        case 6: pt[5] = m[5];
+        case 5: pt[4] = m[4];
+        case 4: *((uint32_t*)&pt[0]) = *((uint32_t*)&m[0]); break;
+        case 3: pt[2] = m[2];
+        case 2: pt[1] = m[1];
+        case 1: pt[0] = m[0];
+        }
+        b |= _le64toh(t);
+
+        v3 ^= b;
+        DOUBLE_ROUND(v0,v1,v2,v3);
+        v0 ^= b; v2 ^= 0xff;
+        DOUBLE_ROUND(v0,v1,v2,v3);
+        DOUBLE_ROUND(v0,v1,v2,v3);
+
+        return (v0 ^ v1) ^ (v2 ^ v3);
+    }
+    //
+    // ========== END CKG_HashMap ==========
     //
 #endif
 

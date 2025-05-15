@@ -73,6 +73,23 @@ int main() {
 
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 
+	typedef struct Person {
+		char* name;
+		int age;
+	} Person;
+
+	CKG_HashMap(char*, Person) person_map = NULLPTR;
+
+	/// Person p1;
+	/// p1.name = "john";
+	/// p1.age = 41;
+/// 
+	/// ckg_hashmap_insert(person_map, "stick_bug", p1);
+	/// Person p2 = ckg_hashmap_get(person_map, "stick_bug");
+
+	int x = (1 + 2, 3 + 4);  // x is 7
+
+
 	ckg_arena_free(&arena);
 	return 0;
 }
