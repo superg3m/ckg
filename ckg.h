@@ -469,20 +469,30 @@
         int capacity;
         size_t element_size;
     } CKG_RingBufferHeader;
-    
+
     void* ckg_ring_buffer_create(size_t element_size, int capacity);
     void* MACRO_ckg_ring_buffer_free(void* buffer);
-    #define ckg_ring_buffer_free(buffer) buffer = MACRO_ckg_ring_buffer_free(buffer)
-    #define ckg_ring_buffer_header_base(buffer) ((CKG_RingBufferHeader*)(((char*)buffer) - sizeof(CKG_RingBufferHeader)))
-    #define ckg_ring_buffer_read(buffer) (*ckg_ring_buffer_header_base(buffer)).read
-    #define ckg_ring_buffer_write(buffer) (*ckg_ring_buffer_header_base(buffer)).write
-    #define ckg_ring_buffer_count(buffer) (ckg_assert(buffer != NULLPTR), (*ckg_ring_buffer_header_base(buffer)).count)
-    #define ckg_ring_buffer_capacity(buffer) (ckg_assert(buffer != NULLPTR), (*ckg_ring_buffer_header_base(buffer)).capacity)
+    #define ckg_ring_buffer_header_base(buffer) ((CKG_RingBufferHeader*)(((char*)(buffer)) - sizeof(CKG_RingBufferHeader)))
 
-    #define ckg_ring_buffer_full(buffer) (ckg_assert(buffer != NULLPTR), (ckg_ring_buffer_count(buffer) == ckg_ring_buffer_capacity(buffer)))
-    #define ckg_ring_buffer_empty(buffer) (ckg_assert(buffer != NULLPTR), (ckg_ring_buffer_count(buffer) == 0))
-    #define ckg_ring_buffer_enqueue(buffer, element) ckg_assert_msg(!ckg_ring_buffer_full(buffer), "Ring buffer is full!\n"); buffer[ckg_ring_buffer_write(buffer)] = element; ckg_ring_buffer_header_base(buffer)->count++; ckg_ring_buffer_header_base(buffer)->write = (ckg_ring_buffer_write(buffer) + 1) % ckg_ring_buffer_capacity(buffer);
-    #define ckg_ring_buffer_dequeue(buffer) buffer[ckg_ring_buffer_read(buffer)]; --ckg_ring_buffer_header_base(buffer)->count; ckg_assert_msg(ckg_ring_buffer_count(buffer) > -1, "Ring buffer is empty!\n"); ckg_ring_buffer_header_base(buffer)->read = (ckg_ring_buffer_read(buffer) + 1) % ckg_ring_buffer_capacity(buffer);  
+    #define ckg_ring_buffer_free(buffer) buffer = MACRO_ckg_ring_buffer_free(buffer)
+    #define ckg_ring_buffer_read(buffer)         (ckg_ring_buffer_header_base(buffer)->read)
+    #define ckg_ring_buffer_write(buffer)        (ckg_ring_buffer_header_base(buffer)->write)
+    #define ckg_ring_buffer_count(buffer)        (ckg_assert(buffer != NULLPTR), ckg_ring_buffer_header_base(buffer)->count)
+    #define ckg_ring_buffer_capacity(buffer)     (ckg_assert(buffer != NULLPTR), ckg_ring_buffer_header_base(buffer)->capacity)
+    #define ckg_ring_buffer_element_size(buffer) (ckg_assert(buffer != NULLPTR), ckg_ring_buffer_header_base(buffer)->element_size)
+
+    #define ckg_ring_buffer_empty(buffer) (ckg_ring_buffer_count(buffer) == 0)
+    #define ckg_ring_buffer_full(buffer)  (ckg_ring_buffer_count(buffer) == ckg_ring_buffer_capacity(buffer))
+
+    #define ckg_ring_buffer_enqueue(buffer, element) do { \
+        ckg_assert_msg(!ckg_ring_buffer_full(buffer), "Ring buffer is overwriting unread memory!\n"); \
+        (buffer)[ckg_ring_buffer_write(buffer)] = (element); \
+        ckg_ring_buffer_header_base(buffer)->count++; \
+        ckg_ring_buffer_header_base(buffer)->write = (ckg_ring_buffer_write(buffer) + 1) % ckg_ring_buffer_capacity(buffer); \
+    } while (0)
+
+    #define ckg_ring_buffer_dequeue(buffer) buffer[ckg_ring_buffer_read(buffer)]; ckg_assert_msg(!ckg_ring_buffer_empty(buffer), "Ring buffer is empty!\n"); ckg_ring_buffer_header_base(buffer)->count--; ckg_ring_buffer_header_base(buffer)->read = (ckg_ring_buffer_read(buffer) + 1) % ckg_ring_buffer_capacity(buffer)
+
     //
     // ========== END CKG_CircularBuffer ==========
     //

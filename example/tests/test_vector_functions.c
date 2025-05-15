@@ -44,22 +44,25 @@ void test_ckg_ring_buffer_overwrite_behavior() {
     const int cap = 8;
     int* ring = ckg_ring_buffer_create(sizeof(int), cap);
 
+    // Fill buffer with initial values 1..8
     for (int i = 0; i < cap; i++) {
         ckg_ring_buffer_enqueue(ring, i + 1);
     }
 
+    // Overwrite all values with 9..16
     for (int i = 0; i < cap; i++) {
-        if (ckg_ring_buffer_full(ring)) {
-            ckg_ring_buffer_header_base(ring)->read = (ckg_ring_buffer_read(ring) + 1) % ckg_ring_buffer_capacity(ring);
-            --ckg_ring_buffer_header_base(ring)->count;
-        }
+		if (ckg_ring_buffer_full(ring)) {
+			ckg_ring_buffer_dequeue(ring);
+		}
 
-        ckg_ring_buffer_enqueue(ring, cap + i + 1);
+        ckg_ring_buffer_enqueue(ring, cap + i + 1); // 9..16
     }
 
+    // Now buffer should contain only 9..16
     for (int i = 0; i < cap; i++) {
         int val = ckg_ring_buffer_dequeue(ring);
-        ckg_assert(val == (cap + i + 1));
+		CKG_LOG_PRINT("%d\n", val);
+        ckg_assert(val == (cap + i + 1)); // Should match 9..16
     }
 
     ckg_assert(ckg_ring_buffer_empty(ring));
