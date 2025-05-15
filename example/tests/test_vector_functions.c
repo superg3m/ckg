@@ -52,7 +52,8 @@ void test_ckg_ring_buffer_overwrite_behavior() {
     // Overwrite all values with 9..16
     for (int i = 0; i < cap; i++) {
 		if (ckg_ring_buffer_full(ring)) {
-			ckg_ring_buffer_dequeue(ring);
+			int d = ckg_ring_buffer_dequeue(ring);
+			CKG_LOG_PRINT("%d\n", d);
 		}
 
         ckg_ring_buffer_enqueue(ring, cap + i + 1); // 9..16
