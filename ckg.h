@@ -124,6 +124,7 @@
         #define OS_DELIMITER '\\'
         #define CRASH __debugbreak()
     #elif defined(__APPLE__)
+        #include <dlfcn.h>
         #define PLATFORM_APPLE
         #define OS_DELIMITER '/'
         #define CRASH __builtin_trap()
