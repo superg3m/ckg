@@ -139,16 +139,10 @@
 
     #if defined(__clang__)
         #define UNUSED_FUNCTION __attribute__((used))
-        #define WRITE_FENCE() __asm__ volatile("" ::: "memory"); __asm__ volatile("sfence" ::: "memory")
-        #define READ_FENCE() __asm__ volatile("" ::: "memory");
     #elif defined(__GNUC__) || defined(__GNUG__)
         #define UNUSED_FUNCTION __attribute__((used))
-        #define WRITE_FENCE() __asm__ volatile("" ::: "memory"); __asm__ volatile("sfence" ::: "memory")
-        #define READ_FENCE() __asm__ volatile("" ::: "memory");
     #elif defined(_MSC_VER)
         #define UNUSED_FUNCTION
-        #define WRITE_FENCE() _WriteBarrier(); _mm_sfence()
-        #define READ_FENCE() _ReadBarrier()
     #endif
 
     CKG_API void ckg_stack_trace_dump();
