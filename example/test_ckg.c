@@ -14,14 +14,14 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 }
 
 typedef struct DEBUG_ENTRY { 
-	char* key; 
+	int key; 
 	int value;
 	bool filled;
 } DEBUG_ENTRY; 
 
 typedef struct DEBUG_MAP {
 	CKG_HashMapMeta meta; 
-	char* temp_key;
+	int temp_key;
 	int temp_value;
 	DEBUG_ENTRY* entries;
 } DEBUG_MAP;

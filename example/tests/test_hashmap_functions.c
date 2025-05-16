@@ -46,11 +46,11 @@ void test_string_literal_keys() {
     CKG_HashMap(char*, int)* str_map = NULLPTR;
     ckg_hashmap_init_string_hash(str_map, char*, int);
 
-    ckg_hashmap_put_key_ptr(str_map, "one", 1);
-    ckg_hashmap_put_key_ptr(str_map, "two", 2);
-    ckg_hashmap_put_key_ptr(str_map, "three", 3);
-    ckg_hashmap_put_key_ptr(str_map, "four", 4);
-    ckg_hashmap_put_key_ptr(str_map, "five", 5);
+    ckg_hashmap_put(str_map, "one", 1);
+    ckg_hashmap_put(str_map, "two", 2);
+    ckg_hashmap_put(str_map, "three", 3);
+    ckg_hashmap_put(str_map, "four", 4);
+    ckg_hashmap_put(str_map, "five", 5);
 
     ckg_assert(ckg_hashmap_get(str_map, "one") == 1);
     ckg_assert(ckg_hashmap_get(str_map, "two") == 2);
@@ -78,16 +78,16 @@ void test_char_ptr_keys() {
     char* key3 = ckg_str_alloc(CKG_LIT_ARG("cherry"));
     char* key4 = ckg_str_alloc(CKG_LIT_ARG("apple"));
 
-    ckg_hashmap_put_key_ptr(map, key1, 1.5);
-    ckg_hashmap_put_key_ptr(map, key2, 2.7);
-    ckg_hashmap_put_key_ptr(map, key3, 3.14);
+    ckg_hashmap_put(map, key1, 1.5);
+    ckg_hashmap_put(map, key2, 2.7);
+    ckg_hashmap_put(map, key3, 3.14);
 
     ckg_assert(ckg_hashmap_get(map, key1) == 1.5);
     ckg_assert(ckg_hashmap_get(map, key2) == 2.7);
     ckg_assert(ckg_hashmap_get(map, key3) == 3.14);
     ckg_assert(ckg_hashmap_get(map, key4) == 1.5);
 
-    ckg_hashmap_put_key_ptr(map, key1, 5.5);
+    ckg_hashmap_put(map, key1, 5.5);
     ckg_assert(ckg_hashmap_get(map, key1) == 5.5);
     ckg_assert(ckg_hashmap_get(map, key4) == 5.5);
 
