@@ -13,19 +13,6 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 	return;
 }
 
-typedef struct DEBUG_ENTRY { 
-	int key; 
-	int value;
-	bool filled;
-} DEBUG_ENTRY; 
-
-typedef struct DEBUG_MAP {
-	CKG_HashMapMeta meta; 
-	int temp_key;
-	int temp_value;
-	DEBUG_ENTRY* entries;
-} DEBUG_MAP;
-
 #define TOTAL_MEMORY_SIZE KiloBytes(30)
 
 int main() {
@@ -86,9 +73,6 @@ int main() {
 	CKG_StringView str_between_test = ckg_sv_between_delimiters(CKG_LIT_ARG("WOW - ${Hello!}"), CKG_LIT_ARG("${"), CKG_LIT_ARG("}"));
 	CKG_LOG_DEBUG("String_Between: %.*s | %d\n", str_between_test.length, str_between_test.data, (int)str_between_test.length);
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
-
-	DEBUG_MAP* d = NULLPTR;
-	(void)d;
 
 	ckg_arena_free(&arena);
 	return 0;
