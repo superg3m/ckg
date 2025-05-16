@@ -120,6 +120,9 @@ void test_struct_keys() {
     ckg_assert(ckg_hashmap_get(map, p1) == 999);
     ckg_assert(ckg_hashmap_get(map, p4) == 999);
 
+    int v = ckg_hashmap_pop(map, p4);
+    ckg_assert(v == 999);
+
     ckg_hashmap_free(map);
 
     CKG_LOG_SUCCESS("Struct key test passed!\n");
