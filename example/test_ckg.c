@@ -85,11 +85,11 @@ int main() {
 	p1.name = "john";
 	p1.age = 41;
 
-	char* test = "dsfsdf";
+	char* test = "dsfsdf8";
 	u64 h = siphash24(test, sizeof(char*));
 
-	ckg_hashmap_put_key_ptr(person_map, "dsfsdf", p1);
-	Person p2 = ckg_hashmap_get_key_ptr(person_map, "dsfsdf");
+	ckg_hashmap_put_key_ptr(person_map, "dsfsdf8", p1);
+	Person p2 = ckg_hashmap_get_key_ptr(person_map, "dsfsdf8");
 	printf("%s\n", p2.name);
 
 	/// 
