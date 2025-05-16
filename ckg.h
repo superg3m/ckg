@@ -1877,8 +1877,6 @@
 
     u64 ckit_hashmap_resolve_collision(u8* hashmap, u8* key, u64 inital_hash_index) {
         CKG_HashMapMeta* meta = (CKG_HashMapMeta*)hashmap;
-        u8* temp_key_address = hashmap + meta->key_offset;
-        u8* temp_value_address = hashmap + meta->value_offset; 
         u8* entries_base_address = *(u8**)(hashmap + meta->entry_offset);
 
         u64 cannonical_hash_index = inital_hash_index;
@@ -1909,6 +1907,8 @@
     }
 
     u64 ckg_string_hash(u8* str, u32 str_length) {
+        (void)str_length;
+
         u64 hash = 5381;
         u8* str_ptr = str;
         int c;
@@ -1936,8 +1936,6 @@
 
         u8** entries = (u8**)(map + meta->entry_offset);
         u8* entry = *entries + (real_index * meta->entry_size);
-        u8* entry_key = entry + meta->entry_key_offset;
-        u8* entry_value = entry + meta->entry_value_offset;
         u8* entry_filled = entry + meta->entry_filled_offset;
         ckg_assert_msg(*entry_filled, "The key doesn't exist in the hashmap!\n");
 
@@ -1965,8 +1963,6 @@
 
         u8** entries = (u8**)(map + meta->entry_offset);
         u8* entry = *entries + (real_index * meta->entry_size);
-        u8* entry_key = entry + meta->entry_key_offset;
-        u8* entry_value = entry + meta->entry_value_offset;
         u8* entry_filled = entry + meta->entry_filled_offset;
         ckg_memory_copy(map + meta->key_offset, entry + meta->entry_key_offset, meta->key_size, meta->key_size);
         ckg_memory_copy(map + meta->value_offset, entry + meta->entry_value_offset, meta->value_size, meta->value_size);

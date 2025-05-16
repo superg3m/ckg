@@ -6,8 +6,10 @@ typedef struct Person {
 } Person;
 
 u64 person_hash(u8* data, u32 size) {
+    (void)size;
+
     Person* person = (Person*)data;
-    u64 h1 = ckg_string_hash(person->name, 0);
+    u64 h1 = ckg_string_hash((u8*)person->name, 0);
     u64 h2 = siphash24((u8*)&person->age, sizeof(person->age));
     return h1 ^ h2;
 }
