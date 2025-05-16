@@ -81,10 +81,18 @@ int main() {
 
 	CKG_HashMap(char*, Person) person_map = NULLPTR;
 
-	/// Person p1;
-	/// p1.name = "john";
-	/// p1.age = 41;
-/// 
+	Person p1;
+	p1.name = "john";
+	p1.age = 41;
+
+	char* test = "dsfsdf";
+	u64 h = siphash24(test, sizeof(char*));
+
+	ckg_hashmap_put_key_ptr(person_map, "dsfsdf", p1);
+	Person p2 = ckg_hashmap_get_key_ptr(person_map, "dsfsdf");
+	printf("%s\n", p2.name);
+
+	/// 
 	/// ckg_hashmap_insert(person_map, "stick_bug", p1);
 	/// Person p2 = ckg_hashmap_get(person_map, "stick_bug");
 
