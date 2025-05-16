@@ -13,8 +13,6 @@ u64 person_hash(u8* data, u32 size) {
 }
 
 void test_integer_keys() {
-    printf("Testing integer keys...\n");
-
     CKG_HashMap(int, int)* map = NULLPTR;
     ckg_hashmap_init_siphash(map, int, int);
 
@@ -68,8 +66,6 @@ void test_string_literal_keys() {
 }
 
 void test_char_ptr_keys() {
-    printf("Testing char pointer keys...\n");
-
     CKG_HashMap(char*, double)* map = NULLPTR;
     ckg_hashmap_init_string_hash(map, char*, double);
 
@@ -102,8 +98,6 @@ void test_char_ptr_keys() {
 }
 
 void test_struct_keys() {
-    printf("Testing struct keys...\n");
-
     CKG_HashMap(Person, int)* map = NULLPTR;
     ckg_hashmap_init_with_hash(map, Person, int, false, person_hash);
 
@@ -138,5 +132,4 @@ void ckg_hashmap_test() {
     test_string_literal_keys();
     test_char_ptr_keys();
     test_struct_keys();
-    // stest_collisions();
 }
