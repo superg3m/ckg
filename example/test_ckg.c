@@ -13,29 +13,16 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 	return;
 }
 
-typedef struct Person {
-	char* name;
-	int age;
-} Person;
-
-u64 person_hash(u8* data, u32 size) {
-	Person* person = (Person*)data;
-	u64 h1 = ckg_string_hash(person->name, 0);
-	u64 h2 = siphash24((u8*)&person->age, sizeof(person->age));
-
-	return h1 ^ h2;
-}
-
 typedef struct DEBUG_ENTRY { 
-	Person key; 
-	u32 value;
+	int key; 
+	int value;
 	bool filled;
 } DEBUG_ENTRY; 
 
 typedef struct DEBUG_MAP {
 	CKG_HashMapMeta meta; 
-	Person temp_key;
-	u32 temp_value;
+	int temp_key;
+	int temp_value;
 	DEBUG_ENTRY* entries;
 } DEBUG_MAP;
 
@@ -52,6 +39,7 @@ int main() {
 		test_ckg_str_operations();
 		test_ckg_vector_operations();
 		test_ckg_ring_buffer_overwrite_behavior();
+		test_hashmap_int_keys();
 	});
 	
 	test_serialization();
@@ -97,30 +85,10 @@ int main() {
 
 	CKG_StringView str_between_test = ckg_sv_between_delimiters(CKG_LIT_ARG("WOW - ${Hello!}"), CKG_LIT_ARG("${"), CKG_LIT_ARG("}"));
 	CKG_LOG_DEBUG("String_Between: %.*s | %d\n", str_between_test.length, str_between_test.data, (int)str_between_test.length);
-
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
-
-	CKG_HashMap(Person, u32)* person_map = NULLPTR; 
-	ckg_hashmap_init_with_hash(person_map, Person, u32, false, person_hash);
 
 	DEBUG_MAP* d = NULLPTR;
 	(void)d;
-
-	Person p1 = {.name = "john", .age = 41};
-	Person p2 = {.name = "john", .age = 41};
-
-	// ckg_assert(person_hash((u8*)&p1, 0) == person_hash((u8*)&p2, 0));
-
-	ckg_hashmap_put(person_map, p1, 32);
-	u32 b = ckg_hashmap_get(person_map, p2);
-	printf("%d\n", b);
-
-	/// 
-	/// ckg_hashmap_insert(person_map, "stick_bug", p1);
-	/// Person p2 = ckg_hashmap_get(person_map, "stick_bug");
-
-	int x = (1 + 2, 3 + 4);  // x is 7
-
 
 	ckg_arena_free(&arena);
 	return 0;
