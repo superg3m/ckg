@@ -577,6 +577,8 @@
     void ckg_hashmap_grow(u8* hashmap);
     u64 siphash24(u8* source, u32 source_size);
     u64 ckg_string_hash(u8* str, u32 str_length);
+    u64 ckg_string_view_hash(u8* view, u32 str_length);
+    u64 ckg_string_view(u8* str, u32 str_length);
     float ckg_hashmap_load_factor(void* hashmap);
     u64 ckit_hashmap_resolve_collision(u8* hashmap, u8* key, u64 inital_hash_index);
     void ckg_hashmap_get_helper(u8* map);
@@ -627,6 +629,7 @@
 
     #define ckg_hashmap_init_siphash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, siphash24)
     #define ckg_hashmap_init_string_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, true, ckg_string_hash)
+    #define ckg_hashmap_init_string_view_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, ckg_string_view_hash)
 
 
     #define ckg_hashmap_put(map, __key, __value) \
@@ -1915,6 +1918,20 @@
         int c;
 
         while ((c = *str_ptr++)) {
+            hash = ((hash << 5) + hash) + c;
+        }
+
+        return hash;
+    }
+
+    u64 ckg_string_view_hash(u8* view, u32 str_length) {
+        (void)str_length;
+        CKG_StringView* str_view = (CKG_StringView*)view;
+        u64 hash = 5381;
+        int c;
+
+        for (int i = 0; i < str_view->length; i++) {
+            c = str_view->data[i];
             hash = ((hash << 5) + hash) + c;
         }
 
