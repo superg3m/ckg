@@ -644,7 +644,7 @@
     #define ckg_hashmap_has(map, key)       \
     (                                       \
         (map)->temp_key = (key),            \
-        ckg_hashmap_has_helper((u8*)(map)), \
+        ckg_hashmap_has_helper((u8*)(map))  \
     )                                       \
 
 
