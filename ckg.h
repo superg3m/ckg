@@ -1900,7 +1900,8 @@
                 break;
             }
 
-            cannonical_hash_index = ++cannonical_hash_index % meta->capacity;
+            cannonical_hash_index++;
+            cannonical_hash_index = cannonical_hash_index % meta->capacity;
         }
 
         return cannonical_hash_index;
