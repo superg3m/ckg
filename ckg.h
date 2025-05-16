@@ -529,6 +529,8 @@
     //
     // ========== START CKG_HashMap ==========
     //
+    typedef u64 (*CKG_HashFunction)(u8* data, u32 size);
+
     typedef struct CKG_HashMapMeta {
         u32 key_offset;
         u32 value_offset;
@@ -543,6 +545,9 @@
 
         u64 capacity;
         u64 count;
+        
+        bool key_is_ptr;
+        CKG_HashFunction hash_fn;
     } CKG_HashMapMeta;
 
 
@@ -570,101 +575,88 @@
 
     float ckg_hashmap_load_factor(void* hashmap);
     void ckg_hashmap_grow(u8* hashmap);
-    uint64_t siphash24(const void *src, unsigned long src_sz);
+    u64 siphash24(u8* source, u32 source_size);
+    u64 ckg_string_hash(u8* str, u32 str_length);
     float ckg_hashmap_load_factor(void* hashmap);
     u64 ckit_hashmap_resolve_collision(u8* hashmap, u8* key, u64 inital_hash_index);
     void ckg_hashmap_get_helper(u8* map, bool key_is_ptr);
 
 
-    #define ckg_hashmap_init(map, KeyType, ValueType)                                           \
-    {                                                                                           \
-        map = ckg_alloc(sizeof(CKG_HashMap(KeyType, ValueType)));                               \
-        map->meta.key_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_key);             \
-        map->meta.value_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_value);         \
-        map->meta.entry_offset = offsetof(CKG_HashMap(KeyType, ValueType), entries);            \
-        map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);       \
-        map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);   \
-        map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled); \
-        map->meta.key_size = sizeof(KeyType);                                                   \
-        map->meta.value_size = sizeof(ValueType);                                               \
-        map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                    \
-        map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                                      \
-        map->meta.count = 0;                                                                    \
-        map->entries = ckg_alloc(map->meta.entry_size * map->meta.capacity);                    \
-    }                                                                                           \
+
+   #define ckg_hashmap_init_with_hash(map, KeyType, ValueType, __key_is_ptr, __hash_function)        \
+    {                                                                                            \
+        map = ckg_alloc(sizeof(CKG_HashMap(KeyType, ValueType)));                                \
+        map->meta.key_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_key);              \
+        map->meta.value_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_value);          \
+        map->meta.entry_offset = offsetof(CKG_HashMap(KeyType, ValueType), entries);             \
+        map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);        \
+        map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);    \
+        map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled);  \
+        map->meta.key_size = sizeof(KeyType);                                                    \
+        map->meta.value_size = sizeof(ValueType);                                                \
+        map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                     \
+        map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                                       \
+        map->meta.count = 0;                                                                     \
+        map->meta.hash_fn = __hash_function;                                                     \
+        map->meta.key_is_ptr = __key_is_ptr;                                                     \
+        map->entries = ckg_alloc(map->meta.entry_size * map->meta.capacity);                     \
+    }                                                                                            \
+
+    #define ckg_hashmap_init_siphash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, siphash24)
+    #define ckg_hashmap_init_string_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, true, ckg_string_hash)
 
 
-    #define ckg_hashmap_put(map, __key, __value)                                           \
-    {                                                                                      \
-        if ((map) == NULLPTR) {                                                            \
-            (map) = ckg_alloc(sizeof(*(map)));                                             \
-            (map)->meta.key_size = sizeof((map)->temp_key);                                \
-            (map)->meta.value_size = sizeof((map)->temp_value);                            \
-            (map)->meta.entry_size = sizeof(*(map)->entries);                              \
-            (map)->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                           \
-            (map)->meta.count = 0;                                                         \
-            (map)->entries = ckg_alloc((map)->meta.entry_size * (map)->meta.capacity);     \
-        }                                                                                  \
-                                                                                           \
-        (map)->temp_key = (__key);                                                         \
-        (map)->temp_value = (__value);                                                     \
-                                                                                           \
-        if (ckg_hashmap_load_factor(map) >= CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {             \
-            ckg_hashmap_grow((u8*)(map));                                                  \
-        }                                                                                  \
-                                                                                           \
-        u64 hash = siphash24(&(map)->temp_key, sizeof((map)->temp_key));                   \
-        u64 index = hash % (map)->meta.capacity;                                           \
-        index = ckit_hashmap_resolve_collision((u8*)(map), (u8*)&(map)->temp_key, index);  \
-                                                                                           \
-        (map)->entries[index].key = (map)->temp_key;                                       \
-        (map)->entries[index].value = (map)->temp_value;                                   \
-        (map)->entries[index].filled = true;                                               \
-        (map)->meta.count++;                                                               \
-    }                                                                                      \
+    #define ckg_hashmap_put(map, __key, __value)                                             \
+    {                                                                                        \
+        (map)->temp_key = (__key);                                                           \
+        (map)->temp_value = (__value);                                                       \
+                                                                                             \
+        if (ckg_hashmap_load_factor(map) >= CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {               \
+            ckg_hashmap_grow((u8*)(map));                                                    \
+        }                                                                                    \
+                                                                                             \
+        u64 hash = (map)->meta.hash_fn((u8*)&(map)->temp_key, sizeof((map)->temp_key));      \
+        u64 index = hash % (map)->meta.capacity;                                             \
+        index = ckit_hashmap_resolve_collision((u8*)(map), (u8*)&(map)->temp_key, index);    \
+                                                                                             \
+        (map)->entries[index].key = (map)->temp_key;                                         \
+        (map)->entries[index].value = (map)->temp_value;                                     \
+        (map)->entries[index].filled = true;                                                 \
+        (map)->meta.count++;                                                                 \
+    }                                                                                        \
 
-    #define ckg_hashmap_put_key_ptr(map, __key, __value)                                   \
-    {                                                                                      \
-        if ((map) == NULLPTR) {                                                            \
-            (map) = ckg_alloc(sizeof(*(map)));                                             \
-            (map)->meta.key_size = sizeof((map)->temp_key);                                \
-            (map)->meta.value_size = sizeof((map)->temp_value);                            \
-            (map)->meta.entry_size = sizeof(*(map)->entries);                              \
-            (map)->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                           \
-            (map)->meta.count = 0;                                                         \
-            (map)->entries = ckg_alloc((map)->meta.entry_size * (map)->meta.capacity);     \
-        }                                                                                  \
-                                                                                           \
-        (map)->temp_key = __key;                                                           \
-        (map)->temp_value = __value;                                                       \
-                                                                                           \
-        if (ckg_hashmap_load_factor(map) >= CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {             \
-            ckg_hashmap_grow((u8*)(map));                                                  \
-        }                                                                                  \
-                                                                                           \
-        u64 hash = siphash24((map)->temp_key, sizeof((map)->temp_key));                    \
-        u64 index = hash % (map)->meta.capacity;                                           \
-        index = ckit_hashmap_resolve_collision((u8*)(map), (u8*)&(map)->temp_key, index);  \
-                                                                                           \
-        (map)->entries[index].key = (map)->temp_key;                                       \
-        (map)->entries[index].value = (map)->temp_value;                                   \
-        (map)->entries[index].filled = true;                                               \
-        (map)->meta.count++;                                                               \
-    }                                                                                      \
+    #define ckg_hashmap_put_key_ptr(map, __key, __value)                                  \
+    {                                                                                     \
+        (map)->temp_key = (__key);                                                        \
+        (map)->temp_value = (__value);                                                    \
+                                                                                          \
+        if (ckg_hashmap_load_factor(map) >= CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {            \
+            ckg_hashmap_grow((u8*)(map));                                                 \
+        }                                                                                 \
+                                                                                          \
+        u64 hash = (map)->meta.hash_fn(&(map)->temp_key, sizeof((map)->temp_key));        \
+        u64 index = hash % (map)->meta.capacity;                                          \
+        index = ckit_hashmap_resolve_collision((u8*)(map), (u8*)&(map)->temp_key, index); \
+                                                                                          \
+        (map)->entries[index].key = (map)->temp_key;                                      \
+        (map)->entries[index].value = (map)->temp_value;                                  \
+        (map)->entries[index].filled = true;                                              \
+        (map)->meta.count++;                                                              \
+    }                                                                                     \
     
-    #define ckg_hashmap_get(map, key)       \
-    (                                       \
-        (map)->temp_key = (key),            \
-        ckg_hashmap_get_helper((u8*)(map), false), \
-        (map)->temp_value                   \
-    )                                       \
+    #define ckg_hashmap_get(map, key)                             \
+    (                                                             \
+        (map)->temp_key = (key),                                  \
+        ckg_hashmap_get_helper((u8*)(map), map->meta.key_is_ptr), \
+        (map)->temp_value                                         \
+    )                                                             \
 
-    #define ckg_hashmap_get_key_ptr(map, key)       \
-    (                                       \
-        (map)->temp_key = (key),            \
-        ckg_hashmap_get_helper((u8*)(map), true), \
-        (map)->temp_value                   \
-    )                                       \
+    #define ckg_hashmap_get_key_ptr(map, key)                      \
+    (                                                              \
+        (map)->temp_key = (key),                                   \
+        ckg_hashmap_get_helper((u8*)(map),  map->meta.key_is_ptr), \
+        (map)->temp_value                                          \
+    )                                                              \
 
 
     //
@@ -1830,7 +1822,7 @@
         HALF_ROUND(v0,v1,v2,v3,13,16); \
         HALF_ROUND(v2,v1,v0,v3,17,21)
 
-    uint64_t siphash24(const void *src, unsigned long src_sz) {
+    uint64_t siphash24(u8* source, u32 source_size) {
         const char key[16] = {
             0x00, 0x01, 0x02, 0x03,
             0x04, 0x05, 0x06, 0x07,
@@ -1841,31 +1833,31 @@
         const uint64_t *_key = (uint64_t *)key;
         uint64_t k0 = _le64toh(_key[0]);
         uint64_t k1 = _le64toh(_key[1]);
-        uint64_t b = (uint64_t)src_sz << 56;
-        const uint64_t *in = (uint64_t*)src;
+        uint64_t b = (uint64_t)source_size << 56;
+        const uint64_t *in = (uint64_t*)source;
 
         uint64_t v0 = k0 ^ 0x736f6d6570736575ULL;
         uint64_t v1 = k1 ^ 0x646f72616e646f6dULL;
         uint64_t v2 = k0 ^ 0x6c7967656e657261ULL;
         uint64_t v3 = k1 ^ 0x7465646279746573ULL;
 
-        while (src_sz >= 8) {
+        while (source_size >= 8) {
             uint64_t mi = _le64toh(*in);
-            in += 1; src_sz -= 8;
+            in += 1; source_size -= 8;
             v3 ^= mi;
             DOUBLE_ROUND(v0,v1,v2,v3);
             v0 ^= mi;
         }
 
         uint64_t t = 0; uint8_t *pt = (uint8_t *)&t; uint8_t *m = (uint8_t *)in;
-        switch (src_sz) {
-        case 7: pt[6] = m[6];
-        case 6: pt[5] = m[5];
-        case 5: pt[4] = m[4];
-        case 4: *((uint32_t*)&pt[0]) = *((uint32_t*)&m[0]); break;
-        case 3: pt[2] = m[2];
-        case 2: pt[1] = m[1];
-        case 1: pt[0] = m[0];
+        switch (source_size) {
+            case 7: pt[6] = m[6];
+            case 6: pt[5] = m[5];
+            case 5: pt[4] = m[4];
+            case 4: *((uint32_t*)&pt[0]) = *((uint32_t*)&m[0]); break;
+            case 3: pt[2] = m[2];
+            case 2: pt[1] = m[1];
+            case 1: pt[0] = m[0];
         }
         b |= _le64toh(t);
 
@@ -1888,16 +1880,20 @@
         CKG_HashMapMeta* meta = (CKG_HashMapMeta*)hashmap;
         u8* temp_key_address = hashmap + meta->key_offset;
         u8* temp_value_address = hashmap + meta->value_offset; 
-        u8* entries_base_address = hashmap + meta->entry_offset;
+        u8** entries_base_address = (u8**)(hashmap + meta->entry_offset);
 
         u64 cannonical_hash_index = inital_hash_index;
 
         while (true) {
-            u8* entry = (entries_base_address + (cannonical_hash_index * meta->entry_size));
+            u8* entry = (*entries_base_address + (cannonical_hash_index * meta->entry_size));
             u8* entry_key = entry + meta->entry_key_offset;
             bool entry_filled = *(entry + meta->entry_filled_offset);
-            bool hashes_match = (siphash24(entry_key, meta->key_size) == siphash24(key, meta->key_size));
-            if (!entry_filled || hashes_match) {
+            if (!entry_filled) {
+                break;
+            }
+
+            bool hashes_match = (meta->hash_fn(entry_key, meta->key_size) == meta->hash_fn(key, meta->key_size));
+            if (hashes_match) {
                 break;
             }
 
@@ -1905,6 +1901,17 @@
         }
 
         return cannonical_hash_index;
+    }
+
+    u64 ckg_string_hash(u8* str, u32 str_length) {
+        u64 hash = 5381;
+        int c;
+
+        while ((c = *str++)) {
+            hash = ((hash << 5) + hash) + c;
+        }
+
+        return hash;
     }
 
     void ckg_hashmap_get_helper(u8* map, bool key_is_ptr) {
@@ -1917,13 +1924,12 @@
             temp_key_address = map + meta->key_offset;
         }
 
-
-        u64 hash = siphash24(temp_key_address, (unsigned long)meta->key_size);
+        u64 hash = meta->hash_fn(temp_key_address, meta->key_size);
         u64 index = hash % meta->capacity;
         u64 real_index = ckit_hashmap_resolve_collision(map, temp_key_address, index);
 
-        u8* entries = map + meta->entry_offset;
-        u8* entry = entries + (real_index * meta->entry_size);
+        u8** entries = (u8**)(map + meta->entry_offset);
+        u8* entry = *entries + (real_index * meta->entry_size);
         bool filled = *(bool*)(entry + meta->entry_filled_offset);
         ckg_assert_msg(filled, "The key doesn't exist in the hashmap!\n");
 
@@ -1952,7 +1958,7 @@
                 continue;
             }
 
-            u64 hash = siphash24(old_entry, (unsigned long)meta->key_size);
+            u64 hash = meta->hash_fn(old_entry, meta->key_size);
             u64 index = hash % meta->capacity;
 
             u64 real_index = ckit_hashmap_resolve_collision((u8*)hashmap, old_entry, index);

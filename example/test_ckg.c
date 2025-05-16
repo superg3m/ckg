@@ -13,6 +13,32 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 	return;
 }
 
+typedef struct Person {
+	char* name;
+	int age;
+} Person;
+
+u64 person_hash(u8* data, u32 size) {
+	Person* person = (Person*)data;
+	u64 h1 = ckg_string_hash(person->name, 0);
+	u64 h2 = siphash24((u8*)&person->age, sizeof(person->age));
+
+	return h1 ^ h2;
+}
+
+typedef struct DEBUG_ENTRY { 
+	Person key; 
+	u32 value;
+	bool filled;
+} DEBUG_ENTRY; 
+
+typedef struct DEBUG_MAP {
+	CKG_HashMapMeta meta; 
+	Person temp_key;
+	u32 temp_value;
+	DEBUG_ENTRY* entries;
+} DEBUG_MAP;
+
 #define TOTAL_MEMORY_SIZE KiloBytes(30)
 
 int main() {
@@ -74,40 +100,20 @@ int main() {
 
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 
-	typedef struct Person {
-		char* name;
-		int age;
-	} Person;
-
 	CKG_HashMap(Person, u32)* person_map = NULLPTR; 
-	ckg_hashmap_init(person_map, Person, u32);
+	ckg_hashmap_init_with_hash(person_map, Person, u32, false, person_hash);
 
+	DEBUG_MAP* d = NULLPTR;
+	(void)d;
 
+	Person p1 = {.name = "john", .age = 41};
+	Person p2 = {.name = "john", .age = 41};
 
-	// Strings need to be hashed differently
-
-	// ckg_hashmap_put()
-	// ckg_hashmap_get()
-	// ckg_hashmap_put_key_str()
-	// ckg_hashmap_get_key_str()    
-
-	// person_map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                      
-	// person_map->meta.count = 0;                                                    
-	// person_map->entries = ckg_alloc((person_map)->meta.entry_size * (person_map)->meta.capacity);
-
-	Person p1;
-	p1.name = "john";
-	p1.age = 41;
-
-	
-	// Person p2;
-	// p2.name = "john";
-	// p2.age = 41;
+	// ckg_assert(person_hash((u8*)&p1, 0) == person_hash((u8*)&p2, 0));
 
 	ckg_hashmap_put(person_map, p1, 32);
-	u32 b = ckg_hashmap_get(person_map, p1);
+	u32 b = ckg_hashmap_get(person_map, p2);
 	printf("%d\n", b);
-
 
 	/// 
 	/// ckg_hashmap_insert(person_map, "stick_bug", p1);
