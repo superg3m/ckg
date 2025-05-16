@@ -79,27 +79,35 @@ int main() {
 		int age;
 	} Person;
 
-	CKG_HashMap(char*, Person) person_map = NULLPTR;
+	CKG_HashMap(Person, u32)* person_map = NULLPTR; 
+	ckg_hashmap_init(person_map, Person, u32);
 
-	Person p1;
-	p1.name = "john";
-	p1.age = 41;
 
-	char* test = "dsfsdf8";
-	u64 h = siphash24(test, sizeof(char*));
 
 	// Strings need to be hashed differently
 
 	// ckg_hashmap_put()
 	// ckg_hashmap_get()
-
 	// ckg_hashmap_put_key_str()
-	// ckg_hashmap_get_key_str()
+	// ckg_hashmap_get_key_str()    
 
+	// person_map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                      
+	// person_map->meta.count = 0;                                                    
+	// person_map->entries = ckg_alloc((person_map)->meta.entry_size * (person_map)->meta.capacity);
 
-	ckg_hashmap_put_key_ptr(person_map, "dsfsdf8", p1);
-	Person p2 = ckg_hashmap_get_key_ptr(person_map, "dsfsdf8");
-	printf("%s\n", p2.name);
+	Person p1;
+	p1.name = "john";
+	p1.age = 41;
+
+	
+	// Person p2;
+	// p2.name = "john";
+	// p2.age = 41;
+
+	ckg_hashmap_put(person_map, p1, 32);
+	u32 b = ckg_hashmap_get(person_map, p1);
+	printf("%d\n", b);
+
 
 	/// 
 	/// ckg_hashmap_insert(person_map, "stick_bug", p1);
