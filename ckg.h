@@ -581,9 +581,10 @@
     u64 ckg_string_view(u8* str, u32 str_length);
     float ckg_hashmap_load_factor(void* hashmap);
     u64 ckit_hashmap_resolve_collision(u8* hashmap, u8* key, u64 inital_hash_index);
+    bool ckg_hashmap_has_helper(u8* map);
     void ckg_hashmap_get_helper(u8* map);
     void ckg_hashmap_put_helper(u8* map);
-    void ckg_hashmap_pop_helper(u8* map);;
+    void ckg_hashmap_pop_helper(u8* map);
 
     /**
      * @brief Inserts a key-value pair into a generic hashmap.
@@ -639,6 +640,12 @@
         ckg_hashmap_put_helper((u8*)(map));      \
         (map)->meta.count++;                     \
     } while(0)                                   \
+
+    #define ckg_hashmap_has(map, key)       \
+    (                                       \
+        (map)->temp_key = (key),            \
+        ckg_hashmap_has_helper((u8*)(map)), \
+    )                                       \
 
 
     #define ckg_hashmap_get(map, key)       \
@@ -1938,27 +1945,49 @@
         return hash;
     }
 
-    void ckg_hashmap_pop_helper(u8* map) {
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
+    typedef struct HashMapContext {
+        u8* temp_key_address;
+        u64 real_index;
+        CKG_HashMapMeta* meta;
+        u8* entry;
+        u8* entry_key_address;
+        u8* entry_value_address;
+        u8* entry_filled_address;
+    } HashMapContext;
 
-        u8* temp_key_address = NULLPTR;
-        if (meta->key_is_ptr) {
-            temp_key_address = *(u8**)(map + meta->key_offset);
+    static HashMapContext ckg_hashmap_find_entry(u8* map) {
+        HashMapContext context;
+        context.meta = (CKG_HashMapMeta*)map;
+        context.temp_key_address = NULLPTR;
+
+        if (context.meta->key_is_ptr) {
+            context.temp_key_address = *(u8**)(map + context.meta->key_offset);
         } else {
-            temp_key_address = map + meta->key_offset;
+            context.temp_key_address = map + context.meta->key_offset;
         }
 
-        u64 hash = meta->hash_fn(temp_key_address, meta->key_size);
-        u64 index = hash % meta->capacity;
-        u64 real_index = ckit_hashmap_resolve_collision(map, temp_key_address, index);
+        u64 hash = context.meta->hash_fn(context.temp_key_address, context.meta->key_size);
+        u64 index = hash % context.meta->capacity;
+        context.real_index = ckit_hashmap_resolve_collision(map, context.temp_key_address, index);
 
-        u8** entries = (u8**)(map + meta->entry_offset);
-        u8* entry = *entries + (real_index * meta->entry_size);
-        u8* entry_filled = entry + meta->entry_filled_offset;
-        ckg_assert_msg(*entry_filled, "The key doesn't exist in the hashmap!\n");
+        u8** entries = (u8**)(map + context.meta->entry_offset);
+        context.entry = *entries + (context.real_index * context.meta->entry_size);
+        context.entry_key_address = context.entry + context.meta->entry_key_offset;
+        context.entry_value_address = context.entry + context.meta->entry_value_offset;
+        context.entry_filled_address = context.entry + context.meta->entry_filled_offset;
 
-        ckg_memory_copy(entry + meta->entry_value_offset, map + meta->value_offset, meta->value_size, meta->value_size);
-        *entry_filled = 0;
+        return context;
+    }
+
+    bool ckg_hashmap_has_helper(u8* map) {
+        HashMapContext context = ckg_hashmap_find_entry(map);
+        return *(bool*)(context.entry_filled_address);
+    }
+
+    void ckg_hashmap_get_helper(u8* map) {
+        HashMapContext context = ckg_hashmap_find_entry(map);
+        ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
+        ckg_memory_copy(context.entry_value_address, map + context.meta->value_offset, context.meta->value_size, context.meta->value_size);
     }
 
     void ckg_hashmap_put_helper(u8* map) {
@@ -1966,48 +1995,19 @@
             ckg_hashmap_grow(map);
         }
 
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
-
-        u8* temp_key_address = NULLPTR;
-        if (meta->key_is_ptr) {
-            temp_key_address = *(u8**)(map + meta->key_offset);
-        } else {
-            temp_key_address = map + meta->key_offset;
-        }
-
-        u64 hash = meta->hash_fn(temp_key_address, meta->key_size);
-        u64 index = hash % meta->capacity;
-        u64 real_index = ckit_hashmap_resolve_collision(map, temp_key_address, index);
-
-        u8** entries = (u8**)(map + meta->entry_offset);
-        u8* entry = *entries + (real_index * meta->entry_size);
-        u8* entry_filled = entry + meta->entry_filled_offset;
-        ckg_memory_copy(map + meta->key_offset, entry + meta->entry_key_offset, meta->key_size, meta->key_size);
-        ckg_memory_copy(map + meta->value_offset, entry + meta->entry_value_offset, meta->value_size, meta->value_size);
-        *entry_filled = 1;
+        HashMapContext context = ckg_hashmap_find_entry(map);
+        ckg_memory_copy(map + context.meta->key_offset, context.entry_key_address, context.meta->key_size, context.meta->key_size);
+        ckg_memory_copy(map + context.meta->value_offset, context.entry_value_address, context.meta->value_size, context.meta->value_size);
+        *(bool*)(context.entry_filled_address) = 1;
     }
 
-    void ckg_hashmap_get_helper(u8* map) {
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
-
-        u8* temp_key_address = NULLPTR;
-        if (meta->key_is_ptr) {
-            temp_key_address = *(u8**)(map + meta->key_offset);
-        } else {
-            temp_key_address = map + meta->key_offset;
-        }
-
-        u64 hash = meta->hash_fn(temp_key_address, meta->key_size);
-        u64 index = hash % meta->capacity;
-        u64 real_index = ckit_hashmap_resolve_collision(map, temp_key_address, index);
-
-        u8** entries = (u8**)(map + meta->entry_offset);
-        u8* entry = *entries + (real_index * meta->entry_size);
-        bool filled = *(bool*)(entry + meta->entry_filled_offset);
-        ckg_assert_msg(filled, "The key doesn't exist in the hashmap!\n");
-
-        ckg_memory_copy(entry + meta->entry_value_offset, map + meta->value_offset, meta->value_size, meta->value_size);
+    void ckg_hashmap_pop_helper(u8* map) {
+        HashMapContext context = ckg_hashmap_find_entry(map);
+        ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
+        ckg_memory_copy(context.entry_value_address, map + context.meta->value_offset, context.meta->value_size, context.meta->value_size);
+        *(bool*)(context.entry_filled_address) = 0;
     }
+
 
     void ckg_hashmap_grow(u8* hashmap) {
         if (ckg_hashmap_load_factor(hashmap) < CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
@@ -2047,7 +2047,6 @@
 
         ckg_free(entries_base_address);
     }
-
 
     //
     // ========== END CKG_HashMap ==========
