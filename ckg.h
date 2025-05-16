@@ -1891,6 +1891,8 @@
 
         u64 cannonical_hash_index = inital_hash_index;
 
+        // Date: May 16, 2025
+        // TODO(Jovanni): This probably needs to have a comparision function to actually be correct
         while (true) {
             u8* entry = entries_base_address + (cannonical_hash_index * meta->entry_size);
             u8* entry_key = NULLPTR;
