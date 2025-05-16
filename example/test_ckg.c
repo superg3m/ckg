@@ -14,14 +14,14 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 }
 
 typedef struct DEBUG_ENTRY { 
-	int key; 
+	char* key; 
 	int value;
 	bool filled;
 } DEBUG_ENTRY; 
 
 typedef struct DEBUG_MAP {
 	CKG_HashMapMeta meta; 
-	int temp_key;
+	char* temp_key;
 	int temp_value;
 	DEBUG_ENTRY* entries;
 } DEBUG_MAP;
@@ -39,7 +39,7 @@ int main() {
 		test_ckg_str_operations();
 		test_ckg_vector_operations();
 		test_ckg_ring_buffer_overwrite_behavior();
-		test_hashmap_int_keys();
+		ckg_hashmap_test();
 	});
 	
 	test_serialization();
