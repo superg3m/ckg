@@ -88,6 +88,15 @@ int main() {
 	char* test = "dsfsdf8";
 	u64 h = siphash24(test, sizeof(char*));
 
+	// Strings need to be hashed differently
+
+	// ckg_hashmap_put()
+	// ckg_hashmap_get()
+
+	// ckg_hashmap_put_key_str()
+	// ckg_hashmap_get_key_str()
+
+
 	ckg_hashmap_put_key_ptr(person_map, "dsfsdf8", p1);
 	Person p2 = ckg_hashmap_get_key_ptr(person_map, "dsfsdf8");
 	printf("%s\n", p2.name);
