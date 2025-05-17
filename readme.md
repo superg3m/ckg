@@ -8,7 +8,7 @@
 - Collection of tools, data structures, and algorithms that I find useful
 - (CONSTRAINT) ckg can't allocate in string functions or any other functions on its own because if it did the ckit memory tracker would not work
 
-#### NOTES 
+#### NOTES (everything here needs a update!)
 - I consider CKG almost
 - Not thread safe (because of the allocator I should do something about this, maybe a preprocessor thing)
 
