@@ -145,7 +145,7 @@
         #define UNUSED_FUNCTION
     #endif
 
-    CKG_API void ckg_stack_trace_dump();
+    CKG_API void ckg_stack_trace_dump(char* function, char* file, u32 line);
 #endif
 
 #if defined(CKG_INCLUDE_LOGGER)
@@ -793,49 +793,137 @@
         *number_to_endian_swap = (b0 << 56)|(b1 << 48)|(b2 << 40)|(b3 << 32)|(b4 << 24)|(b5 << 16)|(b6 << 8)|(b7 << 0);
     }
 
-    #if defined(_MSC_VER )
+    #if defined(PLATFORM_WINDOWS) && defined(_MSC_VER )
         #include <DbgHelp.h>
         #pragma comment(lib, "dbghelp")
-        void ckg_stack_trace_dump() {
+
+        const char* GetModuleNameFromAddress(HANDLE process, DWORD64 address) {
+            static char moduleName[MAX_PATH];
+            IMAGEHLP_MODULE64 moduleInfo;
+            memset(&moduleInfo, 0, sizeof(moduleInfo));
+            moduleInfo.SizeOfStruct = sizeof(moduleInfo);
+            if (SymGetModuleInfo64(process, address, &moduleInfo)) {
+                strncpy(moduleName, moduleInfo.ModuleName, MAX_PATH - 1);
+                moduleName[MAX_PATH - 1] = '\0';
+                return moduleName;
+            }
+            return "Unknown Module";
+        }
+
+        void ckg_stack_trace_dump(char* function, char* file, u32 line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
             // Date: July 02, 2024
-            // NOTE(Jovanni): This only works for windows and when debug symbols are compiled into the program
+            // NOTE(Jovanni): This only works for Windows and when debug symbols are compiled into the program
             void *stack[100];
             unsigned short number_of_captured_frames;
-            SYMBOL_INFO *symbol;
-            HANDLE process;
+            SYMBOL_INFO *symbol = NULLPTR;
+            HANDLE process = GetCurrentProcess();
 
-            process = GetCurrentProcess();
-            SymInitialize(process, NULLPTR, true);
+            SymInitialize(process, NULLPTR, TRUE);
 
-            number_of_captured_frames = CaptureStackBackTrace(0, 100, stack, NULLPTR);
+            number_of_captured_frames = CaptureStackBackTrace(0, 100, stack, NULLPTR) - 6;
+
             symbol = (SYMBOL_INFO *)ckg_alloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char));
-            symbol->MaxNameLen = 255;
-            symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+            if (symbol) {
+                symbol->MaxNameLen = 255;
+                symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
-            int count = 0;
-            for (int i = number_of_captured_frames - 4; i > 0; i--) {
-                DWORD64 displacement = 0;
-                if (SymFromAddr(process, (DWORD64)(stack[i]), &displacement, symbol)) {
-                    DWORD displacementLine = 0;
-                    IMAGEHLP_LINE64 line;
-                    line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
-                    if (SymGetLineFromAddr64(process, (DWORD64)(stack[i]), &displacementLine, &line)) {
-                        printf("%d: %s - %s:%d\n", count, symbol->Name, line.FileName, line.LineNumber);
+                int count = 0;
+                for (unsigned short i = 2; i < number_of_captured_frames; i++) {
+                    DWORD64 displacement = 0;
+                    if (SymFromAddr(process, (DWORD64)(stack[i]), &displacement, symbol)) {
+                        DWORD displacementLine = 0;
+                        IMAGEHLP_LINE64 debug_line;
+                        debug_line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+                        if (i == 2) {
+                            CKG_LOG_PRINT("0: %s - %s:%d\n", function, file, line);
+                            continue;
+                        }
+                        
+                        if (SymGetLineFromAddr64(process, (DWORD64)(stack[i]), &displacementLine, &debug_line)) {
+                            CKG_LOG_PRINT("%d: %s - %s:%d\n", count, symbol->Name, debug_line.FileName, debug_line.LineNumber);
+                        } else {
+                            CKG_LOG_PRINT("%d: %s\n", count, symbol->Name);
+                        }
                     } else {
-                        printf("%d: %s\n", count, symbol->Name);
+                        DWORD error = GetLastError();
+                        CKG_LOG_PRINT("%d: [Error: %lu] Address: 0x%p\n", count, error, stack[i]);
                     }
+                    count++;
                 }
-                count++;
+                ckg_free(symbol);
+            } else {
+                CKG_LOG_PRINT("Error allocating symbol info buffer.\n");
             }
 
-            ckg_free(symbol);
+            SymCleanup(process);
             CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
         }
-    #elif defined(__GNUC__) || defined(__GNUG__) || defined(__clang__)
-        void ckg_stack_trace_dump() {
+    #elif defined(PLATFORM_LINUX) || defined(PLATFORM_DARWIN)
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <unistd.h>
+        #include <cxxabi.h>
+
+        void ckg_stack_trace_dump(char* function, char* file, u32 line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
-            // backtrace
+
+            void* array[100];
+            int size = backtrace(array, 100) - 6;
+            char** strings = backtrace_symbols(array, size);
+
+            if (strings == NULLPTR) {
+                CKG_LOG_PRINT("Failed to get backtrace symbols\n");
+                CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+                return;
+            }
+
+            for (int i = 2; i < size; ++i) {
+                char* begin_name = NULLPTR;
+                char* begin_offset = NULLPTR;
+                char* end_offset = NULLPTR;
+
+                for (char* p = strings[i]; *p; ++p) {
+                    if (*p == '(') {
+                        begin_name = p;
+                    } else if (*p == '+') {
+                        begin_offset = p;
+                    } else if (*p == ')' && begin_offset) {
+                        end_offset = p;
+                        break;
+                    }
+                }
+
+                if (i == 2) {
+                    CKG_LOG_PRINT("0: %s - %s:%d\n", function, file, line);
+                    continue;
+                }
+
+                if (begin_name && begin_offset && end_offset && begin_name < begin_offset) {
+                    *begin_name++ = '\0';
+                    *begin_offset++ = '\0';
+                    *end_offset = '\0';
+
+                    int status;
+                    char* demangled_name = abi::__cxa_demangle(begin_name, NULLPTR, NULLPTR, &status);
+                    if (status == 0 && demangled_name) {
+                        CKG_LOG_PRINT("%d: %s : %s:%s\n", i, strings[i], demangled_name, begin_offset);
+                        free(demangled_name);
+                    } else {
+                        CKG_LOG_PRINT("%d: %s : %s:%s\n", i, strings[i], begin_name, begin_offset);
+                    }
+                } else {
+                    CKG_LOG_PRINT("%d: %s\n", i, strings[i]);
+                }
+            }
+
+            free(strings);
+            CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+        }
+    #else
+        void ckg_stack_trace_dump(char* function, char* file, u32 line) {
+            CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
+            CKG_LOG_PRINT("Stack trace not implemented for this platform\n");
             CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
         }
     #endif
@@ -901,7 +989,7 @@
 #if defined(CKG_IMPL_ASSERT)
     void MACRO_ckg_assert(bool expression, char* function, char* file, u32 line) {
         if (!expression) {                                      
-            ckg_stack_trace_dump();                               
+            ckg_stack_trace_dump(function, file, line);                               
             char ckg__msg[] = "Func: %s, File: %s:%d\n";          
             CKG_LOG_FATAL(ckg__msg, function, file, line);
             CRASH;                   
@@ -913,7 +1001,7 @@
         va_start(args, msg);
 
         if (!(expression)) {                                      
-            ckg_stack_trace_dump();                               
+            ckg_stack_trace_dump(function, file, line);                               
             char ckg__msg[] = "Func: %s, File: %s:%d\n";          
             CKG_LOG_FATAL(ckg__msg, function, file, line);
             CKG_LOG_FATAL("%s", ckg_str_va_sprint(NULLPTR, msg, args));                
@@ -983,8 +1071,8 @@
     internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free, 0};
 
     void ckg_bind_custom_allocator(CKG_Alloc_T* a, CKG_Free_T* f, void* ctx) {
-        ckg_assert_msg(a != NULLPTR, "Alloc function is nullptr\n");
-        ckg_assert_msg(f != NULLPTR, "Free function is nullptr\n");
+        ckg_assert_msg(a != NULLPTR, "Alloc function is NULLPTR\n");
+        ckg_assert_msg(f != NULLPTR, "Free function is NULLPTR\n");
         
         allocator.allocate = a;
         allocator.free = f;
