@@ -503,14 +503,14 @@
     } CKG_LinkedList;
 
     CKG_API CKG_LinkedList* MACRO_ckg_linked_list_create(size_t element_size_in_bytes, bool is_pointer_type);
-    CKG_API CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, size_t index, void* data);
-    CKG_API CKG_Node* ckg_linked_list_get_node(CKG_LinkedList* linked_list, size_t index);
-    CKG_API void* ckg_linked_list_get(CKG_LinkedList* linked_list, size_t index);
+    CKG_API CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u64 index, void* data);
+    CKG_API CKG_Node* ckg_linked_list_get_node(CKG_LinkedList* linked_list, u64 index);
+    CKG_API void* ckg_linked_list_get(CKG_LinkedList* linked_list, u64 index);
     CKG_API void* ckg_linked_list_peek_head(CKG_LinkedList* linked_list);
     CKG_API void* ckg_linked_list_peek_tail(CKG_LinkedList* linked_list);
     CKG_API CKG_Node* ckg_linked_list_push(CKG_LinkedList* linked_list, void* data);
     CKG_API CKG_Node ckg_linked_list_pop(CKG_LinkedList* linked_list);
-    CKG_API CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, size_t index);
+    CKG_API CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u64 index);
     CKG_API void* MACRO_ckg_linked_list_free(CKG_LinkedList* linked_list);
     CKG_API size_t ckg_linked_list_node_to_index(CKG_LinkedList* linked_list, CKG_Node* address);
 
@@ -1276,14 +1276,14 @@
         return ret;
     }
 
-    size_t ckg_cstr_length(char* cstring) {
+    u64 ckg_cstr_length(char* cstring) {
         ckg_assert(cstring);
 
         if (!cstring) {
             return 0; // This should never get here but the compiler wants this
         }
 
-        size_t length = 0;
+        u64 length = 0;
         char* cursor = (char*)cstring;
         while(*cursor++ != '\0') {
             length++;
@@ -1770,7 +1770,7 @@
         return new_node_to_insert;
     }
 
-    CKG_Node* ckg_linked_list_get_node(CKG_LinkedList* linked_list, size_t index) {
+    CKG_Node* ckg_linked_list_get_node(CKG_LinkedList* linked_list, u64 index) {
         ckg_assert(linked_list);
         CKG_Node* current_node = linked_list->head; 
         for (size_t i = 0; i < index; i++) {
@@ -1780,7 +1780,7 @@
         return current_node;
     }
 
-    void* ckg_linked_list_get(CKG_LinkedList* linked_list, size_t index) {
+    void* ckg_linked_list_get(CKG_LinkedList* linked_list, u64 index) {
         return ckg_linked_list_get_node(linked_list, index)->data;
     }
 
@@ -1813,7 +1813,7 @@
         return ckg_linked_list_remove(linked_list, linked_list->count - 1);
     }
 
-    CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, size_t index) {
+    CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, u64 index) {
         ckg_assert(linked_list); 
         ckg_assert(linked_list->count > 0); 
 
