@@ -863,7 +863,9 @@
         #include <stdio.h>
         #include <stdlib.h>
         #include <unistd.h>
-        #include <cxxabi.h>
+        #ifdef __cplusplus
+            #include <cxxabi.h>
+        #endif
 
         void ckg_stack_trace_dump(char* function, char* file, u32 line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
