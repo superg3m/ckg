@@ -27,7 +27,7 @@ cc: CompilerConfig = CompilerConfig(
 )
 
 if IS_WINDOWS() and not C_BUILD_IS_DEPENDENCY():
-    cc.compiler_name = "cl"
+    cc.compiler_name = "gcc"
 elif IS_DARWIN() and not C_BUILD_IS_DEPENDENCY():
     cc.compiler_name = "clang"
 elif IS_LINUX() and not C_BUILD_IS_DEPENDENCY():
@@ -45,8 +45,7 @@ else:
         "missing-braces", 
         "switch", 
         "unused-variable", 
-        "unused-result", 
-        "discarded-qualifiers"
+        "unused-result"
     ]
 
 executable_procedure_libs = []

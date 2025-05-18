@@ -145,7 +145,7 @@
         #define UNUSED_FUNCTION
     #endif
 
-    CKG_API void ckg_stack_trace_dump(char* function, char* file, u32 line);
+    CKG_API void ckg_stack_trace_dump(const char* function, const char* file, u32 line);
 #endif
 
 #if defined(CKG_INCLUDE_LOGGER)
@@ -190,7 +190,7 @@
         CKG_COLOR_RESET
     };
 
-    CKG_API void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...);
+    CKG_API void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...);
     #define ckg_log_output(log_level, message, ...) MACRO_ckg_log_output(log_level, message, ##__VA_ARGS__)
     #define CKG_LOG_PRINT(message, ...) ckg_log_output(LOG_LEVEL_PRINT, message, ##__VA_ARGS__)
     #define CKG_LOG_SUCCESS(message, ...) ckg_log_output(LOG_LEVEL_SUCCESS, message, ##__VA_ARGS__)
@@ -201,13 +201,13 @@
 #endif
 
 #if defined(CKG_INCLUDE_ASSERT)
-    CKG_API void MACRO_ckg_assert(bool expression, char* function, char* file, u32 line);
-    CKG_API void MACRO_ckg_assert_msg(bool expression, char* function, char* file, u32 line, char* msg, ...);
+    CKG_API void MACRO_ckg_assert(bool expression,const char* function, const char* file, u32 line);
+    CKG_API void MACRO_ckg_assert_msg(bool expression, const char* function, const char* file, u32 line, const char* msg, ...);
 
     #define CKG_ASSERT_ENABLED true
     #if CKG_ASSERT_ENABLED == true 
         #define ckg_assert(expression) MACRO_ckg_assert((expression), __func__, __FILE__, __LINE__)
-        #define ckg_assert_msg(expression, message, ...) MACRO_ckg_assert_msg((expression), __func__, __FILE__, __LINE__, message)
+        #define ckg_assert_msg(expression, message, ...) MACRO_ckg_assert_msg((expression), __func__, __FILE__, __LINE__, message, ##__VA_ARGS__)
     #else
         #define ckg_assert(expression)
         #define ckg_assert_msg(expression, message, ...)
@@ -364,8 +364,8 @@
 	CKG_API void   ckg_str_insert(char* str, size_t str_length, size_t str_capacity, char* to_insert, size_t to_insert_length, size_t index);
 	CKG_API void   ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, char to_insert, size_t index);
     CKG_API void   ckg_str_reverse(char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
-    CKG_API char*  ckg_str_va_sprint(u64* str_length, char* fmt, va_list args);
-    CKG_API char*  MACRO_ckg_str_sprint(u64* str_length_ptr_back, char* fmt, ...);
+    CKG_API char*  ckg_str_va_sprint(u64* str_length, const char* fmt, va_list args);
+    CKG_API char*  MACRO_ckg_str_sprint(u64* str_length_ptr_back, const char* fmt, ...);
     #define ckg_str_sprint(str_length_ptr_back, fmt, ...) MACRO_ckg_str_sprint(str_length_ptr_back, fmt, ##__VA_ARGS__)
 
     CKG_API bool ckg_str_equal(char* s1, size_t s1_length, char* s2, size_t s2_length);
@@ -810,7 +810,7 @@
             return "Unknown Module";
         }
 
-        void ckg_stack_trace_dump(char* function, char* file, u32 line) {
+        void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
             // Date: July 02, 2024
             // NOTE(Jovanni): This only works for Windows and when debug symbols are compiled into the program
@@ -867,7 +867,7 @@
             #include <cxxabi.h>
         #endif
 
-        void ckg_stack_trace_dump(char* function, char* file, u32 line) {
+        void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
 
             void* array[100];
@@ -923,7 +923,7 @@
             CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
         }
     #else
-        void ckg_stack_trace_dump(char* function, char* file, u32 line) {
+        void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
             CKG_LOG_PRINT("Stack trace not implemented for this platform\n");
             CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
@@ -962,7 +962,7 @@
         __ckg_special_print_helper(right_side_view.data, right_side_view.length, log_level);
     }
 
-    void MACRO_ckg_log_output(CKG_LogLevel log_level, char* message, ...) {
+    void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...) {
         va_list args_list;
         va_start(args_list, message);
         
@@ -989,7 +989,7 @@
 #endif
 
 #if defined(CKG_IMPL_ASSERT)
-    void MACRO_ckg_assert(bool expression, char* function, char* file, u32 line) {
+    void MACRO_ckg_assert(bool expression, const char* function, const char* file, u32 line) {
         if (!expression) {                                      
             ckg_stack_trace_dump(function, file, line);                               
             char ckg__msg[] = "Func: %s, File: %s:%d\n";          
@@ -998,7 +998,7 @@
         }                                                         
     }
 
-    void MACRO_ckg_assert_msg(bool expression, char* function, char* file, u32 line, char* msg, ...) {  
+    void MACRO_ckg_assert_msg(bool expression, const char* function, const char* file, u32 line, const char* msg, ...) {  
         va_list args;
         va_start(args, msg);
 
@@ -1543,7 +1543,7 @@
         return false;
     }
 
-    char* ckg_str_va_sprint(u64* str_length_ptr_back, char* fmt, va_list args) {
+    char* ckg_str_va_sprint(u64* str_length_ptr_back, const char* fmt, va_list args) {
         va_list args_copy;
         va_copy(args_copy, args);
         u64 allocation_ret = vsnprintf(NULLPTR, 0, fmt, args_copy) + 1; // +1 for null terminator
@@ -1562,7 +1562,7 @@
         return buffer;
     }
 
-    char* MACRO_ckg_str_sprint(u64* str_length_ptr_back, char* fmt, ...) {
+    char* MACRO_ckg_str_sprint(u64* str_length_ptr_back, const char* fmt, ...) {
         va_list args;
         va_start(args, fmt);
         char* ret = ckg_str_va_sprint(str_length_ptr_back, fmt, args);
