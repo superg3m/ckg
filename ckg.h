@@ -2380,7 +2380,8 @@
                 return NULL;
             }
 
-            if (rewind(file_handle) || ferror(file_handle)) {
+            rewind(file_handle);
+            if (ferror(file_handle)) {
                 CKG_LOG_ERROR("rewind() failed: ckg_io_read_entire_file(%s)\n", file_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 fclose(file_handle);
