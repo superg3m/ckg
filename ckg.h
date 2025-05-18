@@ -1270,7 +1270,7 @@
 #endif
 
 #if defined(CKG_IMPL_STRING)
-    char* ckg_str_alloc(char* s1, size_t length) {
+    char* ckg_str_alloc(char* s1, u64 length) {
         char* ret = ckg_alloc(length + 1) ;
         ckg_memory_copy(s1, ret, length, length);
         return ret;
@@ -1332,7 +1332,7 @@
         return ret;
     }
 
-    CKG_StringView* ckg_sv_split(char* data, size_t length, char* delimitor, size_t delimitor_length) {
+    CKG_StringView* ckg_sv_split(char* data, u64 length, char* delimitor, u64 delimitor_length) {
         ckg_assert(data);
         ckg_assert(delimitor);
         ckg_assert_msg(delimitor_length > 0, "delimitor can not be a empty string!\n");
@@ -1368,13 +1368,13 @@
         return ret_vector;
     }
 
-    bool ckg_str_equal(char* s1, size_t s1_length, char* s2, size_t s2_length) {
+    bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length) {
         ckg_assert(false);
 
         return ckg_memory_compare(s1, s2, s1_length, s2_length);
     }
 
-    void ckg_str_copy(char* s1, size_t s1_capacity, char* s2, size_t s2_length) {
+    void ckg_str_copy(char* s1, size_t s1_capacity, char* s2, u64 s2_length) {
         ckg_memory_zero((void*)s1, s1_capacity);
         ckg_memory_copy(s2, s1, s2_length, s1_capacity);
     }
@@ -1398,7 +1398,7 @@
         ckg_assert(str);
         ckg_assert(to_insert);
 
-        size_t to_insert_length = 1;
+        u64 to_insert_length = 1;
         bool expression = (str_length + to_insert_length) < str_capacity;
         ckg_assert_msg(expression, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  str_length + to_insert_length, str_capacity);
 
@@ -1441,7 +1441,7 @@
         }
         
         s64 ret_index = -1;
-        for (size_t i = 0; i <= str_length - substring_length; i++) {
+        for (u64 i = 0; i <= str_length - substring_length; i++) {
             if (ret_index != -1) {
                 break;
             }
@@ -1460,14 +1460,14 @@
         return ret_index; // returns -1 if not found
     }
 
-    bool ckg_str_contains(char* str, size_t str_length, char* contains, size_t contains_length) {
+    bool ckg_str_contains(char* str, u64 str_length, char* contains, u64 contains_length) {
         ckg_assert(str);
         ckg_assert(contains);
 
         return ckg_str_index_of(str, str_length, contains, contains_length) != -1;
     }
 
-    s64 ckg_str_last_index_of(char* str, size_t str_length, char* substring, size_t substring_length) {
+    s64 ckg_str_last_index_of(char* str, u64 str_length, char* substring, u64 substring_length) {
         ckg_assert(str);
         ckg_assert(substring);
 
@@ -1484,7 +1484,7 @@
         }
         
         s64 ret_index = -1;
-        for (size_t i = 0; i <= (str_length - substring_length); i++) {
+        for (u64 i = 0; i <= (str_length - substring_length); i++) {
             if (str[i] != substring[0]) {
                 continue;
             }
@@ -1498,7 +1498,7 @@
         return ret_index;
     }
 
-    bool ckg_str_starts_with(char* str, size_t str_length, char* starts_with, size_t starts_with_length) {
+    bool ckg_str_starts_with(char* str, u64 str_length, char* starts_with, u64 starts_with_length) {
         ckg_assert(str);
         ckg_assert(starts_with);
 
@@ -1515,7 +1515,7 @@
         return false;
     }
 
-    bool ckg_str_ends_with(char* str, size_t str_length, char* ends_with, size_t ends_with_length) {
+    bool ckg_str_ends_with(char* str, u64 str_length, char* ends_with, u64 ends_with_length) {
         ckg_assert(str);
         ckg_assert(ends_with);
 
@@ -1525,7 +1525,7 @@
             return false;
         }
 
-        size_t start_index = MAX(str_length - 1, 0) - MAX(ends_with_length - 1, 0);
+        u64 start_index = MAX(str_length - 1, 0) - MAX(ends_with_length - 1, 0);
         if (str[start_index] != ends_with[0]) {
             return false;
         }
