@@ -104,9 +104,12 @@
     CKG_API void U32_EndianSwap(u32* number_to_endian_swap);
     CKG_API void U64_EndianSwap(u64* number_to_endian_swap);
 
-    // Date: July 12, 2024
-    // TODO(Jovanni): Test this to make sure its actually works but it makes sense to me
-    #define OFFSET_OF(type, member) sizeof((size_t)(&(((type*)0)->member)))
+
+    #if defined _MSC_VER && !defined _CRT_USE_BUILTIN_OFFSETOF
+        #define OFFSET_OF(type, member) (size_t)(&(((type*)0)->member))
+    #else
+        #define OFFSET_OF(type, member) __builtin_offsetof(type, member)
+    #endif
     #define FIRST_DIGIT(number) ((int)number % 10);
     #define GET_BIT(number, bit_to_check) ((number & (1 << bit_to_check)) >> bit_to_check)
     #define SET_BIT(number, bit_to_set) number |= (1 << bit_to_set);
@@ -611,12 +614,12 @@
    #define ckg_hashmap_init_with_hash(map, KeyType, ValueType, __key_is_ptr, __hash_function)    \
     do {                                                                                         \
         map = ckg_alloc(sizeof(CKG_HashMap(KeyType, ValueType)));                                \
-        map->meta.key_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_key);              \
-        map->meta.value_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_value);          \
-        map->meta.entry_offset = offsetof(CKG_HashMap(KeyType, ValueType), entries);             \
-        map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);        \
-        map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);    \
-        map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled);  \
+        map->meta.key_offset = OFFSET_OF(CKG_HashMap(KeyType, ValueType), temp_key);             \
+        map->meta.value_offset = OFFSET_OF(CKG_HashMap(KeyType, ValueType), temp_value);         \
+        map->meta.entry_offset = OFFSET_OF(CKG_HashMap(KeyType, ValueType), entries);            \
+        map->meta.entry_key_offset = OFFSET_OF(CKG_HashMapEntry(KeyType, ValueType), key);       \
+        map->meta.entry_value_offset = OFFSET_OF(CKG_HashMapEntry(KeyType, ValueType), value);   \
+        map->meta.entry_filled_offset = OFFSET_OF(CKG_HashMapEntry(KeyType, ValueType), filled); \
         map->meta.key_size = sizeof(KeyType);                                                    \
         map->meta.value_size = sizeof(ValueType);                                                \
         map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                     \
@@ -1369,8 +1372,6 @@
     }
 
     bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length) {
-        ckg_assert(false);
-
         return ckg_memory_compare(s1, s2, s1_length, s2_length);
     }
 
