@@ -1073,24 +1073,24 @@
         free(data);
     }
 
-    internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR};
+    internal CKG_Allocator global_allocator = {ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR};
 
     void ckg_bind_custom_allocator(CKG_Alloc_T* a, CKG_Free_T* f, void* ctx) {
         ckg_assert_msg(a, "Alloc function is NULLPTR\n");
         ckg_assert_msg(f, "Free function is NULLPTR\n");
         
-        allocator.allocate = a;
-        allocator.free = f;
+        global_allocator.allocate = a;
+        global_allocator.free = f;
 
         if (ctx) {
-            allocator.ctx = ctx;
+            global_allocator.ctx = ctx;
         }
     }
 
     void* ckg_alloc(size_t allocation_size) {
         ckg_assert(allocation_size != 0);
 
-        void* ret = allocator.allocate(&allocator, allocation_size);
+        void* ret = global_allocator.allocate(&global_allocator, allocation_size);
         ckg_memory_zero(ret, allocation_size);
         return ret;
     }
@@ -1098,7 +1098,7 @@
     void* MACRO_ckg_free(void* data) {
         ckg_assert(data);
         
-        allocator.free(&allocator, data);
+        global_allocator.free(&global_allocator, data);
         return NULLPTR;
     }
 
