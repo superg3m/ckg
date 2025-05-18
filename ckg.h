@@ -1073,7 +1073,7 @@
         free(data);
     }
 
-    internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free, 0};
+    internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR};
 
     void ckg_bind_custom_allocator(CKG_Alloc_T* a, CKG_Free_T* f, void* ctx) {
         ckg_assert_msg(a != NULLPTR, "Alloc function is NULLPTR\n");
