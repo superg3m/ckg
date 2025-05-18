@@ -1076,8 +1076,8 @@
     internal CKG_Allocator allocator = {ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR};
 
     void ckg_bind_custom_allocator(CKG_Alloc_T* a, CKG_Free_T* f, void* ctx) {
-        ckg_assert_msg(a != NULLPTR, "Alloc function is NULLPTR\n");
-        ckg_assert_msg(f != NULLPTR, "Free function is NULLPTR\n");
+        ckg_assert_msg(a, "Alloc function is NULLPTR\n");
+        ckg_assert_msg(f, "Free function is NULLPTR\n");
         
         allocator.allocate = a;
         allocator.free = f;
