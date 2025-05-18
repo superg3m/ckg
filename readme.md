@@ -1,12 +1,13 @@
 # builds using c_build with cl/gcc/g++ and on ubuntu(wsl)
 # Tested on clang before but not tested on clang++
 
+# NOTE: This is not updated, i'm lazy - 05/18/25
+
 # CKG's Core Thesis
 - The point of the ckit granular (ckg) is building out everything at a granular level.
 	- Using this small library to build out [CKIT](https://github.com/superg3m/ckit) (A much more sophisticated C library build)
 - This library will be completly cross-platform
 - Collection of tools, data structures, and algorithms that I find useful
-- (CONSTRAINT) ckg can't allocate in string functions or any other functions on its own because if it did the ckit memory tracker would not work
 
 #### NOTES (everything here needs a update!)
 - I consider CKG almost
@@ -83,7 +84,7 @@
     - [x] ckg_memory_delete_index(data, data_capacity, index)
     - [x] ckg_memory_insert_index(data, data_capacity, element, index)
 
-- [x] ckg_arena.h (REMOVE This, it should be a ckit thing only)
+- [x] ckg_arena.h
 	- [x] ckg_arena_create(allocation, name, flag)
 	- [x] ckg_arena_push(arena, type)	
 	- [x] ckg_arena_free(arena)
