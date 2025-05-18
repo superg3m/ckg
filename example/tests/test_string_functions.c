@@ -1,7 +1,7 @@
 #include "../../ckg.h"
 
 void test_ckg_cstr_length() {
-    int expected_size = 5;
+    u64 expected_size = 5;
     char str1[] = "Hello";
     u64 actual_size = ckg_cstr_length(str1);
     ckg_assert_msg(actual_size == expected_size, "Test ckg_str_length failed: expected %d, got %d\n", expected_size, actual_size);

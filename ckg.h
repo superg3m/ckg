@@ -281,8 +281,8 @@
     CKG_API void ckg_memory_copy(void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes);
     CKG_API void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
-    CKG_API void MACRO_ckg_memory_delete_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, size_t index);
-    CKG_API void MACRO_ckg_memory_insert_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, size_t index);
+    CKG_API void MACRO_ckg_memory_delete_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index);
+    CKG_API void MACRO_ckg_memory_insert_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index);
 
     #define ckg_memory_fill(_buffer, _buffer_count, _fill_element) \
     do {														   \
@@ -355,35 +355,35 @@
 	 * @param s1 
 	 * @return char* 
 	 */
-	CKG_API char*  ckg_str_alloc(char* s1, size_t length);
-    CKG_API size_t ckg_cstr_length(char* c_string);
-    CKG_API void   ckg_str_clear(char* s1, size_t length);
-    CKG_API void   ckg_str_copy(char* dest, size_t dest_capacity, char* source, size_t source_length);
-	CKG_API void   ckg_str_append(char* str, size_t str_length, size_t str_capacity, char* to_append, size_t to_append_length);
-	CKG_API void   ckg_str_append_char(char* str, size_t str_length, size_t str_capacity, char to_append);
-	CKG_API void   ckg_str_insert(char* str, size_t str_length, size_t str_capacity, char* to_insert, size_t to_insert_length, size_t index);
-	CKG_API void   ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, char to_insert, size_t index);
-    CKG_API void   ckg_str_reverse(char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
-    CKG_API char*  ckg_str_va_sprint(u64* str_length, const char* fmt, va_list args);
-    CKG_API char*  MACRO_ckg_str_sprint(u64* str_length_ptr_back, const char* fmt, ...);
+	CKG_API char* ckg_str_alloc(char* s1, u64 length);
+    CKG_API u64   ckg_cstr_length(char* c_string);
+    CKG_API void  ckg_str_clear(char* s1, u64 length);
+    CKG_API void  ckg_str_copy(char* dest, size_t dest_capacity, char* source, u64 source_length);
+	CKG_API void  ckg_str_append(char* str, u64 str_length, size_t str_capacity, char* to_append, u64 to_append_length);
+	CKG_API void  ckg_str_append_char(char* str, u64 str_length, size_t str_capacity, char to_append);
+	CKG_API void  ckg_str_insert(char* str, u64 str_length, size_t str_capacity, char* to_insert, u64 to_insert_length, u64 index);
+	CKG_API void  ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index);
+    CKG_API void  ckg_str_reverse(char* str, u64 str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
+    CKG_API char* ckg_str_va_sprint(u64* str_length, const char* fmt, va_list args);
+    CKG_API char* MACRO_ckg_str_sprint(u64* str_length_ptr_back, const char* fmt, ...);
     #define ckg_str_sprint(str_length_ptr_back, fmt, ...) MACRO_ckg_str_sprint(str_length_ptr_back, fmt, ##__VA_ARGS__)
 
-    CKG_API bool ckg_str_equal(char* s1, size_t s1_length, char* s2, size_t s2_length);
-    CKG_API bool ckg_str_contains(char* s1, size_t s1_length, char* contains, size_t contains_length);
-	CKG_API s64  ckg_str_index_of(char* str, size_t str_length, char* substring, size_t substring_length);
-	CKG_API s64  ckg_str_last_index_of(char* str, size_t str_length, char* substring, size_t substring_length);
-	CKG_API bool ckg_str_starts_with(char* str, size_t str_length, char* starts_with, size_t starts_with_length);
-	CKG_API bool ckg_str_ends_with(char* str, size_t str_length, char* ends_with, size_t ends_with_length);
+    CKG_API bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length);
+    CKG_API bool ckg_str_contains(char* s1, u64 s1_length, char* contains, u64 contains_length);
+	CKG_API s64  ckg_str_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
+	CKG_API s64  ckg_str_last_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
+	CKG_API bool ckg_str_starts_with(char* str, u64 str_length, char* starts_with, u64 starts_with_length);
+	CKG_API bool ckg_str_ends_with(char* str, u64 str_length, char* ends_with, u64 ends_with_length);
 
 
     typedef struct CKG_StringView {
         char* data;
-        size_t length;
+        u64 length;
     } CKG_StringView;
     
-    CKG_StringView  ckg_sv_create(char* data, size_t length);
+    CKG_StringView  ckg_sv_create(char* data, u64 length);
     CKG_StringView  ckg_sv_between_delimiters(char* str, u64 str_length, char* start_delimitor, u64 start_delimitor_length, char* end_delimitor, u64 end_delimitor_length);
-    CKG_StringView* ckg_sv_split(char* data, size_t length, char* delimitor, size_t delimitor_length);
+    CKG_StringView* ckg_sv_split(char* data, u64 length, char* delimitor, u64 delimitor_length);
     
     #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
     #define CKG_SV_EMPTY() (CKG_StringView){"", 0}
@@ -411,7 +411,7 @@
     // ========== START CKG_VECTOR ==========
     //
     typedef struct CKG_VectorHeader {
-        size_t count;
+        u64 count;
         size_t capacity;
         size_t element_size;
     } CKG_VectorHeader;
@@ -1156,10 +1156,9 @@
 
     // Date: September 12, 2024
     // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
-    void MACRO_ckg_memory_delete_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, size_t index) {
+    void MACRO_ckg_memory_delete_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index) {
         ckg_assert((s32)number_of_elements - 1 >= 0);
         ckg_assert(index < data_capacity);
-        ckg_assert(index >= 0);
 
         u8* byte_data = (u8*)data;
 
@@ -1173,10 +1172,9 @@
 
     // Date: September 12, 2024
     // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
-    void MACRO_ckg_memory_insert_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, size_t index) {
+    void MACRO_ckg_memory_insert_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index) {
         ckg_assert((number_of_elements + 1) < data_capacity);
         ckg_assert(index < data_capacity - 1);
-        ckg_assert(index >= 0);
 
         u8* byte_data = (u8*)data;
 
@@ -1294,13 +1292,12 @@
         return length;
     }
 
-    void ckg_cstr_clear(char* s1, size_t length) {
+    void ckg_cstr_clear(char* s1, u64 length) {
         ckg_memory_zero(s1, length);
     }
 
-    CKG_StringView ckg_sv_create(char* data, size_t length) {
+    CKG_StringView ckg_sv_create(char* data, u64 length) {
         ckg_assert(data);
-        ckg_assert(length >= 0);
 
         CKG_StringView ret;
         ret.data = data;
@@ -1382,27 +1379,24 @@
         ckg_memory_copy(s2, s1, s2_length, s1_capacity);
     }
 
-    void ckg_str_insert(char* str, size_t str_length, size_t str_capacity, char* to_insert, size_t to_insert_length, size_t index) {
+    void ckg_str_insert(char* str, u64 str_length, size_t str_capacity, char* to_insert, u64 to_insert_length, u64 index) {
         ckg_assert(str);
         ckg_assert(to_insert);
 
-        size_t new_length = str_length + to_insert_length;
-
-        ckg_assert(index >= 0 && index <= str_length);
+        u64 new_length = str_length + to_insert_length;
         ckg_assert_msg(new_length < str_capacity, "ckg_str_insert: str_capacity is %lld but new valid cstring length is %d + %d + 1(null_term)= %d\n", str_capacity, str_length, to_insert_length, new_length + 1);
+        
         u8* move_source_ptr = (u8*)(str + index);
         u8* move_dest_ptr = (u8*)(move_source_ptr + to_insert_length);
 
         ckg_memory_copy(move_source_ptr, move_dest_ptr, str_length - index, str_capacity - (index + to_insert_length));
-        
         u8* copy_dest_ptr = (u8*)(str + index);
         ckg_memory_copy(to_insert, copy_dest_ptr, to_insert_length, str_capacity);
     }
 
-    void ckg_str_insert_char(char* str, size_t str_length, size_t str_capacity, char to_insert, size_t index) {
+    void ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index) {
         ckg_assert(str);
         ckg_assert(to_insert);
-        ckg_assert(index >= 0 && index <= str_length);
 
         size_t to_insert_length = 1;
         bool expression = (str_length + to_insert_length) < str_capacity;
@@ -1413,15 +1407,15 @@
         str[index] = to_insert;
     }
 
-    void ckg_str_append(char* str, size_t str_length, size_t str_capacity, char* to_append, size_t to_append_length) {
+    void ckg_str_append(char* str, u64 str_length, size_t str_capacity, char* to_append, u64 to_append_length) {
         ckg_str_insert(str, str_length, str_capacity, to_append, to_append_length, str_length);
     }
 
-    void ckg_str_append_char(char* str, size_t str_length, size_t str_capacity, char to_append) {
+    void ckg_str_append_char(char* str, u64 str_length, size_t str_capacity, char to_append) {
         ckg_str_insert_char(str, str_length, str_capacity, to_append, str_length);
     }
 
-    void ckg_str_reverse(char* str, size_t str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity) {
+    void ckg_str_reverse(char* str, u64 str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity) {
         ckg_assert(str);
         ckg_assert(reversed_buffer_capacity > str_length);
 
@@ -1430,7 +1424,7 @@
         }
     }
 
-    s64 ckg_str_index_of(char* str, size_t str_length, char* substring, size_t substring_length) {
+    s64 ckg_str_index_of(char* str, u64 str_length, char* substring, u64 substring_length) {
         ckg_assert(str);
         ckg_assert(substring);
 
@@ -1727,12 +1721,11 @@
     }
     #define ckg_node_data_free(linked_list, node) node = MACRO_ckg_node_data_free(linked_list, node)
 
-    CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, size_t index, void* data) {
+    CKG_Node* ckg_linked_list_insert(CKG_LinkedList* linked_list, u64 index, void* data) {
         ckg_assert(linked_list);
         ckg_assert(data);
-        ckg_assert(index >= 0);
 
-        size_t old_count = linked_list->count++;
+        u64 old_count = linked_list->count++;
         if (linked_list->head == NULLPTR) { // there is not a head and by definition no tail
             CKG_Node* new_node_to_insert = ckg_node_create(linked_list, data);
             linked_list->head = new_node_to_insert;
@@ -1823,7 +1816,6 @@
     CKG_Node ckg_linked_list_remove(CKG_LinkedList* linked_list, size_t index) {
         ckg_assert(linked_list); 
         ckg_assert(linked_list->count > 0); 
-        ckg_assert(index >= 0);
 
         size_t old_count = linked_list->count--;
         if (index == 0 && old_count == 1) { // removing the head fully
@@ -2031,7 +2023,7 @@
         u64 hash = 5381;
         int c;
 
-        for (int i = 0; i < str_view->length; i++) {
+        for (u64 i = 0; i < str_view->length; i++) {
             c = str_view->data[i];
             hash = ((hash << 5) + hash) + c;
         }
@@ -2152,6 +2144,7 @@
         ckg_assert(file_handle);
 
         switch (collection_type) {
+            case CKG_COLLECTION_STACK:
             case CKG_COLLECTION_VECTOR: {
                 CKG_VectorHeader* header = ckg_vector_header_base(collection);
                 fwrite(header, sizeof(CKG_VectorHeader), 1, file_handle);
@@ -2159,14 +2152,14 @@
                     fwrite(collection, (header->element_size * header->count), 1, file_handle);
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* sv_vector = (CKG_StringView*)collection;
-                    for (int i = 0; i < header->count; i++) {
+                    for (u64 i = 0; i < header->count; i++) {
                         CKG_StringView sv = sv_vector[i];
                         fwrite(&sv.length, sizeof(size_t), 1, file_handle);
                         fwrite(sv.data, sv.length, 1, file_handle);
                     }
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = (char**)collection;
-                    for (int i = 0; i < header->count; i++) {
+                    for (u64 i = 0; i < header->count; i++) {
                         char* current_string = string_vector[i];
                         size_t count = ckg_cstr_length(current_string);
                         fwrite(&count, sizeof(size_t), 1, file_handle);
@@ -2220,7 +2213,7 @@
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* sv_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
 
-                    for (int i = 0; i < header.count; i++) {
+                    for (u64 i = 0; i < header.count; i++) {
                         CKG_StringView sv;
                         fread(&sv.length, sizeof(size_t), 1, file_handle);
 
@@ -2234,7 +2227,7 @@
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
 
-                    for (int i = 0; i < header.count; i++) {
+                    for (u64 i = 0; i < header.count; i++) {
                         size_t char_count = 0;
                         fread(&char_count, sizeof(size_t), 1, file_handle);
                         char* current_string = ckg_alloc(char_count + 1); // prob want a way to specify if you should allocate or not

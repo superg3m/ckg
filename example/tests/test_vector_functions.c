@@ -28,7 +28,7 @@ void test_ckg_stack_operations() {
 
 	u64 stack_count = ckg_stack_count(int_stack);
 	for (u64 i = 0; i < stack_count; i++) {
-		int value2 = ckg_stack_pop(int_stack);
+		u64 value2 = ckg_stack_pop(int_stack);
 		ckg_assert(value2 == (2040 - i));
 	}
 
