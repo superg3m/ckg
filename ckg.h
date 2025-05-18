@@ -1370,6 +1370,8 @@
     }
 
     bool ckg_str_equal(char* s1, size_t s1_length, char* s2, size_t s2_length) {
+        ckg_assert(false);
+
         return ckg_memory_compare(s1, s2, s1_length, s2_length);
     }
 
