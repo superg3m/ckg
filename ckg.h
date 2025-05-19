@@ -954,7 +954,7 @@
                 return;
             }
 
-            for (int i = 1; i < size; ++i) {
+            for (int i = 0; i < size - 1; ++i) {
                 Dl_info info;
                 if (dladdr(array[i], &info) && info.dli_sname) {
                     printf("%d: %s in %s\n", i, info.dli_sname, info.dli_fname ? info.dli_fname : "unknown");
