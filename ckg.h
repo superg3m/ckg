@@ -862,7 +862,7 @@
             SymCleanup(process);
             CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
         }
-    #elif defined(PLATFORM_LINUX) || defined(PLATFORM_DARWIN)
+    #elif defined(PLATFORM_LINUX) || defined(PLATFORM_APPLE)
         #include <stdio.h>
         #include <stdlib.h>
         #include <unistd.h>
