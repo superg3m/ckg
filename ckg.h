@@ -903,7 +903,6 @@
                 char* name_begin = NULL;
                 char* name_end = NULL;
                 char* offset_begin = NULL;
-                char* offset_end = NULL;
                 
                 name_begin = strchr(symbol_str, '(');
                 if (name_begin) {
@@ -912,7 +911,6 @@
                     if (offset_begin) {
                         name_end = offset_begin;
                         offset_begin++;
-                        offset_end = strchr(offset_begin, ')');
                     }
                 }
                 
@@ -995,7 +993,6 @@
         if (middle_to_color.length == 0) {
             bool found = message[message_length - 1] == '\n';
             printf("%.*s", (int)(message_length - found), message);
-            ckg_assert(false);
             return;
         }
 
