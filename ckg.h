@@ -639,7 +639,6 @@
         (map)->temp_key = (__key);               \
         (map)->temp_value = (__value);           \
         ckg_hashmap_put_helper((u8*)(map));      \
-        (map)->meta.count++;                     \
     } while(0)                                   \
 
     #define ckg_hashmap_has(map, key)       \
@@ -2078,7 +2077,7 @@
         u8* entry;
         u8* entry_key_address;
         u8* entry_value_address;
-        u8* entry_filled_address;
+        bool* entry_filled_address;
         u64 real_index;
     } HashMapContext;
 
@@ -2101,7 +2100,7 @@
         context.entry = *entries + (context.real_index * context.meta->entry_size);
         context.entry_key_address = context.entry + context.meta->entry_key_offset;
         context.entry_value_address = context.entry + context.meta->entry_value_offset;
-        context.entry_filled_address = context.entry + context.meta->entry_filled_offset;
+        context.entry_filled_address = (bool*)(context.entry + context.meta->entry_filled_offset);
 
         return context;
     }
@@ -2123,6 +2122,10 @@
         }
 
         HashMapContext context = ckg_hashmap_find_entry(map);
+        bool filled = *context.entry_filled_address;
+        if (!filled) {
+           context.meta->count++;
+        }
         ckg_memory_copy(map + context.meta->key_offset, context.entry_key_address, context.meta->key_size, context.meta->key_size);
         ckg_memory_copy(map + context.meta->value_offset, context.entry_value_address, context.meta->value_size, context.meta->value_size);
         *(bool*)(context.entry_filled_address) = 1;
