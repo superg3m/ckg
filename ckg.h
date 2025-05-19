@@ -815,7 +815,6 @@
         void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
             void* stack[100];
-            unsigned short frames_to_skip = 1;
             unsigned short max_frames = 100;
             unsigned short frames_captured;
             HANDLE process = GetCurrentProcess();
@@ -823,26 +822,24 @@
 
             sym_initialized = SymInitialize(process, NULL, TRUE);
             if (!sym_initialized) {
-                CKG_LOG_PRINT("Failed to initialize symbol handler: %lu\n", GetLastError());
-                CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+                printf("Failed to initialize symbol handler: %lu\n", GetLastError());
+                printf("------------------ Error Stack Trace End ------------------\n");
                 return;
             }
 
-            frames_captured = CaptureStackBackTrace(frames_to_skip, max_frames, stack, NULL);
+            frames_captured = CaptureStackBackTrace(0, max_frames, stack, NULL);
             if (frames_captured == 0) {
-                CKG_LOG_PRINT("Failed to capture stack trace\n");
+                printf("Failed to capture stack trace\n");
                 SymCleanup(process);
-                CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+                printf("------------------ Error Stack Trace End ------------------\n");
                 return;
             }
-
-            CKG_LOG_PRINT("0: %s - %s:%u\n", function, file, line);
 
             SYMBOL_INFO* symbol = (SYMBOL_INFO*)ckg_alloc(sizeof(SYMBOL_INFO) + (MAX_SYM_NAME * sizeof(char)));
             if (!symbol) {
-                CKG_LOG_PRINT("Error allocating symbol info buffer\n");
+                printf("Error allocating symbol info buffer\n");
                 SymCleanup(process);
-                CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+                printf("------------------ Error Stack Trace End ------------------\n");
                 return;
             }
 
@@ -852,26 +849,32 @@
             IMAGEHLP_LINE64 line_info;
             line_info.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
             
-            for (unsigned short i = 1; i < frames_captured; i++) {
+            int skip = 2;
+            for (int i = skip; i < frames_captured - 6; i++) {
                 DWORD64 address = (DWORD64)stack[i];
                 DWORD64 displacement = 0;
                 DWORD line_displacement = 0;
+
+                if (i == skip) {
+                    printf("0: %s - %s:%u\n", function, file, line);
+                    continue;
+                } 
                 
                 if (SymFromAddr(process, address, &displacement, symbol)) {
                     if (SymGetLineFromAddr64(process, address, &line_displacement, &line_info)) {
-                        CKG_LOG_PRINT("%d: %s - %s:%u\n", i, symbol->Name, line_info.FileName, line_info.LineNumber);
+                        printf("%d: %s - %s:%u\n", i - skip, symbol->Name, line_info.FileName, (int)line_info.LineNumber);
                     } else {
                         const char* module_name = GetModuleNameFromAddress(process, address);
-                        CKG_LOG_PRINT("%d: %s [%s+0x%llx]\n", i, symbol->Name, module_name, displacement);
+                        printf("%d: %s [%s+0x%llx]\n", i - skip, symbol->Name, module_name, displacement);
                     }
                 } else {
-                    CKG_LOG_PRINT("%d: [Unknown symbol] 0x%p (Error: %lu)\n", i, stack[i], GetLastError());
+                    printf("%d: [Unknown symbol] 0x%p (Error: %lu)\n", i - skip, stack[i], GetLastError());
                 }
             }
 
             ckg_free(symbol);
             SymCleanup(process);
-            CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+            printf("------------------ Error Stack Trace End ------------------\n");
         }
     #elif defined(PLATFORM_LINUX)
         #include <stdio.h>
