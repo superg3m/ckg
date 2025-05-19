@@ -796,18 +796,17 @@
         *number_to_endian_swap = (b0 << 56)|(b1 << 48)|(b2 << 40)|(b3 << 32)|(b4 << 24)|(b5 << 16)|(b6 << 8)|(b7 << 0);
     }
 
-    #if defined(PLATFORM_WINDOWS) && defined(_MSC_VER )
+    #if defined(PLATFORM_WINDOWS) && defined(_MSC_VER)
         #include <DbgHelp.h>
         #pragma comment(lib, "dbghelp")
 
-        const char* GetModuleNameFromAddress(HANDLE process, DWORD64 address) {
+        static const char* GetModuleNameFromAddress(HANDLE process, DWORD64 address) {
             static char moduleName[MAX_PATH];
             IMAGEHLP_MODULE64 moduleInfo;
-            memset(&moduleInfo, 0, sizeof(moduleInfo));
+            ZeroMemory(&moduleInfo, sizeof(moduleInfo));
             moduleInfo.SizeOfStruct = sizeof(moduleInfo);
             if (SymGetModuleInfo64(process, address, &moduleInfo)) {
-                strncpy(moduleName, moduleInfo.ModuleName, MAX_PATH - 1);
-                moduleName[MAX_PATH - 1] = '\0';
+                strncpy_s(moduleName, sizeof(moduleName), moduleInfo.ModuleName, _TRUNCATE);
                 return moduleName;
             }
             return "Unknown Module";
@@ -815,158 +814,163 @@
 
         void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
-            // Date: July 02, 2024
-            // NOTE(Jovanni): This only works for Windows and when debug symbols are compiled into the program
-            void *stack[100];
-            unsigned short number_of_captured_frames;
-            SYMBOL_INFO *symbol = NULLPTR;
+            void* stack[100];
+            unsigned short frames_to_skip = 1;
+            unsigned short max_frames = 100;
+            unsigned short frames_captured;
             HANDLE process = GetCurrentProcess();
+            BOOL sym_initialized = FALSE;
 
-            SymInitialize(process, NULLPTR, TRUE);
-
-            number_of_captured_frames = CaptureStackBackTrace(0, 100, stack, NULLPTR) - 6;
-
-            symbol = (SYMBOL_INFO *)ckg_alloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char));
-            if (symbol) {
-                symbol->MaxNameLen = 255;
-                symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-
-                int count = 0;
-                for (unsigned short i = 2; i < number_of_captured_frames; i++) {
-                    DWORD64 displacement = 0;
-                    if (SymFromAddr(process, (DWORD64)(stack[i]), &displacement, symbol)) {
-                        DWORD displacementLine = 0;
-                        IMAGEHLP_LINE64 debug_line;
-                        debug_line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
-                        if (i == 2) {
-                            CKG_LOG_PRINT("0: %s - %s:%d\n", function, file, line);
-                            continue;
-                        }
-                        
-                        if (SymGetLineFromAddr64(process, (DWORD64)(stack[i]), &displacementLine, &debug_line)) {
-                            CKG_LOG_PRINT("%d: %s - %s:%d\n", count, symbol->Name, debug_line.FileName, debug_line.LineNumber);
-                        } else {
-                            CKG_LOG_PRINT("%d: %s\n", count, symbol->Name);
-                        }
-                    } else {
-                        DWORD error = GetLastError();
-                        CKG_LOG_PRINT("%d: [Error: %lu] Address: 0x%p\n", count, error, stack[i]);
-                    }
-                    count++;
-                }
-                ckg_free(symbol);
-            } else {
-                CKG_LOG_PRINT("Error allocating symbol info buffer.\n");
+            sym_initialized = SymInitialize(process, NULL, TRUE);
+            if (!sym_initialized) {
+                CKG_LOG_PRINT("Failed to initialize symbol handler: %lu\n", GetLastError());
+                CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+                return;
             }
 
+            frames_captured = CaptureStackBackTrace(frames_to_skip, max_frames, stack, NULL);
+            if (frames_captured == 0) {
+                CKG_LOG_PRINT("Failed to capture stack trace\n");
+                SymCleanup(process);
+                CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+                return;
+            }
+
+            CKG_LOG_PRINT("0: %s - %s:%u\n", function, file, line);
+
+            SYMBOL_INFO* symbol = (SYMBOL_INFO*)ckg_alloc(sizeof(SYMBOL_INFO) + (MAX_SYM_NAME * sizeof(char)));
+            if (!symbol) {
+                CKG_LOG_PRINT("Error allocating symbol info buffer\n");
+                SymCleanup(process);
+                CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+                return;
+            }
+
+            symbol->MaxNameLen = MAX_SYM_NAME;
+            symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+
+            IMAGEHLP_LINE64 line_info;
+            line_info.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
+            
+            for (unsigned short i = 1; i < frames_captured; i++) {
+                DWORD64 address = (DWORD64)stack[i];
+                DWORD64 displacement = 0;
+                DWORD line_displacement = 0;
+                
+                if (SymFromAddr(process, address, &displacement, symbol)) {
+                    if (SymGetLineFromAddr64(process, address, &line_displacement, &line_info)) {
+                        CKG_LOG_PRINT("%d: %s - %s:%u\n", i, symbol->Name, line_info.FileName, line_info.LineNumber);
+                    } else {
+                        const char* module_name = GetModuleNameFromAddress(process, address);
+                        CKG_LOG_PRINT("%d: %s [%s+0x%llx]\n", i, symbol->Name, module_name, displacement);
+                    }
+                } else {
+                    CKG_LOG_PRINT("%d: [Unknown symbol] 0x%p (Error: %lu)\n", i, stack[i], GetLastError());
+                }
+            }
+
+            ckg_free(symbol);
             SymCleanup(process);
             CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
         }
     #elif defined(PLATFORM_LINUX)
         #include <stdio.h>
         #include <stdlib.h>
-        #include <unistd.h>
         #include <execinfo.h>
-        #ifdef __cplusplus
-            #include <cxxabi.h>
-        #endif
+        #include <string.h>
 
         void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
             printf("------------------ Error Stack Trace ------------------\n");
 
-            void* array[100];
-            int size = backtrace(array, 100) - 6;
-            char** strings = backtrace_symbols(array, size);
+            // Log the triggering function first
+            printf("0: %s - %s:%u\n", function, file, line);
 
-            if (strings == NULLPTR) {
+            void* array[100];
+            int size = backtrace(array, 100);
+            char** symbols = backtrace_symbols(array, size);
+
+            if (symbols == NULL) {
                 printf("Failed to get backtrace symbols\n");
                 printf("------------------ Error Stack Trace End ------------------\n");
                 return;
             }
 
-            for (int i = 2; i < size; ++i) {
-                char* begin_name = NULLPTR;
-                char* begin_offset = NULLPTR;
-                char* end_offset = NULLPTR;
-
-                for (char* p = strings[i]; *p; ++p) {
-                    if (*p == '(') {
-                        begin_name = p;
-                    } else if (*p == '+') {
-                        begin_offset = p;
-                    } else if (*p == ')' && begin_offset) {
-                        end_offset = p;
-                        break;
+            for (int i = 1; i < size; ++i) {
+                char* symbol_str = symbols[i];
+                char* name_begin = NULL;
+                char* name_end = NULL;
+                char* offset_begin = NULL;
+                char* offset_end = NULL;
+                
+                name_begin = strchr(symbol_str, '(');
+                if (name_begin) {
+                    name_begin++;
+                    offset_begin = strchr(name_begin, '+');
+                    if (offset_begin) {
+                        name_end = offset_begin;
+                        offset_begin++;
+                        offset_end = strchr(offset_begin, ')');
                     }
                 }
-
-                if (i == 2) {
-                    printf("0: %s - %s:%d\n", function, file, line);
-                    continue;
-                }
-
-                if (begin_name && begin_offset && end_offset && begin_name < begin_offset) {
-                    *begin_name++ = '\0';
-                    *begin_offset++ = '\0';
-                    *end_offset = '\0';
-
-                    int status;
-                    char* demangled_name = abi::__cxa_demangle(begin_name, NULLPTR, NULLPTR, &status);
-                    if (status == 0 && demangled_name) {
-                        printf("%d: %s : %s:%s\n", i, strings[i], demangled_name, begin_offset);
-                        free(demangled_name);
+                
+                if (name_begin && name_end && name_end > name_begin) {
+                    size_t name_len = name_end - name_begin;
+                    char* symbol_name = (char*)malloc(name_len + 1);
+                    if (symbol_name) {
+                        memcpy(symbol_name, name_begin, name_len);
+                        symbol_name[name_len] = '\0';
+                        
+                        printf("%d: %s\n", i, symbol_str);
+                        
+                        free(symbol_name);
                     } else {
-                        printf("%d: %s : %s:%s\n", i, strings[i], begin_name, begin_offset);
+                        printf("%d: %s\n", i, symbol_str);
                     }
                 } else {
-                    printf("%d: %s\n", i, strings[i]);
+                    printf("%d: %s\n", i, symbol_str);
                 }
             }
 
-            free(strings);
+            free(symbols);
             printf("------------------ Error Stack Trace End ------------------\n");
         }
-
     #elif defined(PLATFORM_APPLE)
         #include <stdio.h>
         #include <stdlib.h>
-        #include <unistd.h>
         #include <execinfo.h>
         #include <dlfcn.h>
-        #ifdef __cplusplus
-            #include <cxxabi.h>
-        #endif
 
         void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
             printf("------------------ Error Stack Trace ------------------\n");
+            printf("0: %s - %s:%u\n", function, file, line);
 
             void* array[100];
             int size = backtrace(array, 100);
+            char** symbols = backtrace_symbols(array, size);
+            
+            if (symbols == NULL) {
+                printf("Failed to get backtrace symbols\n");
+                printf("------------------ Error Stack Trace End ------------------\n");
+                return;
+            }
 
             for (int i = 1; i < size; ++i) {
                 Dl_info info;
                 if (dladdr(array[i], &info) && info.dli_sname) {
-                    int status;
-                    char* demangled_name = abi::__cxa_demangle(info.dli_sname, NULLPTR, NULLPTR, &status);
-                    if (status == 0 && demangled_name) {
-                        printf("%d: %s : %s\n", i, info.dli_fname, demangled_name);
-                        free(demangled_name);
-                    } else {
-                        printf("%d: %s : %s\n", i, info.dli_fname, info.dli_sname);
-                    }
+                    printf("%d: %s in %s\n", i, info.dli_sname, info.dli_fname ? info.dli_fname : "unknown");
                 } else {
-                    printf("%d: [unknown symbol]\n", i);
+                    printf("%d: %s\n", i, symbols[i]);
                 }
             }
 
-            printf("0: %s - %s:%d\n", function, file, line);
+            free(symbols);
             printf("------------------ Error Stack Trace End ------------------\n");
         }
-
     #else
         void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
             printf("------------------ Error Stack Trace ------------------\n");
-            printf("Stack trace not implemented for this platform\n");
+            printf("0: %s - %s:%u\n", function, file, line);
+            printf("Stack trace functionality not implemented for this platform\n");
             printf("------------------ Error Stack Trace End ------------------\n");
         }
     #endif
