@@ -182,15 +182,6 @@
     #define LOG_LEVEL_COUNT 6
     typedef u8 CKG_LogLevel;
 
-    internal char* ckg_log_level_format[LOG_LEVEL_COUNT] = {
-        CKG_RED_BACKGROUND,
-        CKG_RED,
-        CKG_PURPLE,
-        CKG_BLUE,
-        CKG_GREEN,
-        CKG_COLOR_RESET
-    };
-
     CKG_API void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...);
     #define ckg_log_output(log_level, message, ...) MACRO_ckg_log_output(log_level, message, ##__VA_ARGS__)
     #define CKG_LOG_PRINT(message, ...) ckg_log_output(LOG_LEVEL_PRINT, message, ##__VA_ARGS__)
@@ -249,7 +240,7 @@
         CKG_ERROR_ARGS_COUNT = 12
     } CKG_Error;
 
-    CKG_API char* ckg_error_str(CKG_Error error_code);
+    CKG_API const char* ckg_error_str(CKG_Error error_code);
 #endif
 
 #if defined(CKG_INCLUDE_MEMORY)
@@ -282,8 +273,8 @@
     CKG_API void ckg_memory_copy(void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes);
     CKG_API void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
-    CKG_API void MACRO_ckg_memory_delete_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index);
-    CKG_API void MACRO_ckg_memory_insert_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index);
+    CKG_API void MACRO_ckg_memory_delete_index(void* data, u64 number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index);
+    CKG_API void MACRO_ckg_memory_insert_index(void* data, u64 number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index);
 
     #define ckg_memory_fill(_buffer, _buffer_count, _fill_element) \
     do {														   \
@@ -319,7 +310,7 @@
         size_t used_save_point;
         size_t used;
         u8 alignment;
-        u32 flags;
+        s32 flags;
     } CKG_Arena;
     
     /**
@@ -331,7 +322,7 @@
      * @param alignment
      * @return CKG_API* 
      */
-    CKG_API CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, u32 flags, u8 alignment);
+    CKG_API CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, s32 flags, u8 alignment);
     CKG_API void ckg_arena_free(CKG_Arena* arena);
     CKG_API void* ckg_arena_push_custom(CKG_Arena* arena, size_t element_size);	
     CKG_API void ckg_arena_begin_temp(CKG_Arena* arena);
@@ -371,6 +362,16 @@
 
     CKG_API bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length);
     CKG_API bool ckg_str_contains(char* s1, u64 s1_length, char* contains, u64 contains_length);
+    
+    /**
+     * @brief Check the return value of -1 to know if there is not a substring in the string provided
+     * 
+     * @param str 
+     * @param str_length 
+     * @param substring 
+     * @param substring_length 
+     * @return s64 
+     */
 	CKG_API s64  ckg_str_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
 	CKG_API s64  ckg_str_last_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
 	CKG_API bool ckg_str_starts_with(char* str, u64 str_length, char* starts_with, u64 starts_with_length);
@@ -387,7 +388,7 @@
     CKG_StringView* ckg_sv_split(char* data, u64 length, char* delimitor, u64 delimitor_length);
     
     #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
-    #define CKG_SV_EMPTY() (CKG_StringView){"", 0}
+    #define CKG_SV_EMPTY() (CKG_StringView){NULLPTR, 0}
     #define CKG_LIT_ARG(literal) literal, sizeof(literal) - 1
 
     #define ckg_sv_equal(sv1, sv2) ckg_str_equal(sv1.data, sv1.length, sv2.data, sv2.length)
@@ -451,12 +452,12 @@
     typedef struct CKG_RingBufferHeader {
         int read;
         int write;
-        int count;
-        int capacity;
+        u32 count;
+        u32 capacity;
         size_t element_size;
     } CKG_RingBufferHeader;
 
-    void* ckg_ring_buffer_create(size_t element_size, int capacity);
+    void* ckg_ring_buffer_create(size_t element_size, u32 capacity);
     void* MACRO_ckg_ring_buffer_free(void* buffer);
     #define ckg_ring_buffer_header_base(buffer) ((CKG_RingBufferHeader*)(((char*)(buffer)) - sizeof(CKG_RingBufferHeader)))
 
@@ -475,7 +476,7 @@
         ckg_assert_msg(!ckg_ring_buffer_full(buffer), "Ring buffer is overwriting unread memory!\n");                        \
         (buffer)[ckg_ring_buffer_write(buffer)] = (element);                                                                 \
         ckg_ring_buffer_header_base(buffer)->count++;                                                                        \
-        ckg_ring_buffer_header_base(buffer)->write = (ckg_ring_buffer_write(buffer) + 1) % ckg_ring_buffer_capacity(buffer); \
+        ckg_ring_buffer_header_base(buffer)->write = (int)((ckg_ring_buffer_write(buffer) + 1) % ckg_ring_buffer_capacity(buffer)); \
     } while(0)                                                                                                               \
 
     #define ckg_ring_buffer_dequeue(buffer) buffer[ckg_ring_buffer_read(buffer)]; ckg_assert_msg(!ckg_ring_buffer_empty(buffer), "Ring buffer is empty!\n"); ckg_ring_buffer_header_base(buffer)->count--; ckg_ring_buffer_header_base(buffer)->read = (ckg_ring_buffer_read(buffer) + 1) % ckg_ring_buffer_capacity(buffer)
@@ -975,8 +976,17 @@
 #endif
 
 #if defined(CKG_IMPL_LOGGER)
-    #define LOGGER_START_DELIM "${"
-    #define LOGGER_END_DELIM "}"
+    char LOGGER_START_DELIM[] = "${";
+    char LOGGER_END_DELIM[] = "}";
+
+    internal const char* ckg_log_level_format[LOG_LEVEL_COUNT] = {
+        CKG_RED_BACKGROUND,
+        CKG_RED,
+        CKG_PURPLE,
+        CKG_BLUE,
+        CKG_GREEN,
+        CKG_COLOR_RESET
+    };
 
     internal bool __ckg_message_has_special_delmitor(char* message, u64 message_length) {
         bool start_delimitor_index = ckg_str_contains(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1);
@@ -996,8 +1006,8 @@
         s64 start_delimitor_index = ckg_str_index_of(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1);
         s64 end_delimitor_index = ckg_str_index_of(message, message_length, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
 
-        CKG_StringView left_side_view = ckg_sv_create(message, start_delimitor_index);
-        CKG_StringView right_side_view = ckg_sv_create(message + (end_delimitor_index + (sizeof(LOGGER_END_DELIM) - 1)), message_length);
+        CKG_StringView left_side_view = ckg_sv_create(message, (u64)start_delimitor_index);
+        CKG_StringView right_side_view = ckg_sv_create(message + ((u64)end_delimitor_index + (sizeof(LOGGER_END_DELIM) - 1)), (u64)message_length);
 
         printf("%.*s%s%.*s%s", (int)left_side_view.length, left_side_view.data, ckg_log_level_format[log_level], (int)middle_to_color.length, middle_to_color.data, CKG_COLOR_RESET);
 
@@ -1057,12 +1067,12 @@
 #endif
 
 #if defined(CKG_IMPL_ERRORS)
-    internal char* CKG_ERROR_IO_STRINGS[CKG_ERROR_IO_COUNT] = {
+    internal const char* CKG_ERROR_IO_STRINGS[CKG_ERROR_IO_COUNT] = {
         stringify(CKG_ERROR_IO_RESOURCE_NOT_FOUND),
         stringify(CKG_ERROR_IO_RESOURCE_TOO_BIG)
     };
 
-    internal char* CKG_ERROR_ARGS_STRINGS[CKG_ERROR_ARGS_COUNT] = {
+    internal const char* CKG_ERROR_ARGS_STRINGS[CKG_ERROR_ARGS_COUNT] = {
         stringify(CKG_ERROR_ARG_ONE_INVALID),
         stringify(CKG_ERROR_ARG_ONE_NULLPTR),
         stringify(CKG_ERROR_ARG_ONE_ZERO),
@@ -1077,7 +1087,7 @@
         stringify(CKG_ERROR_ARG_FOUR_ZERO)
     };
 
-    char* ckg_error_str(CKG_Error error_code) {
+    const char* ckg_error_str(CKG_Error error_code) {
         if (error_code == CKG_ERROR_SUCCESS) {
             return stringify(CKG_ERROR_SUCCESS);
         }
@@ -1198,8 +1208,7 @@
 
     // Date: September 12, 2024
     // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
-    void MACRO_ckg_memory_delete_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index) {
-        ckg_assert((s32)number_of_elements - 1 >= 0);
+    void MACRO_ckg_memory_delete_index(void* data, u64 number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index) {
         ckg_assert(index < data_capacity);
 
         u8* byte_data = (u8*)data;
@@ -1214,7 +1223,7 @@
 
     // Date: September 12, 2024
     // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
-    void MACRO_ckg_memory_insert_index(void* data, size_t number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index) {
+    void MACRO_ckg_memory_insert_index(void* data, u64 number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index) {
         ckg_assert((number_of_elements + 1) < data_capacity);
         ckg_assert(index < data_capacity - 1);
 
@@ -1230,7 +1239,7 @@
 #endif
 
 #if defined(CKG_IMPL_ARENA)
-    CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, u32 flags, u8 alignment) {
+    CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, s32 flags, u8 alignment) {
         ckg_assert_msg(memory, "Memory can't be a null pointer!\n");
         ckg_assert_msg(allocation_size != 0, "Can't have a zero allocation size!\n");
         ckg_assert_msg(!((flags & CKG_ARENA_FLAG_CIRCULAR) && (flags & CKG_ARENA_FLAG_FIXED)), "Can't have both a fixed an circular arena!\n");
@@ -1252,7 +1261,7 @@
             ckg_free(arena->base_address);
         }
 
-        arena->flags = (u32)CKG_ARENA_FLAG_INVALID;
+        arena->flags = CKG_ARENA_FLAG_INVALID;
     }
 
     void ckg_arena_zero(CKG_Arena* arena) {
@@ -1367,9 +1376,9 @@
         }
 
         CKG_StringView ret = CKG_SV_EMPTY();
-        u64 start_str_index = (u64)(start_delimitor_index + start_delimitor_length);
+        u64 start_str_index = (u64)((u64)start_delimitor_index + start_delimitor_length);
         ret.data = str + start_str_index;
-        ret.length = end_delimitor_index - start_str_index;
+        ret.length = (u64)end_delimitor_index - start_str_index;
 
         return ret;
     }
@@ -1399,12 +1408,12 @@
             if (found_index == 0) {
                 ckg_vector_push(ret_vector, CKG_SV_EMPTY());
             } else {
-                CKG_StringView substring = ckg_sv_create(str_view.data, found_index);
+                CKG_StringView substring = ckg_sv_create(str_view.data, (u64)found_index);
                 ckg_vector_push(ret_vector, substring);
             }
 
-            str_view.data += (found_index + 1);
-            str_view.length -= (found_index + 1);
+            str_view.data += ((u64)found_index + 1);
+            str_view.length -= ((u64)found_index + 1);
         }
 
         return ret_vector;
@@ -1459,8 +1468,8 @@
         ckg_assert(str);
         ckg_assert(reversed_buffer_capacity > str_length);
 
-        for (s64 i = str_length - 1; i >= 0; i--) {
-            ckg_str_append_char(returned_reversed_string_buffer, (str_length - 1) - i, reversed_buffer_capacity, str[i]);
+        for (s64 i = (s64)str_length - 1; i >= 0; i--) {
+            ckg_str_append_char(returned_reversed_string_buffer, ((str_length - 1) - (u64)i), reversed_buffer_capacity, str[i]);
         }
     }
 
@@ -1492,7 +1501,7 @@
 
             CKG_StringView current_view = ckg_sv_create(str + i, substring_length);
             if (ckg_str_equal(substring, substring_length, current_view.data, current_view.length)) {
-                ret_index = i;
+                ret_index = (s64)i;
                 break;
             }
         }
@@ -1531,7 +1540,7 @@
 
             CKG_StringView current_view = ckg_sv_create(str + i, substring_length);
             if (ckg_str_equal(current_view.data, current_view.length, substring, substring_length)) {
-                ret_index = i;
+                ret_index = (s64)i;
             }
         }
 
@@ -1580,7 +1589,7 @@
     char* ckg_str_va_sprint(u64* str_length_ptr_back, const char* fmt, va_list args) {
         va_list args_copy;
         va_copy(args_copy, args);
-        u64 allocation_ret = vsnprintf(NULLPTR, 0, fmt, args_copy) + 1; // +1 for null terminator
+        u64 allocation_ret = (u64)vsnprintf(NULLPTR, 0, fmt, args_copy) + 1; // +1 for null terminator
         va_end(args_copy);
 
         char* buffer = ckg_alloc(allocation_ret);
@@ -1608,7 +1617,7 @@
 
 #if defined(CKG_IMPL_CHAR)
     bool ckg_char_is_alpha(char c) {
-        c = (c & (0b11011111)); // mask off the 32 bit
+        c = (char)((s32)c & (0b11011111)); // mask off the 32 bit
         return ckg_char_is_upper(c);
     }
 
@@ -1667,7 +1676,7 @@
     //
     // Date: March 22, 2025
     // NOTE(Jovanni): Do we actually need this at all because we have a circular arena?
-    void* ckg_ring_buffer_create(size_t element_size, int capacity) {
+    void* ckg_ring_buffer_create(size_t element_size, u32 capacity) {
         size_t allocation_size = sizeof(CKG_RingBufferHeader) + (capacity * element_size);
         CKG_RingBufferHeader* header = ckg_alloc(allocation_size);
         header->element_size = element_size;
@@ -1963,11 +1972,11 @@
             0x0C, 0x0D, 0x0E, 0x0F
         };
 
-        const uint64_t *_key = (uint64_t *)key;
+        const uint64_t *_key = (const uint64_t*)key;
         uint64_t k0 = _le64toh(_key[0]);
         uint64_t k1 = _le64toh(_key[1]);
         uint64_t b = (uint64_t)source_size << 56;
-        const uint64_t *in = (uint64_t*)source;
+        const uint64_t* in = (const uint64_t*)source;
 
         uint64_t v0 = k0 ^ 0x736f6d6570736575ULL;
         uint64_t v1 = k1 ^ 0x646f72616e646f6dULL;
@@ -1982,7 +1991,9 @@
             v0 ^= mi;
         }
 
-        uint64_t t = 0; uint8_t *pt = (uint8_t *)&t; uint8_t *m = (uint8_t *)in;
+        uint64_t t = 0; 
+        uint8_t* pt = (uint8_t*)&t; 
+        const uint8_t* m = (const uint8_t*)in;
         switch (source_size) {
             case 7: pt[6] = m[6];
             case 6: pt[5] = m[5];
@@ -2219,14 +2230,14 @@
                     fwrite(collection, (header->element_size * header->count), 1, file_handle);
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* string_vector = (CKG_StringView*)collection;
-                    for (int i = 0; i < header->count; i++) {
+                    for (u32 i = 0; i < header->count; i++) {
                         CKG_StringView sv = string_vector[i];
                         fwrite(&sv.length, sizeof(size_t), 1, file_handle);
                         fwrite(sv.data, sv.length, 1, file_handle);
                     }
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = (char**)collection;
-                    for (int i = 0; i < header->count; i++) {
+                    for (u32 i = 0; i < header->count; i++) {
                         char* current_string = string_vector[i];
                         size_t count = ckg_cstr_length(current_string);
                         fwrite(&count, sizeof(size_t), 1, file_handle);
@@ -2295,7 +2306,7 @@
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* sv_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
 
-                    for (int i = 0; i < header.count; i++) {
+                    for (u32 i = 0; i < header.count; i++) {
                         CKG_StringView sv;
                         fread(&sv.length, sizeof(size_t), 1, file_handle);
                         sv.data = ckg_alloc(sv.length + 1);
@@ -2308,7 +2319,7 @@
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
 
-                    for (int i = 0; i < header.count; i++) {
+                    for (u32 i = 0; i < header.count; i++) {
                         size_t char_count = 0;
                         fread(&char_count, sizeof(size_t), 1, file_handle);
                         char* current_string = ckg_alloc(char_count + 1);
@@ -2353,7 +2364,7 @@
                 return NULLPTR;
             }
 
-            size_t file_size = large_int.QuadPart;
+            size_t file_size = (size_t)large_int.QuadPart;
             if (file_size > SIZE_MAX) {
                 CKG_LOG_ERROR("File size is bigger than max size: ckg_io_read_entire_file(%s)\n", file_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_TOO_BIG);

@@ -96,7 +96,7 @@ void test_ckg_memory_operations() {
 
 	u32 final_array[] = {15161, 2, 3, 22, 23, 52, 51212};
 
-	for (int i = 0; i < ArrayCount(final_array); i++) {
+	for (u32 i = 0; i < ArrayCount(final_array); i++) {
 		ckg_assert(test_data[i] == final_array[i]);
 	}
 

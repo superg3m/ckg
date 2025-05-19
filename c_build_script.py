@@ -27,13 +27,14 @@ cc: CompilerConfig = CompilerConfig(
 )
 
 if IS_WINDOWS() and not C_BUILD_IS_DEPENDENCY():
-    cc.compiler_name = "cl"
+    cc.compiler_name = "gcc"
 elif IS_DARWIN() and not C_BUILD_IS_DEPENDENCY():
     cc.compiler_name = "clang"
 elif IS_LINUX() and not C_BUILD_IS_DEPENDENCY():
     cc.compiler_name = "gcc"
 
 # Do different things depending on the platform
+compiler_inject = []
 if cc.compiler_name == "cl":
     cc.compiler_warning_level = "all"
     cc.compiler_disable_specific_warnings = [
@@ -49,13 +50,9 @@ if cc.compiler_name == "cl":
     ]
 else:
     cc.compiler_warning_level = "all"
+    compiler_inject = ["-Wextra"]
     cc.compiler_disable_specific_warnings = [
-        "deprecated", 
-        "parentheses", 
-        "missing-braces", 
-        "switch", 
-        "unused-variable", 
-        "unused-result"
+        "implicit-fallthrough"
     ]
 
 executable_procedure_libs = []
@@ -68,14 +65,16 @@ procedures: Dict[str, ProcedureConfig] = {
     "ckg_lib": ProcedureConfig(
         build_directory = f"./{build_postfix}",
         output_name = GET_LIB_NAME(cc, 'ckg'),
-        source_files = ["../../ckg.c"]
+        source_files = ["../../ckg.c"],
+        compiler_inject_into_args=compiler_inject
     ),
 
     "test_ckg": ProcedureConfig(
         build_directory = f"./example/{build_postfix}",
         output_name = "test_ckg.exe",
         source_files = ["../../*.c"],
-        additional_libs = [f"../../../{build_postfix}/{GET_LIB_NAME(cc, 'ckg')}"]
+        additional_libs = [f"../../../{build_postfix}/{GET_LIB_NAME(cc, 'ckg')}"],
+        compiler_inject_into_args=compiler_inject
     ),
 }
 
