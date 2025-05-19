@@ -43,7 +43,9 @@ if cc.compiler_name == "cl":
         "4996", 
         "4255",
         "5045",
-        "4464"
+        "4464",
+        "4711",
+        "4710"
     ]
 else:
     cc.compiler_warning_level = "all"

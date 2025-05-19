@@ -950,7 +950,7 @@
         if (middle_to_color.length == 0) {
             bool found = message[message_length - 1] == '\n';
             printf("%.*s", (int)(message_length - found), message);
-
+            ckg_assert(false);
             return;
         }
 
