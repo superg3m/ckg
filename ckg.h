@@ -100,10 +100,8 @@
     #define local_persist static
     #define internal static
 
-
     CKG_API void U32_EndianSwap(u32* number_to_endian_swap);
     CKG_API void U64_EndianSwap(u64* number_to_endian_swap);
-
 
     #if defined _MSC_VER && !defined _CRT_USE_BUILTIN_OFFSETOF
         #define OFFSET_OF(type, member) (size_t)(&(((type*)0)->member))
@@ -2075,13 +2073,13 @@
     }
 
     typedef struct HashMapContext {
-        u8* temp_key_address;
-        u64 real_index;
         CKG_HashMapMeta* meta;
+        u8* temp_key_address;
         u8* entry;
         u8* entry_key_address;
         u8* entry_value_address;
         u8* entry_filled_address;
+        u64 real_index;
     } HashMapContext;
 
     static HashMapContext ckg_hashmap_find_entry(u8* map) {
