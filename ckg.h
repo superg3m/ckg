@@ -862,24 +862,25 @@
             SymCleanup(process);
             CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
         }
-    #elif defined(PLATFORM_LINUX) || defined(PLATFORM_APPLE)
+    #elif defined(PLATFORM_LINUX)
         #include <stdio.h>
         #include <stdlib.h>
         #include <unistd.h>
+        #include <execinfo.h>
         #ifdef __cplusplus
             #include <cxxabi.h>
         #endif
 
         void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
-            CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
+            printf("------------------ Error Stack Trace ------------------\n");
 
             void* array[100];
             int size = backtrace(array, 100) - 6;
             char** strings = backtrace_symbols(array, size);
 
             if (strings == NULLPTR) {
-                CKG_LOG_PRINT("Failed to get backtrace symbols\n");
-                CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+                printf("Failed to get backtrace symbols\n");
+                printf("------------------ Error Stack Trace End ------------------\n");
                 return;
             }
 
@@ -900,7 +901,7 @@
                 }
 
                 if (i == 2) {
-                    CKG_LOG_PRINT("0: %s - %s:%d\n", function, file, line);
+                    printf("0: %s - %s:%d\n", function, file, line);
                     continue;
                 }
 
@@ -912,24 +913,61 @@
                     int status;
                     char* demangled_name = abi::__cxa_demangle(begin_name, NULLPTR, NULLPTR, &status);
                     if (status == 0 && demangled_name) {
-                        CKG_LOG_PRINT("%d: %s : %s:%s\n", i, strings[i], demangled_name, begin_offset);
+                        printf("%d: %s : %s:%s\n", i, strings[i], demangled_name, begin_offset);
                         free(demangled_name);
                     } else {
-                        CKG_LOG_PRINT("%d: %s : %s:%s\n", i, strings[i], begin_name, begin_offset);
+                        printf("%d: %s : %s:%s\n", i, strings[i], begin_name, begin_offset);
                     }
                 } else {
-                    CKG_LOG_PRINT("%d: %s\n", i, strings[i]);
+                    printf("%d: %s\n", i, strings[i]);
                 }
             }
 
             free(strings);
-            CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+            printf("------------------ Error Stack Trace End ------------------\n");
         }
+
+    #elif defined(PLATFORM_APPLE)
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <unistd.h>
+        #include <execinfo.h>
+        #include <dlfcn.h>
+        #ifdef __cplusplus
+            #include <cxxabi.h>
+        #endif
+
+        void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
+            printf("------------------ Error Stack Trace ------------------\n");
+
+            void* array[100];
+            int size = backtrace(array, 100);
+
+            for (int i = 1; i < size; ++i) {
+                Dl_info info;
+                if (dladdr(array[i], &info) && info.dli_sname) {
+                    int status;
+                    char* demangled_name = abi::__cxa_demangle(info.dli_sname, NULLPTR, NULLPTR, &status);
+                    if (status == 0 && demangled_name) {
+                        printf("%d: %s : %s\n", i, info.dli_fname, demangled_name);
+                        free(demangled_name);
+                    } else {
+                        printf("%d: %s : %s\n", i, info.dli_fname, info.dli_sname);
+                    }
+                } else {
+                    printf("%d: [unknown symbol]\n", i);
+                }
+            }
+
+            printf("0: %s - %s:%d\n", function, file, line);
+            printf("------------------ Error Stack Trace End ------------------\n");
+        }
+
     #else
         void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
-            CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
-            CKG_LOG_PRINT("Stack trace not implemented for this platform\n");
-            CKG_LOG_PRINT("------------------ Error Stack Trace End ------------------\n");
+            printf("------------------ Error Stack Trace ------------------\n");
+            printf("Stack trace not implemented for this platform\n");
+            printf("------------------ Error Stack Trace End ------------------\n");
         }
     #endif
 #endif
