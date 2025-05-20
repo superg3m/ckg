@@ -79,6 +79,7 @@
         "xfacet": "c",
         "xlocinfo": "c",
         "xstddef": "c",
-        "*.rh": "c"
+        "*.rh": "c",
+        "stddef.h": "c"
     }
 }

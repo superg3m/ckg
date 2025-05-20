@@ -51,13 +51,11 @@
     #undef CLAMP
     #undef local_persist
     #undef internal
-    #undef OFFSET_OF
     #undef FIRST_DIGIT
     #undef GET_BIT
     #undef SET_BIT
     #undef UNSET_BIT
     #undef ArrayCount
-    #undef PLATFORM_MAX_PATH
     #undef PLATFORM_WINDOWS
     #undef PLATFORM_APPLE
     #undef PLATFORM_LINUX
@@ -70,6 +68,7 @@
     #include <stdarg.h>
     #include <stdlib.h>
     #include <stdbool.h>
+    #include <stddef.h>
 
     typedef int8_t  s8;
     typedef int16_t s16;
@@ -98,19 +97,12 @@
     #define local_persist static
     #define internal static
 
-    #if defined _MSC_VER && !defined _CRT_USE_BUILTIN_OFFSETOF
-        #define OFFSET_OF(type, member) (size_t)(&(((type*)0)->member))
-    #else
-        #define OFFSET_OF(type, member) __builtin_offsetof(type, member)
-    #endif
     #define FIRST_DIGIT(number) ((int)number % 10);
     #define GET_BIT(number, bit_to_check) ((number & (1 << bit_to_check)) >> bit_to_check)
     #define SET_BIT(number, bit_to_set) number |= (1 << bit_to_set);
     #define UNSET_BIT(number, bit_to_unset) number &= (~(1 << bit_to_unset));
 
     #define ArrayCount(array) (int)(sizeof(array) / sizeof(array[0]))
-
-    #define PLATFORM_MAX_PATH 256
 
     #if defined(_WIN32)
         #define NOMINMAX
@@ -610,12 +602,12 @@
    #define ckg_hashmap_init_with_hash(map, KeyType, ValueType, __key_is_ptr, __hash_function)    \
     do {                                                                                         \
         map = ckg_alloc(sizeof(CKG_HashMap(KeyType, ValueType)));                                \
-        map->meta.key_offset = OFFSET_OF(CKG_HashMap(KeyType, ValueType), temp_key);             \
-        map->meta.value_offset = OFFSET_OF(CKG_HashMap(KeyType, ValueType), temp_value);         \
-        map->meta.entry_offset = OFFSET_OF(CKG_HashMap(KeyType, ValueType), entries);            \
-        map->meta.entry_key_offset = OFFSET_OF(CKG_HashMapEntry(KeyType, ValueType), key);       \
-        map->meta.entry_value_offset = OFFSET_OF(CKG_HashMapEntry(KeyType, ValueType), value);   \
-        map->meta.entry_filled_offset = OFFSET_OF(CKG_HashMapEntry(KeyType, ValueType), filled); \
+        map->meta.key_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_key);              \
+        map->meta.value_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_value);          \
+        map->meta.entry_offset = offsetof(CKG_HashMap(KeyType, ValueType), entries);             \
+        map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);        \
+        map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);    \
+        map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled);  \
         map->meta.key_size = sizeof(KeyType);                                                    \
         map->meta.value_size = sizeof(ValueType);                                                \
         map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                     \
