@@ -27,7 +27,7 @@ void test_ckg_arena_operations() {
   const int arena_size_common = sizeof(int) * 16;
   // Test circular arena
   CKG_Arena circular_arena = ckg_arena_create_custom(function_memory, arena_size_common, CKG_ARENA_FLAG_CIRCULAR|CKG_ARENA_FLAG_STACK_MEMORY, sizeof(int));
-  for (u32 i = 0; i < 32; i++) {
+  for (int i = 0; i < 32; i++) {
     int* ptr = ckg_arena_push(&circular_arena, int);
     *ptr = i;
   }
@@ -38,7 +38,7 @@ void test_ckg_arena_operations() {
 
   // Test vector arena
   CKG_Arena fixed_arena = ckg_arena_create_custom(function_memory, arena_size_common, CKG_ARENA_FLAG_FIXED|CKG_ARENA_FLAG_STACK_MEMORY, sizeof(int));
-  for (u32 i = 0; i < 16; i++) {
+  for (int i = 0; i < 16; i++) {
     int* ptr = ckg_arena_push(&fixed_arena, int);
     *ptr = i;
   }

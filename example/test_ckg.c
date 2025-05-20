@@ -33,25 +33,6 @@ int main() {
 	test_ckg_stack_operations();
 	linked_list_operations();
 
-	u32 number_to_endian_swap = 2;
-	U32_EndianSwap(&number_to_endian_swap);
-	CKG_LOG_SUCCESS("EndianSwap: %d\n", number_to_endian_swap);
-
-	U32_EndianSwap(&number_to_endian_swap);
-	CKG_LOG_SUCCESS("EndianSwap: %d\n", number_to_endian_swap);
-
-	CKG_LOG_SUCCESS("Before first bit set: %d\n", number_to_endian_swap);
-	SET_BIT(number_to_endian_swap, 0);
-	CKG_LOG_SUCCESS("After first bit set: %d\n", number_to_endian_swap);
-
-	SET_BIT(number_to_endian_swap, 2);
-	CKG_LOG_SUCCESS("After third bit set: %d\n", number_to_endian_swap);
-
-	UNSET_BIT(number_to_endian_swap, 2);
-	CKG_LOG_SUCCESS("After ${third} bit set: %d\n", number_to_endian_swap);
-
-	ckg_assert(GET_BIT(number_to_endian_swap, 0));
-
 	for (char i = 0; i < 26; i++) {
 		char c = i + 'a';
 		ckg_assert_msg(ckg_char_is_alpha(c), "Character: %c\n", c);
@@ -61,7 +42,7 @@ int main() {
 	}
 	
 	CKG_StringView* split_strings = ckg_sv_split(CKG_LIT_ARG("They said it couldn't be done. They tried to recite the dark magics to me! THEY DON'T KNOW I WAS THERE WHEN THEY WERE WRITTEN!"), CKG_LIT_ARG(" "));
-	for (u32 i = 0; i < ckg_vector_count(split_strings); i++) {
+	for (int i = 0; i < ckg_vector_count(split_strings); i++) {
 		CKG_StringView line = split_strings[i];
 		CKG_LOG_SUCCESS("str #%d | %.*s\n", i, line.length, line.data);
 	}

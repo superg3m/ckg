@@ -73,12 +73,10 @@
 
     typedef int8_t  s8;
     typedef int16_t s16;
-    typedef int32_t s32;
     typedef int64_t s64;
-
+    
     typedef uint8_t  u8;
     typedef uint16_t u16;
-    typedef uint32_t u32;
     typedef uint64_t u64;
 
     #define NULLPTR 0
@@ -99,9 +97,6 @@
 
     #define local_persist static
     #define internal static
-
-    CKG_API void U32_EndianSwap(u32* number_to_endian_swap);
-    CKG_API void U64_EndianSwap(u64* number_to_endian_swap);
 
     #if defined _MSC_VER && !defined _CRT_USE_BUILTIN_OFFSETOF
         #define OFFSET_OF(type, member) (size_t)(&(((type*)0)->member))
@@ -146,7 +141,7 @@
         #define UNUSED_FUNCTION
     #endif
 
-    CKG_API void ckg_stack_trace_dump(const char* function, const char* file, u32 line);
+    CKG_API void ckg_stack_trace_dump(const char* function, const char* file, int line);
 #endif
 
 #if defined(CKG_INCLUDE_LOGGER)
@@ -193,8 +188,8 @@
 #endif
 
 #if defined(CKG_INCLUDE_ASSERT)
-    CKG_API void MACRO_ckg_assert(bool expression,const char* function, const char* file, u32 line);
-    CKG_API void MACRO_ckg_assert_msg(bool expression, const char* function, const char* file, u32 line, const char* msg, ...);
+    CKG_API void MACRO_ckg_assert(bool expression,const char* function, const char* file, int line);
+    CKG_API void MACRO_ckg_assert_msg(bool expression, const char* function, const char* file, int line, const char* msg, ...);
 
     #define CKG_ASSERT_ENABLED true
     #if CKG_ASSERT_ENABLED == true 
@@ -274,8 +269,8 @@
     CKG_API void ckg_memory_copy(void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes);
     CKG_API void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
-    CKG_API void MACRO_ckg_memory_delete_index(void* data, u64 number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index);
-    CKG_API void MACRO_ckg_memory_insert_index(void* data, u64 number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index);
+    CKG_API void MACRO_ckg_memory_delete_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index);
+    CKG_API void MACRO_ckg_memory_insert_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index);
 
     #define ckg_memory_fill(_buffer, _buffer_count, _fill_element) \
     do {														   \
@@ -311,7 +306,7 @@
         size_t used_save_point;
         size_t used;
         u8 alignment;
-        s32 flags;
+        int flags;
     } CKG_Arena;
     
     /**
@@ -323,7 +318,7 @@
      * @param alignment
      * @return CKG_API* 
      */
-    CKG_API CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, s32 flags, u8 alignment);
+    CKG_API CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, int flags, u8 alignment);
     CKG_API void ckg_arena_free(CKG_Arena* arena);
     CKG_API void* ckg_arena_push_custom(CKG_Arena* arena, size_t element_size);	
     CKG_API void ckg_arena_begin_temp(CKG_Arena* arena);
@@ -414,12 +409,12 @@
     // ========== START CKG_VECTOR ==========
     //
     typedef struct CKG_VectorHeader {
-        u64 count;
-        size_t capacity;
+        int count;
+        int capacity;
         size_t element_size;
     } CKG_VectorHeader;
 
-    CKG_API void* ckg_vector_grow(void* vector, size_t element_size, size_t capacity);
+    CKG_API void* ckg_vector_grow(void* vector, size_t element_size, int capacity);
     CKG_API void* MACRO_ckg_vector_free(void* vector);
 
     #define VECTOR_DEFAULT_CAPACITY 1
@@ -453,12 +448,12 @@
     typedef struct CKG_RingBufferHeader {
         int read;
         int write;
-        u32 count;
-        u32 capacity;
+        int count;
+        int capacity;
         size_t element_size;
     } CKG_RingBufferHeader;
 
-    void* ckg_ring_buffer_create(size_t element_size, u32 capacity);
+    void* ckg_ring_buffer_create(size_t element_size, int capacity);
     void* MACRO_ckg_ring_buffer_free(void* buffer);
     #define ckg_ring_buffer_header_base(buffer) ((CKG_RingBufferHeader*)(((char*)(buffer)) - sizeof(CKG_RingBufferHeader)))
 
@@ -532,19 +527,19 @@
     //
     // ========== START CKG_HashMap ==========
     //
-    typedef u64 (*CKG_HashFunction)(void* data, u32 size);
+    typedef u64 (*CKG_HashFunction)(void* data, u64 size);
 
     typedef struct CKG_HashMapMeta {
-        u32 key_offset;
-        u32 value_offset;
-        u32 entry_offset;
-        u32 entry_key_offset;
-        u32 entry_value_offset;
-        u32 entry_filled_offset;
+        int key_offset;
+        int value_offset;
+        int entry_offset;
+        int entry_key_offset;
+        int entry_value_offset;
+        int entry_filled_offset;
 
-        u32 key_size;
-        u32 value_size;
-        u32 entry_size;
+        int key_size;
+        int value_size;
+        int entry_size;
 
         u64 capacity;
         u64 count;
@@ -576,14 +571,15 @@
     #define CKG_HASHMAP_DEFAULT_CAPACITY 4
     #define CKG_HASHMAP_DEFAULT_LOAD_FACTOR 0.70f
 
+    u64 siphash24(void* source, u64 source_size);
+    u64 ckg_string_hash(void* str, u64 str_length);
+    u64 ckg_string_view_hash(void* view, u64 str_length);
+    u64 ckg_string_view(void* str, u64 str_length);
+
     float ckg_hashmap_load_factor(void* map);
     void ckg_hashmap_grow(void* map);
-    u64 siphash24(void* source, u32 source_size);
-    u64 ckg_string_hash(void* str, u32 str_length);
-    u64 ckg_string_view_hash(void* view, u32 str_length);
-    u64 ckg_string_view(void* str, u32 str_length);
     float ckg_hashmap_load_factor(void* map);
-    u64 ckit_hashmap_resolve_collision(void* map, void* key, u64 inital_hash_index);
+    
     bool ckg_hashmap_has_helper(void* map);
     void ckg_hashmap_get_helper(void* map);
     void ckg_hashmap_put_helper(void* map);
@@ -769,32 +765,6 @@
 //
 
 #if defined(CKG_IMPL_TYPES)
-    void U32_EndianSwap(u32* number_to_endian_swap) {
-        u32 temp = *number_to_endian_swap;
-        
-        u32 b0 = (temp >> 0) & 0xFF;
-        u32 b1 = (temp >> 8) & 0xFF;
-        u32 b2 = (temp >> 16) & 0xFF;
-        u32 b3 = (temp >> 24) & 0xFF;
-
-        *number_to_endian_swap = (b0 << 24)|(b1 << 16)|(b2 << 8)|(b3 << 0);
-    } 
-
-    void U64_EndianSwap(u64* number_to_endian_swap) {
-        u64 temp = *number_to_endian_swap;
-        
-        u64 b0 = (temp >> 0) & 0xFF;
-        u64 b1 = (temp >> 8) & 0xFF;
-        u64 b2 = (temp >> 16) & 0xFF;
-        u64 b3 = (temp >> 24) & 0xFF;
-        u64 b4 = (temp >> 32) & 0xFF;
-        u64 b5 = (temp >> 40) & 0xFF;
-        u64 b6 = (temp >> 48) & 0xFF;
-        u64 b7 = (temp >> 56) & 0xFF;
-
-        *number_to_endian_swap = (b0 << 56)|(b1 << 48)|(b2 << 40)|(b3 << 32)|(b4 << 24)|(b5 << 16)|(b6 << 8)|(b7 << 0);
-    }
-
     #if defined(PLATFORM_WINDOWS) && defined(_MSC_VER)
         #include <DbgHelp.h>
         #pragma comment(lib, "dbghelp")
@@ -811,7 +781,7 @@
             return "Unknown Module";
         }
 
-        void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
+        void ckg_stack_trace_dump(const char* function, const char* file, int line) {
             CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
             void* stack[100];
             unsigned short max_frames = 100;
@@ -881,7 +851,7 @@
         #include <execinfo.h>
         #include <string.h>
 
-        void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
+        void ckg_stack_trace_dump(const char* function, const char* file, int line) {
             printf("------------------ Error Stack Trace ------------------\n");
 
             // Log the triggering function first
@@ -940,7 +910,7 @@
         #include <execinfo.h>
         #include <dlfcn.h>
 
-        void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
+        void ckg_stack_trace_dump(const char* function, const char* file, int line) {
             printf("------------------ Error Stack Trace ------------------\n");
             printf("0: %s - %s:%u\n", function, file, line);
 
@@ -967,7 +937,7 @@
             printf("------------------ Error Stack Trace End ------------------\n");
         }
     #else
-        void ckg_stack_trace_dump(const char* function, const char* file, u32 line) {
+        void ckg_stack_trace_dump(const char* function, const char* file, int line) {
             printf("------------------ Error Stack Trace ------------------\n");
             printf("0: %s - %s:%u\n", function, file, line);
             printf("Stack trace functionality not implemented for this platform\n");
@@ -1042,7 +1012,7 @@
 #endif
 
 #if defined(CKG_IMPL_ASSERT)
-    void MACRO_ckg_assert(bool expression, const char* function, const char* file, u32 line) {
+    void MACRO_ckg_assert(bool expression, const char* function, const char* file, int line) {
         if (!expression) {                                      
             ckg_stack_trace_dump(function, file, line);                               
             char ckg__msg[] = "Func: %s, File: %s:%d\n";          
@@ -1051,7 +1021,7 @@
         }                                                         
     }
 
-    void MACRO_ckg_assert_msg(bool expression, const char* function, const char* file, u32 line, const char* msg, ...) {  
+    void MACRO_ckg_assert_msg(bool expression, const char* function, const char* file, int line, const char* msg, ...) {  
         va_list args;
         va_start(args, msg);
 
@@ -1212,7 +1182,8 @@
 
     // Date: September 12, 2024
     // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
-    void MACRO_ckg_memory_delete_index(void* data, u64 number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index) {
+    void MACRO_ckg_memory_delete_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index) {
+        ckg_assert(index >= 0);
         ckg_assert(index < data_capacity);
 
         u8* byte_data = (u8*)data;
@@ -1227,7 +1198,7 @@
 
     // Date: September 12, 2024
     // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
-    void MACRO_ckg_memory_insert_index(void* data, u64 number_of_elements, size_t data_capacity, size_t element_size_in_bytes, u64 index) {
+    void MACRO_ckg_memory_insert_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index) {
         ckg_assert((number_of_elements + 1) < data_capacity);
         ckg_assert(index < data_capacity - 1);
 
@@ -1243,7 +1214,7 @@
 #endif
 
 #if defined(CKG_IMPL_ARENA)
-    CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, s32 flags, u8 alignment) {
+    CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, int flags, u8 alignment) {
         ckg_assert_msg(memory, "Memory can't be a null pointer!\n");
         ckg_assert_msg(allocation_size != 0, "Can't have a zero allocation size!\n");
         ckg_assert_msg(!((flags & CKG_ARENA_FLAG_CIRCULAR) && (flags & CKG_ARENA_FLAG_FIXED)), "Can't have both a fixed an circular arena!\n");
@@ -1627,7 +1598,7 @@
 
 #if defined(CKG_IMPL_CHAR)
     bool ckg_char_is_alpha(char c) {
-        c = (char)((s32)c & (0b11011111)); // mask off the 32 bit
+        c = (char)((int)c & (0b11011111)); // mask off the 32 bit
         return ckg_char_is_upper(c);
     }
 
@@ -1641,21 +1612,21 @@
     //
     // ========== START CKG_VECTOR ==========
     //
-    void* ckg_vector_grow(void* vector, size_t element_size, size_t capacity) {
+    void* ckg_vector_grow(void* vector, size_t element_size, int capacity) {
         if (vector == NULLPTR) {
-            size_t real_capacity = (capacity > 0 ? capacity : VECTOR_DEFAULT_CAPACITY);
+            int real_capacity = (capacity > 0 ? capacity : VECTOR_DEFAULT_CAPACITY);
             vector = ckg_alloc(sizeof(CKG_VectorHeader) + (real_capacity * element_size));
             vector = (u8*)vector + sizeof(CKG_VectorHeader);
             ckg_vector_header_base(vector)->capacity = real_capacity;
             ckg_vector_header_base(vector)->element_size = element_size;
         }
 
-        size_t count = ckg_vector_count(vector);
-        size_t capactiy = ckg_vector_capacity(vector);
+        int count = ckg_vector_count(vector);
+        int capactiy = ckg_vector_capacity(vector);
 
         if (capactiy < count + 1) {
             size_t old_allocation_size = sizeof(CKG_VectorHeader) + (capactiy * element_size);
-            size_t new_capactiy = capactiy * 2;
+            int new_capactiy = capactiy * 2;
             size_t new_allocation_size = sizeof(CKG_VectorHeader) + (new_capactiy * element_size);
 
             vector = ckg_realloc(ckg_vector_header_base(vector), old_allocation_size, new_allocation_size);
@@ -1686,7 +1657,9 @@
     //
     // Date: March 22, 2025
     // NOTE(Jovanni): Do we actually need this at all because we have a circular arena?
-    void* ckg_ring_buffer_create(size_t element_size, u32 capacity) {
+    void* ckg_ring_buffer_create(size_t element_size, int capacity) {
+        ckg_assert(capacity > 0);
+
         size_t allocation_size = sizeof(CKG_RingBufferHeader) + (capacity * element_size);
         CKG_RingBufferHeader* header = ckg_alloc(allocation_size);
         header->element_size = element_size;
@@ -1974,7 +1947,7 @@
         HALF_ROUND(v0,v1,v2,v3,13,16); \
         HALF_ROUND(v2,v1,v0,v3,17,21)
 
-    uint64_t siphash24(void* source, u32 source_size) {
+    uint64_t siphash24(void* source, u64 source_size) {
         const char key[16] = {
             0x00, 0x01, 0x02, 0x03,
             0x04, 0x05, 0x06, 0x07,
@@ -2065,7 +2038,7 @@
         return cannonical_hash_index;
     }
 
-    u64 ckg_string_hash(void* str, u32 str_length) {
+    u64 ckg_string_hash(void* str, u64 str_length) {
         (void)str_length;
 
         u64 hash = 5381;
@@ -2079,7 +2052,7 @@
         return hash;
     }
 
-    u64 ckg_string_view_hash(void* view, u32 str_length) {
+    u64 ckg_string_view_hash(void* view, u64 str_length) {
         (void)str_length;
         CKG_StringView* str_view = (CKG_StringView*)view;
         u64 hash = 5381;
@@ -2219,14 +2192,14 @@
                     fwrite(collection, (header->element_size * header->count), 1, file_handle);
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* sv_vector = (CKG_StringView*)collection;
-                    for (u64 i = 0; i < header->count; i++) {
+                    for (int i = 0; i < header->count; i++) {
                         CKG_StringView sv = sv_vector[i];
                         fwrite(&sv.length, sizeof(size_t), 1, file_handle);
                         fwrite(sv.data, sv.length, 1, file_handle);
                     }
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = (char**)collection;
-                    for (u64 i = 0; i < header->count; i++) {
+                    for (int i = 0; i < header->count; i++) {
                         char* current_string = string_vector[i];
                         size_t count = ckg_cstr_length(current_string);
                         fwrite(&count, sizeof(size_t), 1, file_handle);
@@ -2242,14 +2215,14 @@
                     fwrite(collection, (header->element_size * header->count), 1, file_handle);
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* string_vector = (CKG_StringView*)collection;
-                    for (u32 i = 0; i < header->count; i++) {
+                    for (int i = 0; i < header->count; i++) {
                         CKG_StringView sv = string_vector[i];
                         fwrite(&sv.length, sizeof(size_t), 1, file_handle);
                         fwrite(sv.data, sv.length, 1, file_handle);
                     }
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = (char**)collection;
-                    for (u32 i = 0; i < header->count; i++) {
+                    for (int i = 0; i < header->count; i++) {
                         char* current_string = string_vector[i];
                         size_t count = ckg_cstr_length(current_string);
                         fwrite(&count, sizeof(size_t), 1, file_handle);
@@ -2280,7 +2253,7 @@
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* sv_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
 
-                    for (u64 i = 0; i < header.count; i++) {
+                    for (int i = 0; i < header.count; i++) {
                         CKG_StringView sv;
                         fread(&sv.length, sizeof(size_t), 1, file_handle);
 
@@ -2294,7 +2267,7 @@
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
 
-                    for (u64 i = 0; i < header.count; i++) {
+                    for (int i = 0; i < header.count; i++) {
                         size_t char_count = 0;
                         fread(&char_count, sizeof(size_t), 1, file_handle);
                         char* current_string = ckg_alloc(char_count + 1); // prob want a way to specify if you should allocate or not
@@ -2318,7 +2291,7 @@
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
                     CKG_StringView* sv_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
 
-                    for (u32 i = 0; i < header.count; i++) {
+                    for (int i = 0; i < header.count; i++) {
                         CKG_StringView sv;
                         fread(&sv.length, sizeof(size_t), 1, file_handle);
                         sv.data = ckg_alloc(sv.length + 1);
@@ -2331,7 +2304,7 @@
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
                     char** string_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
 
-                    for (u32 i = 0; i < header.count; i++) {
+                    for (int i = 0; i < header.count; i++) {
                         size_t char_count = 0;
                         fread(&char_count, sizeof(size_t), 1, file_handle);
                         char* current_string = ckg_alloc(char_count + 1);

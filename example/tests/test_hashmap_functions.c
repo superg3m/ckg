@@ -2,10 +2,10 @@
 
 typedef struct Person {
     char* name;
-    u32 age;
+    int age;
 } Person;
 
-u64 person_hash(void* data, u32 size) {
+u64 person_hash(void* data, u64 size) {
     (void)size;
 
     Person* person = (Person*)data;
