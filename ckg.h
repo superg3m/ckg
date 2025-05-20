@@ -63,11 +63,11 @@
     #undef CRASH
     #undef UNUSED_FUNCTION
 
-    #include <stdint.h>
     #include <stdio.h>
+    #include <stdbool.h>
+    #include <stdint.h>
     #include <stdarg.h>
     #include <stdlib.h>
-    #include <stdbool.h>
     #include <stddef.h>
 
     typedef int8_t  s8;
