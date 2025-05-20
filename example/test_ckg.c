@@ -13,7 +13,7 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 	return;
 }
 
-#define TOTAL_MEMORY_SIZE KiloBytes(30)
+#define TOTAL_MEMORY_SIZE KiloBytes(18)
 
 int main() {
 	u8 program_stack_memory[TOTAL_MEMORY_SIZE] = {0};
@@ -27,12 +27,14 @@ int main() {
 		test_ckg_vector_operations();
 		test_ckg_ring_buffer_overwrite_behavior();
 		ckg_hashmap_test();
+		test_serialization();
+	});
+
+	ckg_arena_temp(&arena, {
+		test_ckg_stack_operations();
+		linked_list_operations();
 	});
 	
-	test_serialization();
-	test_ckg_stack_operations();
-	linked_list_operations();
-
 	for (char i = 0; i < 26; i++) {
 		char c = i + 'a';
 		ckg_assert_msg(ckg_char_is_alpha(c), "Character: %c\n", c);
@@ -52,7 +54,7 @@ int main() {
 	CKG_LOG_DEBUG("JUST MAKING SURE THIS IS GOOD!\n");
 
 	CKG_StringView str_between_test = ckg_sv_between_delimiters(CKG_LIT_ARG("WOW - ${Hello!}"), CKG_LIT_ARG("${"), CKG_LIT_ARG("}"));
-	CKG_LOG_DEBUG("String_Between: %.*s | %d\n", str_between_test.length, str_between_test.data, (int)str_between_test.length);
+	CKG_LOG_DEBUG("String_Between: ${%.*s} | %d\n", str_between_test.length, str_between_test.data, (int)str_between_test.length);
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 
 	ckg_arena_free(&arena);

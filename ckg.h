@@ -797,7 +797,7 @@
                 return;
             }
 
-            SYMBOL_INFO* symbol = (SYMBOL_INFO*)ckg_alloc(sizeof(SYMBOL_INFO) + (MAX_SYM_NAME * sizeof(char)));
+            SYMBOL_INFO* symbol = (SYMBOL_INFO*)malloc(sizeof(SYMBOL_INFO) + (MAX_SYM_NAME * sizeof(char)));
             if (!symbol) {
                 printf("Error allocating symbol info buffer\n");
                 SymCleanup(process);
@@ -834,7 +834,7 @@
                 }
             }
 
-            ckg_free(symbol);
+            free(symbol);
             SymCleanup(process);
             printf("------------------ Error Stack Trace End ------------------\n");
         }
@@ -1250,17 +1250,11 @@
         ckg_assert_msg(element_size != 0, "Element size can't be zero!\n");
 
         if (arena->flags & CKG_ARENA_FLAG_FIXED) {
-            if (arena->used + element_size > arena->capacity) {
-                printf(CKG_RED"Ran out of arena memory!"CKG_COLOR_RESET"\n");
-                CRASH;
-            }
+            ckg_assert_msg(arena->used + element_size <= arena->capacity, "Ran out of arena memory!\n");
         } else if (arena->flags & CKG_ARENA_FLAG_CIRCULAR) {
             if ((arena->used + element_size > arena->capacity)) {
                 arena->used = sizeof(CKG_Arena);
-                if (arena->used + element_size > arena->capacity) {
-                    printf(CKG_RED"Element size exceeds circular arena allocation capacity!"CKG_COLOR_RESET"\n");
-                    CRASH;
-                }
+                ckg_assert_msg(arena->used + element_size <= arena->capacity, "Element size exceeds circular arena allocation capacity!\n");
             }
         }
 
