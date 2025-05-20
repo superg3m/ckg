@@ -16,7 +16,6 @@ void test_ckg_vector_operations() {
 	CKG_LOG_SUCCESS("All vector tests passed!\n"); 
 
 	ckg_vector_free(int_vector);
-	return;
 }
 
 void test_ckg_stack_operations() {
@@ -37,7 +36,6 @@ void test_ckg_stack_operations() {
 	}
 
 	CKG_LOG_SUCCESS("All vector tests passed!\n"); 
-	return;
 }
 
 void test_ckg_ring_buffer_overwrite_behavior() {
