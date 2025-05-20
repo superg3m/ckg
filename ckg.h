@@ -2111,14 +2111,14 @@
         }
         ckg_memory_copy((u8*)map + context.meta->key_offset, context.entry_key_address, context.meta->key_size, context.meta->key_size);
         ckg_memory_copy((u8*)map + context.meta->value_offset, context.entry_value_address, context.meta->value_size, context.meta->value_size);
-        *(bool*)(context.entry_filled_address) = 1;
+        *context.entry_filled_address = 1;
     }
 
     void ckg_hashmap_pop_helper(void* map) {
         HashMapContext context = ckg_hashmap_find_entry(map);
-        ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
+        ckg_assert_msg(*context.entry_filled_address, "The key doesn't exist in the hashmap!\n");
         ckg_memory_copy(context.entry_value_address, (u8*)map + context.meta->value_offset, context.meta->value_size, context.meta->value_size);
-        *(bool*)(context.entry_filled_address) = 0;
+        *context.entry_filled_address = 0;
     }
 
 
