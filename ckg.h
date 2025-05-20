@@ -160,14 +160,15 @@
     #define CKG_PLATFORM_CHARACTER_LIMIT 512
 
     // Log Levels
-    #define LOG_LEVEL_FATAL 0
-    #define LOG_LEVEL_ERROR 1
-    #define LOG_LEVEL_WARN 2
-    #define LOG_LEVEL_DEBUG 3
-    #define LOG_LEVEL_SUCCESS 4
-    #define LOG_LEVEL_PRINT 5
-    #define LOG_LEVEL_COUNT 6
-    typedef u8 CKG_LogLevel;
+    typedef enum CKG_LogLevel {
+        LOG_LEVEL_FATAL,
+        LOG_LEVEL_ERROR,
+        LOG_LEVEL_WARN,
+        LOG_LEVEL_DEBUG,
+        LOG_LEVEL_SUCCESS,
+        LOG_LEVEL_PRINT,
+        LOG_LEVEL_COUNT
+    } CKG_LogLevel;
 
     CKG_API void MACRO_ckg_log_output(CKG_LogLevel log_level, const char* message, ...);
     #define ckg_log_output(log_level, message, ...) MACRO_ckg_log_output(log_level, message, ##__VA_ARGS__)
@@ -1007,8 +1008,8 @@
     void MACRO_ckg_assert(bool expression, const char* function, const char* file, int line) {
         if (!expression) {                                      
             ckg_stack_trace_dump(function, file, line);                               
-            char ckg__msg[] = "Func: %s, File: %s:%d\n";          
-            CKG_LOG_FATAL(ckg__msg, function, file, line);
+            char msg[] = "Func: %s, File: %s:%d\n";          
+            CKG_LOG_FATAL(msg, function, file, line);
             CRASH;                   
         }                                                         
     }
@@ -1019,8 +1020,8 @@
 
         if (!(expression)) {                                      
             ckg_stack_trace_dump(function, file, line);                               
-            char ckg__msg[] = "Func: %s, File: %s:%d\n";          
-            CKG_LOG_FATAL(ckg__msg, function, file, line);
+            char ckg_msg[] = "Func: %s, File: %s:%d\n";          
+            CKG_LOG_FATAL(ckg_msg, function, file, line);
             CKG_LOG_FATAL("%s", ckg_str_va_sprint(NULLPTR, msg, args));                
             CRASH;                                                
         }   
