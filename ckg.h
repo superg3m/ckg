@@ -74,7 +74,7 @@
     typedef int8_t  s8;
     typedef int16_t s16;
     typedef int64_t s64;
-    
+
     typedef uint8_t  u8;
     typedef uint16_t u16;
     typedef uint64_t u64;
@@ -108,7 +108,7 @@
     #define SET_BIT(number, bit_to_set) number |= (1 << bit_to_set);
     #define UNSET_BIT(number, bit_to_unset) number &= (~(1 << bit_to_unset));
 
-    #define ArrayCount(array) (sizeof(array) / sizeof(array[0]))
+    #define ArrayCount(array) (int)(sizeof(array) / sizeof(array[0]))
 
     #define PLATFORM_MAX_PATH 256
 
