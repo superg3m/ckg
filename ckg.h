@@ -2032,7 +2032,7 @@
             u8* entry = entries_base_address + (cannonical_hash_index * meta->entry_size);
             u8* entry_key = NULLPTR;
             if (meta->key_is_ptr) {
-                entry_key = *(u8**)(entry + meta->entry_key_offset);
+                ckg_memory_copy((u8*)entry + meta->entry_key_offset, &entry_key, sizeof(u8*), sizeof(u8*));
             } else {
                 entry_key = entry + meta->entry_key_offset;
             }
@@ -2098,7 +2098,7 @@
         context.temp_key_address = NULLPTR;
 
         if (context.meta->key_is_ptr) {
-            context.temp_key_address = *(u8**)(map + context.meta->key_offset);
+            ckg_memory_copy((u8*)map + context.meta->key_offset, &context.temp_key_address, sizeof(u8*), sizeof(u8*));
         } else {
             context.temp_key_address = map + context.meta->key_offset;
         }
