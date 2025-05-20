@@ -207,13 +207,14 @@
 #endif
 
 #if defined(CKG_INCLUDE_ERRORS)
+
     /*
     +------------+----------------------------+
     | Error Type |        Error Code          |
     | (4bits)    |         (28bits)           |
     +------------+----------------------------+
     */
-
+    // this only allows for 4 types (CKG_ERROR_TYPE_COUNT <= 4)
     #define CKG_ERROR_TYPE_COUNT 2
     #define CKG_ERROR_TYPE_MASK (0b1111 << 28)
 
