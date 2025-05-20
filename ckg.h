@@ -424,10 +424,10 @@
 
     #define VECTOR_DEFAULT_CAPACITY 1
     #define ckg_vector_header_base(vector) ((CKG_VectorHeader*)(((u8*)vector) - sizeof(CKG_VectorHeader)))
-    #define ckg_vector_count(vector) (ckg_assert(vector != NULLPTR), (*ckg_vector_header_base(vector)).count)
-    #define ckg_vector_capacity(vector) (ckg_assert(vector != NULLPTR), (*ckg_vector_header_base(vector)).capacity)
+    #define ckg_vector_count(vector) (ckg_assert(vector), (*ckg_vector_header_base(vector)).count)
+    #define ckg_vector_capacity(vector) (ckg_assert(vector), (*ckg_vector_header_base(vector)).capacity)
 
-    #define ckg_stack_count(stack) (ckg_assert(stack != NULLPTR), (*ckg_vector_header_base(stack)).count)
+    #define ckg_stack_count(stack) (ckg_assert(stack), (*ckg_vector_header_base(stack)).count)
 
     #ifdef __cplusplus
         #define ckg_vector_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(vector[0]), 0); vector[ckg_vector_header_base(vector)->count++] = element
@@ -439,9 +439,9 @@
     
     #define ckg_vector_free(vector) vector = MACRO_ckg_vector_free(vector)
     #define ckg_stack_free(stack) stack = MACRO_ckg_vector_free(stack)
-    #define ckg_stack_pop(stack) (ckg_assert(stack != NULLPTR), stack[--ckg_vector_header_base(stack)->count])
-    #define ckg_stack_peek(stack) (ckg_assert(stack != NULLPTR), stack[ckg_stack_count(stack) - 1])
-    #define ckg_stack_empty(stack) (ckg_assert(stack != NULLPTR), (ckg_stack_count(stack) == 0))
+    #define ckg_stack_pop(stack) (ckg_assert(stack), stack[--ckg_vector_header_base(stack)->count])
+    #define ckg_stack_peek(stack) (ckg_assert(stack), stack[ckg_stack_count(stack) - 1])
+    #define ckg_stack_empty(stack) (ckg_assert(stack), (ckg_stack_count(stack) == 0))
     //
     // ========== END CKG_VECTOR ==========
     //
@@ -532,7 +532,7 @@
     //
     // ========== START CKG_HashMap ==========
     //
-    typedef u64 (*CKG_HashFunction)(u8* data, u32 size);
+    typedef u64 (*CKG_HashFunction)(void* data, u32 size);
 
     typedef struct CKG_HashMapMeta {
         u32 key_offset;
@@ -576,18 +576,18 @@
     #define CKG_HASHMAP_DEFAULT_CAPACITY 4
     #define CKG_HASHMAP_DEFAULT_LOAD_FACTOR 0.70f
 
-    float ckg_hashmap_load_factor(u8* map);
-    void ckg_hashmap_grow(u8* map);
-    u64 siphash24(u8* source, u32 source_size);
-    u64 ckg_string_hash(u8* str, u32 str_length);
-    u64 ckg_string_view_hash(u8* view, u32 str_length);
-    u64 ckg_string_view(u8* str, u32 str_length);
-    float ckg_hashmap_load_factor(u8* map);
-    u64 ckit_hashmap_resolve_collision(u8* map, u8* key, u64 inital_hash_index);
-    bool ckg_hashmap_has_helper(u8* map);
-    void ckg_hashmap_get_helper(u8* map);
-    void ckg_hashmap_put_helper(u8* map);
-    void ckg_hashmap_pop_helper(u8* map);
+    float ckg_hashmap_load_factor(void* map);
+    void ckg_hashmap_grow(void* map);
+    u64 siphash24(void* source, u32 source_size);
+    u64 ckg_string_hash(void* str, u32 str_length);
+    u64 ckg_string_view_hash(void* view, u32 str_length);
+    u64 ckg_string_view(void* str, u32 str_length);
+    float ckg_hashmap_load_factor(void* map);
+    u64 ckit_hashmap_resolve_collision(void* map, void* key, u64 inital_hash_index);
+    bool ckg_hashmap_has_helper(void* map);
+    void ckg_hashmap_get_helper(void* map);
+    void ckg_hashmap_put_helper(void* map);
+    void ckg_hashmap_pop_helper(void* map);
 
     /**
      * @brief Inserts a key-value pair into a generic hashmap.
@@ -1974,7 +1974,7 @@
         HALF_ROUND(v0,v1,v2,v3,13,16); \
         HALF_ROUND(v2,v1,v0,v3,17,21)
 
-    uint64_t siphash24(u8* source, u32 source_size) {
+    uint64_t siphash24(void* source, u32 source_size) {
         const char key[16] = {
             0x00, 0x01, 0x02, 0x03,
             0x04, 0x05, 0x06, 0x07,
@@ -2025,12 +2025,12 @@
         return ret;
     }
 
-    float ckg_hashmap_load_factor(u8* map) {
+    float ckg_hashmap_load_factor(void* map) {
         CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
         return (float)meta->count / (float)meta->capacity;
     }
 
-    u64 ckit_hashmap_resolve_collision(u8* map, u8* key, u64 inital_hash_index) {
+    u64 ckit_hashmap_resolve_collision(void* map, void* key, u64 inital_hash_index) {
         CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
         u8* entries_base_address = NULLPTR;
         ckg_memory_copy((u8*)map + meta->entry_offset, &entries_base_address, sizeof(u8*), sizeof(u8*));
@@ -2065,7 +2065,7 @@
         return cannonical_hash_index;
     }
 
-    u64 ckg_string_hash(u8* str, u32 str_length) {
+    u64 ckg_string_hash(void* str, u32 str_length) {
         (void)str_length;
 
         u64 hash = 5381;
@@ -2079,7 +2079,7 @@
         return hash;
     }
 
-    u64 ckg_string_view_hash(u8* view, u32 str_length) {
+    u64 ckg_string_view_hash(void* view, u32 str_length) {
         (void)str_length;
         CKG_StringView* str_view = (CKG_StringView*)view;
         u64 hash = 5381;
@@ -2095,23 +2095,23 @@
 
     typedef struct HashMapContext {
         CKG_HashMapMeta* meta;
-        u8* temp_key_address;
-        u8* entry;
-        u8* entry_key_address;
-        u8* entry_value_address;
+        void* temp_key_address;
+        void* entry;
+        void* entry_key_address;
+        void* entry_value_address;
         bool* entry_filled_address;
         u64 real_index;
     } HashMapContext;
 
-    static HashMapContext ckg_hashmap_find_entry(u8* map) {
+    static HashMapContext ckg_hashmap_find_entry(void* map) {
         HashMapContext context;
         context.meta = (CKG_HashMapMeta*)map;
         context.temp_key_address = NULLPTR;
 
         if (context.meta->key_is_ptr) {
-            ckg_memory_copy((u8*)map + context.meta->key_offset, &context.temp_key_address, sizeof(u8*), sizeof(u8*));
+            ckg_memory_copy((u8*)map + context.meta->key_offset, &context.temp_key_address, sizeof(void*), sizeof(void*));
         } else {
-            context.temp_key_address = map + context.meta->key_offset;
+            context.temp_key_address = (u8*)map + context.meta->key_offset;
         }
 
         u64 hash = context.meta->hash_fn(context.temp_key_address, context.meta->key_size);
@@ -2119,7 +2119,7 @@
         context.real_index = ckit_hashmap_resolve_collision(map, context.temp_key_address, index);
 
         u8* entries = NULLPTR;
-        ckg_memory_copy((u8*)map + context.meta->entry_offset, &entries, sizeof(u8*), sizeof(u8*));
+        ckg_memory_copy((u8*)map + context.meta->entry_offset, &entries, sizeof(void*), sizeof(void*));
         context.entry = entries + (context.real_index * context.meta->entry_size);
         context.entry_key_address = context.entry + context.meta->entry_key_offset;
         context.entry_value_address = context.entry + context.meta->entry_value_offset;
@@ -2128,18 +2128,18 @@
         return context;
     }
 
-    bool ckg_hashmap_has_helper(u8* map) {
+    bool ckg_hashmap_has_helper(void* map) {
         HashMapContext context = ckg_hashmap_find_entry(map);
         return *(bool*)(context.entry_filled_address);
     }
 
-    void ckg_hashmap_get_helper(u8* map) {
+    void ckg_hashmap_get_helper(void* map) {
         HashMapContext context = ckg_hashmap_find_entry(map);
         ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
         ckg_memory_copy(context.entry_value_address, map + context.meta->value_offset, context.meta->value_size, context.meta->value_size);
     }
 
-    void ckg_hashmap_put_helper(u8* map) {
+    void ckg_hashmap_put_helper(void* map) {
         if (ckg_hashmap_load_factor(map) >= CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
             ckg_hashmap_grow(map);
         }
@@ -2154,7 +2154,7 @@
         *(bool*)(context.entry_filled_address) = 1;
     }
 
-    void ckg_hashmap_pop_helper(u8* map) {
+    void ckg_hashmap_pop_helper(void* map) {
         HashMapContext context = ckg_hashmap_find_entry(map);
         ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
         ckg_memory_copy(context.entry_value_address, map + context.meta->value_offset, context.meta->value_size, context.meta->value_size);
@@ -2162,7 +2162,7 @@
     }
 
 
-    void ckg_hashmap_grow(u8* map) {
+    void ckg_hashmap_grow(void* map) {
         if (ckg_hashmap_load_factor(map) < CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
             return;
         }
@@ -2185,7 +2185,7 @@
                 entry_key = entry + meta->entry_key_offset;
             }
 
-            bool entry_filled = *(entry + meta->entry_filled_offset);
+            bool entry_filled = *(bool*)(entry + meta->entry_filled_offset);
             if (!entry_filled) {
                 continue;
             }
