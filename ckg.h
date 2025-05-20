@@ -575,14 +575,14 @@
     #define CKG_HASHMAP_DEFAULT_CAPACITY 4
     #define CKG_HASHMAP_DEFAULT_LOAD_FACTOR 0.70f
 
-    float ckg_hashmap_load_factor(void* hashmap);
-    void ckg_hashmap_grow(u8* hashmap);
+    float ckg_hashmap_load_factor(u8* map);
+    void ckg_hashmap_grow(u8* map);
     u64 siphash24(u8* source, u32 source_size);
     u64 ckg_string_hash(u8* str, u32 str_length);
     u64 ckg_string_view_hash(u8* view, u32 str_length);
     u64 ckg_string_view(u8* str, u32 str_length);
-    float ckg_hashmap_load_factor(void* hashmap);
-    u64 ckit_hashmap_resolve_collision(u8* hashmap, u8* key, u64 inital_hash_index);
+    float ckg_hashmap_load_factor(u8* map);
+    u64 ckit_hashmap_resolve_collision(u8* map, u8* key, u64 inital_hash_index);
     bool ckg_hashmap_has_helper(u8* map);
     void ckg_hashmap_get_helper(u8* map);
     void ckg_hashmap_put_helper(u8* map);
@@ -1188,16 +1188,19 @@
             return;
         }
 
-        u8* temp_data_copy = (u8*)ckg_alloc(source_size_in_bytes);
-        for (size_t i = 0; i < source_size_in_bytes; i++) {
-            temp_data_copy[i] = ((u8*)source)[i];
-        }
+        u8* src = (u8*)source;
+        u8* dst = (u8*)destination;
 
-        for (size_t i = 0; i < source_size_in_bytes; i++) {
-            ((u8*)destination)[i] = temp_data_copy[i];
+        bool overlap = dst < src || dst >= src + source_size_in_bytes;
+        if (overlap) {
+            for (size_t i = 0; i < source_size_in_bytes; i++) {
+                dst[i] = src[i];
+            }
+        } else {
+            for (size_t i = source_size_in_bytes; i-- > 0;) {
+                dst[i] = src[i];
+            }
         }
-
-        ckg_free(temp_data_copy);
     }
 
     void ckg_memory_zero(void* data, size_t data_size_in_bytes) {
@@ -1282,11 +1285,17 @@
         ckg_assert_msg(element_size != 0, "Element size can't be zero!\n");
 
         if (arena->flags & CKG_ARENA_FLAG_FIXED) {
-            ckg_assert_msg((arena->used + element_size <= arena->capacity), "Ran out of arena memory!\n");
+            if (arena->used + element_size > arena->capacity) {
+                printf(CKG_RED"Ran out of arena memory!"CKG_COLOR_RESET"\n");
+                CRASH;
+            }
         } else if (arena->flags & CKG_ARENA_FLAG_CIRCULAR) {
             if ((arena->used + element_size > arena->capacity)) {
                 arena->used = sizeof(CKG_Arena);
-                ckg_assert_msg((arena->used + element_size <= arena->capacity), "Element size exceeds circular arena allocation capacity!\n");
+                if (arena->used + element_size > arena->capacity) {
+                    printf(CKG_RED"Element size exceeds circular arena allocation capacity!"CKG_COLOR_RESET"\n");
+                    CRASH;
+                }
             }
         }
 
@@ -2015,14 +2024,14 @@
         return ret;
     }
 
-    float ckg_hashmap_load_factor(void* hashmap) {
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)hashmap;
+    float ckg_hashmap_load_factor(u8* map) {
+        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
         return (float)meta->count / (float)meta->capacity;
     }
 
-    u64 ckit_hashmap_resolve_collision(u8* hashmap, u8* key, u64 inital_hash_index) {
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)hashmap;
-        u8* entries_base_address = *(u8**)(hashmap + meta->entry_offset);
+    u64 ckit_hashmap_resolve_collision(u8* map, u8* key, u64 inital_hash_index) {
+        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
+        u8* entries_base_address = *(u8**)(map + meta->entry_offset);
 
         u64 cannonical_hash_index = inital_hash_index;
 
@@ -2107,8 +2116,9 @@
         u64 index = hash % context.meta->capacity;
         context.real_index = ckit_hashmap_resolve_collision(map, context.temp_key_address, index);
 
-        u8** entries = (u8**)(map + context.meta->entry_offset);
-        context.entry = *entries + (context.real_index * context.meta->entry_size);
+        u8* entries = NULLPTR;
+        ckg_memory_copy((u8*)map + context.meta->entry_offset, &entries, sizeof(u8*), sizeof(u8*));
+        context.entry = entries + (context.real_index * context.meta->entry_size);
         context.entry_key_address = context.entry + context.meta->entry_key_offset;
         context.entry_value_address = context.entry + context.meta->entry_value_offset;
         context.entry_filled_address = (bool*)(context.entry + context.meta->entry_filled_offset);
@@ -2150,25 +2160,25 @@
     }
 
 
-    void ckg_hashmap_grow(u8* hashmap) {
-        if (ckg_hashmap_load_factor(hashmap) < CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
+    void ckg_hashmap_grow(u8* map) {
+        if (ckg_hashmap_load_factor(map) < CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
             return;
         }
 
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)hashmap;
-        u8* entries_base_address = *(u8**)(hashmap + meta->entry_offset);
-
+        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
+        u8* entries_base_address = NULLPTR;
+        ckg_memory_copy((u8*)map + meta->entry_offset, &entries_base_address, sizeof(u8*), sizeof(u8*));
         u64 old_capacity = meta->capacity;
         meta->capacity *= 2;
         void* new_entries = ckg_alloc(meta->capacity * meta->entry_size);
-        *(u8**)(hashmap + meta->entry_offset) = new_entries;
+        ckg_memory_copy(&new_entries, (u8*)map + meta->entry_offset, sizeof(u8*), sizeof(u8*));
 
         // rehash
         for (u64 i = 0; i < old_capacity; i++) {
-            u8* entry = (entries_base_address + (i * meta->entry_size));
+            u8* entry = entries_base_address + (i * meta->entry_size);
             u8* entry_key = NULLPTR;
             if (meta->key_is_ptr) {
-                entry_key = *(u8**)(entry + meta->entry_key_offset);
+                ckg_memory_copy(entry + meta->entry_key_offset, &entry_key, sizeof(u8*), sizeof(u8*));
             } else {
                 entry_key = entry + meta->entry_key_offset;
             }
@@ -2180,7 +2190,7 @@
 
             u64 hash = meta->hash_fn(entry_key, meta->key_size);
             u64 index = hash % meta->capacity;
-            u64 real_index = ckit_hashmap_resolve_collision((u8*)hashmap, entry_key, index);
+            u64 real_index = ckit_hashmap_resolve_collision((u8*)map, entry_key, index);
 
             u8* new_entry = (u8*)new_entries + (real_index * meta->entry_size);
             ckg_memory_copy(entry, new_entry, meta->entry_size, meta->entry_size);

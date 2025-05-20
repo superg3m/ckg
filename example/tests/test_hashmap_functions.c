@@ -165,7 +165,7 @@ void test_trival_struct() {
 
   ckg_hashmap_free(map);
 
-  CKG_LOG_SUCCESS("Struct key test passed!\n");
+  CKG_LOG_SUCCESS("TrivialStruct key test passed!\n");
 }
 
 
