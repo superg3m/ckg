@@ -53,7 +53,7 @@ void test_ckg_ring_buffer_overwrite_behavior() {
     for (int i = 0; i < cap; i++) {
 		if (ckg_ring_buffer_full(ring)) {
 			int d = ckg_ring_buffer_dequeue(ring);
-			CKG_LOG_PRINT("%d\n", d);
+			ckg_assert(i + 1 == d);
 		}
 
         ckg_ring_buffer_enqueue(ring, cap + i + 1); // 9..16
@@ -62,7 +62,6 @@ void test_ckg_ring_buffer_overwrite_behavior() {
     // Now buffer should contain only 9..16
     for (int i = 0; i < cap; i++) {
         int val = ckg_ring_buffer_dequeue(ring);
-		CKG_LOG_PRINT("%d\n", val);
         ckg_assert(val == (cap + i + 1)); // Should match 9..16
     }
 
