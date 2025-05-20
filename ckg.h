@@ -229,6 +229,12 @@
         CKG_ERROR_ARGS_COUNT = 12
     } CKG_Error;
 
+    /**
+     * @brief returns a string literal of the error code
+     * 
+     * @param error_code 
+     * @return const char*
+     */
     CKG_API const char* ckg_error_str(CKG_Error error_code);
 #endif
 
@@ -248,6 +254,11 @@
     CKG_API void* ckg_alloc(size_t allocation_size);
     CKG_API void* MACRO_ckg_free(void* data);
     CKG_API void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);
+    #ifdef __cplusplus
+        #define ckg_free(data) data = (decltype(data))MACRO_ckg_free(data)
+    #else 
+        #define ckg_free(data) data = MACRO_ckg_free(data)
+    #endif
 
     /**
      * @brief Compares the bytes in the two buffers returns true if equal
@@ -271,13 +282,7 @@
             _buffer[i] = _fill_element;                            \
         }                                                  	       \
     } while(0)                                                     \
-    
-    #ifdef __cplusplus
-        #define ckg_free(data) data = (decltype(data))MACRO_ckg_free(data)
-    #else 
-        #define ckg_free(data) data = MACRO_ckg_free(data)
-    #endif
-    
+
     #define ckg_memory_delete_index(data, number_of_elements, data_capacity, index) MACRO_ckg_memory_delete_index(data, number_of_elements, data_capacity, sizeof(data[0]), index)
     #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
 #endif
@@ -303,7 +308,7 @@
     } CKG_Arena;
     
     /**
-     * @brief 
+     * @brief if memory is stack memory make sure to set the CKG_ARENA_FLAG_STACK_MEMORY bit in the flags
      * 
      * @param memory 
      * @param allocation_size 
@@ -719,9 +724,6 @@
 
 #if defined(CKG_INCLUDE_OS)
     typedef void* CKG_DLL;
-
-    // Date: May 05, 2025
-    // TODO(Jovanni): ACTUALLY TEST THIS BECUASE NOT SURE IF VOID* will work with HMOUDLE
 
     /**
      * @brief
@@ -1173,8 +1175,6 @@
         }
     }
 
-    // Date: September 12, 2024
-    // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
     void MACRO_ckg_memory_delete_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index) {
         ckg_assert(index >= 0);
         ckg_assert(index < data_capacity);
@@ -1189,8 +1189,6 @@
         ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
     }
 
-    // Date: September 12, 2024
-    // TODO(Jovanni): MAKE SURE YOU TEST THIS. Its seems to maybe work?
     void MACRO_ckg_memory_insert_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index) {
         ckg_assert((number_of_elements + 1) < data_capacity);
         ckg_assert(index < data_capacity - 1);
@@ -1772,9 +1770,6 @@
             return new_node_to_insert;
         }
 
-        // Date: July 19, 2024
-        // TODO(Jovanni): check if index is closer to count or not then reverse the loop if approaching from the tail end.
-        // as opposed to the head end.
         CKG_Node* current_node = linked_list->head; 
         for (size_t i = 0; i < index; i++) {
             current_node = current_node->next;
