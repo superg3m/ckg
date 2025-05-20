@@ -2031,7 +2031,8 @@
 
     u64 ckit_hashmap_resolve_collision(u8* map, u8* key, u64 inital_hash_index) {
         CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
-        u8* entries_base_address = *(u8**)(map + meta->entry_offset);
+        u8* entries_base_address = NULLPTR;
+        ckg_memory_copy((u8*)map + meta->entry_offset, &entries_base_address, sizeof(u8*), sizeof(u8*));
 
         u64 cannonical_hash_index = inital_hash_index;
 
@@ -2041,7 +2042,7 @@
             u8* entry = entries_base_address + (cannonical_hash_index * meta->entry_size);
             u8* entry_key = NULLPTR;
             if (meta->key_is_ptr) {
-                ckg_memory_copy((u8*)entry + meta->entry_key_offset, &entry_key, sizeof(u8*), sizeof(u8*));
+                ckg_memory_copy(entry + meta->entry_key_offset, &entry_key, sizeof(u8*), sizeof(u8*));
             } else {
                 entry_key = entry + meta->entry_key_offset;
             }
