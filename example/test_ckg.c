@@ -13,7 +13,7 @@ void custom_free_callback(CKG_Allocator* allocator, void* data) {
 	return;
 }
 
-#define TOTAL_MEMORY_SIZE KiloBytes(18)
+#define TOTAL_MEMORY_SIZE KiloBytes(12)
 
 int main() {
 	u8 program_stack_memory[TOTAL_MEMORY_SIZE] = {0};

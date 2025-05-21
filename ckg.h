@@ -800,7 +800,7 @@
         }
 
         void ckg_stack_trace_dump(const char* function, const char* file, int line) {
-            CKG_LOG_PRINT("------------------ Error Stack Trace ------------------\n");
+            printf("------------------ Error Stack Trace ------------------\n");
             void* stack[100];
             unsigned short max_frames = 100;
             unsigned short frames_captured;
