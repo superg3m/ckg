@@ -651,7 +651,7 @@
 
     #define ckg_hashmap_init_siphash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, siphash24, byte_equality)
     #define ckg_hashmap_init_string_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, true, ckg_string_hash, string_equality)
-    #define ckg_hashmap_init_string_view_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, ckg_string_view_hash, string_view_equality)s
+    #define ckg_hashmap_init_string_view_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, ckg_string_view_hash, string_view_equality)
 
     #define ckg_hashmap_put(map, __key, __value) \
     do {                                         \
