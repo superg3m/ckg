@@ -30,7 +30,7 @@ void test_ckg_memory_operations() {
 	// Test ckg_ckg_memory_copy
 	int arr1[] = {1, 2, 3};
 	int arr2[3];
-	ckg_memory_copy(arr2, arr1, 3 * sizeof(int), 3 * sizeof(int));
+	ckg_memory_copy(arr1, 3 * sizeof(int), arr2, 3 * sizeof(int));
 	ckg_assert(arr1[0] == arr2[0] && arr1[1] == arr2[1] && arr1[2] == arr2[2]);
 
 	// Test ckg_ckg_memory_zero
@@ -42,8 +42,8 @@ void test_ckg_memory_operations() {
 	int arr4[] = {1, 2, 3};
 	int arr5[] = {1, 2, 3};
 	int arr6[] = {4, 5, 6};
-	ckg_assert(ckg_memory_compare(arr4, arr5, 3 * sizeof(int), 3 * sizeof(int)) == true);
-	ckg_assert(!ckg_memory_compare(arr4, arr6, 3 * sizeof(int), 3 * sizeof(int)));
+	ckg_assert(ckg_memory_compare(arr4, 3 * sizeof(int), arr5, 3 * sizeof(int)) == true);
+	ckg_assert(!ckg_memory_compare(arr4, 3 * sizeof(int), arr6, 3 * sizeof(int)));
 
 	int test_data[] = {1, 2, 3, 12, 22, 23, 41, 52, 73};
 	CKG_LOG_PRINT("[ ");

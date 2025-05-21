@@ -269,8 +269,8 @@
      * @param b2_allocation_size 
      * @return bool 
      */
-    CKG_API bool ckg_memory_compare(void* buffer_one, void* buffer_two, size_t b1_allocation_size, size_t b2_allocation_size);
-    CKG_API void ckg_memory_copy(void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes);
+    CKG_API bool ckg_memory_compare(void* buffer_one, size_t b1_size, void* buffer_two, size_t b2_size);
+    CKG_API void ckg_memory_copy(void* destination, size_t destination_size, void* source, size_t source_size);
     CKG_API void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
     CKG_API void MACRO_ckg_memory_delete_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index);
@@ -526,6 +526,7 @@
     // ========== START CKG_HashMap ==========
     //
     typedef u64 (*CKG_HashFunction)(void* data, u64 size);
+    typedef bool (*CKG_EqualityFunction)(void* c1, size_t c1_size, void* c2, size_t c2_size);
 
     typedef struct CKG_HashMapMeta {
         int key_offset;
@@ -544,6 +545,7 @@
         
         bool key_is_ptr;
         CKG_HashFunction hash_fn;
+        CKG_EqualityFunction equal_fn;
     } CKG_HashMapMeta;
 
 
@@ -570,9 +572,13 @@
     #define CKG_HASHMAP_DEFAULT_LOAD_FACTOR 0.70f
 
     u64 siphash24(void* source, u64 source_size);
+    bool compare_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
+
     u64 ckg_string_hash(void* str, u64 str_length);
+    bool string_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
+
     u64 ckg_string_view_hash(void* view, u64 str_length);
-    u64 ckg_string_view(void* str, u64 str_length);
+    bool string_view_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
 
     float ckg_hashmap_load_factor(void* map);
     void ckg_hashmap_grow(void* map);
@@ -1122,22 +1128,22 @@
         ckg_assert(new_allocation_size != 0);
 
         void* ret = ckg_alloc(new_allocation_size);
-        ckg_memory_copy(data, ret, old_allocation_size, new_allocation_size);
+        ckg_memory_copy(ret, new_allocation_size, data, old_allocation_size);
         ckg_free(data);
         return ret;
     }
 
-    bool ckg_memory_compare(void* buffer_one, void* buffer_two, size_t buffer_one_size, size_t buffer_two_size) {
+    bool ckg_memory_compare(void* buffer_one, size_t b1_size, void* buffer_two, size_t b2_size) {
         ckg_assert(buffer_one);
         ckg_assert(buffer_two);
 
-        if (buffer_one_size != buffer_two_size) {
+        if (b1_size != b2_size) {
             return false;
         }
 
         u8* buffer_one_data = (u8*)buffer_one;
         u8* buffer_two_data = (u8*)buffer_two;
-        for (size_t i = 0; i < buffer_one_size; i++) {
+        for (size_t i = 0; i < b1_size; i++) {
             if (buffer_one_data[i] != buffer_two_data[i]) {
                 return false;
             }
@@ -1146,24 +1152,24 @@
         return true;
     }
 
-    void ckg_memory_copy(void* source, void* destination, size_t source_size_in_bytes, size_t destination_size_in_bytes) {
+    void ckg_memory_copy(void* destination, size_t destination_size, void* source, size_t source_size) {
         ckg_assert(source);
         ckg_assert(destination);
-        ckg_assert(source_size_in_bytes <= destination_size_in_bytes);
-        if (source_size_in_bytes == 0) {
+        ckg_assert(source_size <= destination_size);
+        if (source_size == 0) {
             return;
         }
 
         u8* src = (u8*)source;
         u8* dst = (u8*)destination;
 
-        bool overlap = dst < src || dst >= src + source_size_in_bytes;
+        bool overlap = dst < src || dst >= src + source_size;
         if (overlap) {
-            for (size_t i = 0; i < source_size_in_bytes; i++) {
+            for (size_t i = 0; i < source_size; i++) {
                 dst[i] = src[i];
             }
         } else {
-            for (size_t i = source_size_in_bytes; i-- > 0;) {
+            for (size_t i = source_size; i-- > 0;) {
                 dst[i] = src[i];
             }
         }
@@ -1186,7 +1192,7 @@
         size_t dest_offset =  index * element_size_in_bytes;
 
         size_t payload_source_size = (number_of_elements * element_size_in_bytes) - source_offset;
-        ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
+        ckg_memory_copy(byte_data + dest_offset, total_size - source_offset, byte_data + source_offset, payload_source_size);
     }
 
     void MACRO_ckg_memory_insert_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index) {
@@ -1200,7 +1206,7 @@
         size_t dest_offset = (index + 1) * element_size_in_bytes;
 
         size_t payload_source_size = (number_of_elements * element_size_in_bytes) - source_offset;
-        ckg_memory_copy(byte_data + source_offset, byte_data + dest_offset, payload_source_size, total_size - source_offset);
+        ckg_memory_copy(byte_data + dest_offset, total_size - source_offset, byte_data + source_offset, payload_source_size);
     }
 #endif
 
@@ -1289,7 +1295,7 @@
 #if defined(CKG_IMPL_STRING)
     char* ckg_str_alloc(char* s1, u64 length) {
         char* ret = ckg_alloc(length + 1) ;
-        ckg_memory_copy(s1, ret, length, length);
+        ckg_memory_copy(ret, length, s1, length);
         return ret;
     }
 
@@ -1386,12 +1392,12 @@
     }
 
     bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length) {
-        return ckg_memory_compare(s1, s2, s1_length, s2_length);
+        return ckg_memory_compare(s1, s1_length, s2, s2_length);
     }
 
     void ckg_str_copy(char* s1, size_t s1_capacity, char* s2, u64 s2_length) {
         ckg_memory_zero((void*)s1, s1_capacity);
-        ckg_memory_copy(s2, s1, s2_length, s1_capacity);
+        ckg_memory_copy(s1, s1_capacity, s2, s2_length);
     }
 
     void ckg_str_insert(char* str, u64 str_length, size_t str_capacity, char* to_insert, u64 to_insert_length, u64 index) {
@@ -1404,9 +1410,9 @@
         u8* move_source_ptr = (u8*)(str + index);
         u8* move_dest_ptr = (u8*)(move_source_ptr + to_insert_length);
 
-        ckg_memory_copy(move_source_ptr, move_dest_ptr, str_length - index, str_capacity - (index + to_insert_length));
+        ckg_memory_copy(move_dest_ptr, str_capacity - (index + to_insert_length), move_source_ptr, str_length - index);
         u8* copy_dest_ptr = (u8*)(str + index);
-        ckg_memory_copy(to_insert, copy_dest_ptr, to_insert_length, str_capacity);
+        ckg_memory_copy(copy_dest_ptr, str_capacity, to_insert, to_insert_length);
     }
 
     void ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index) {
@@ -1418,7 +1424,7 @@
         ckg_assert_msg(expression, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  str_length + to_insert_length, str_capacity);
 
         char* source_ptr = str + index;
-        ckg_memory_copy(source_ptr, source_ptr + 1, str_length - index, str_capacity - (index + 1));
+        ckg_memory_copy(source_ptr + 1, str_capacity - (index + 1), source_ptr, str_length - index);
         str[index] = to_insert;
     }
 
@@ -1687,7 +1693,7 @@
             ret->data = data;
         } else {
             ret->data = ckg_alloc(linked_list->element_size_in_bytes); // user has to free
-            ckg_memory_copy(data, ret->data, linked_list->element_size_in_bytes, linked_list->element_size_in_bytes); 
+            ckg_memory_copy(ret->data, linked_list->element_size_in_bytes, data, linked_list->element_size_in_bytes); 
         }
 
         ret->element_size_in_bytes = linked_list->element_size_in_bytes;
@@ -1980,6 +1986,10 @@
         return ret;
     }
 
+    bool compare_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
+        return ckg_memory_compare(c1, c1_size, c2, c2_size);
+    }
+
     float ckg_hashmap_load_factor(void* map) {
         CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
         return (float)meta->count / (float)meta->capacity;
@@ -1988,7 +1998,7 @@
     u64 ckit_hashmap_resolve_collision(void* map, void* key, u64 inital_hash_index) {
         CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
         u8* entries_base_address = NULLPTR;
-        ckg_memory_copy((u8*)map + meta->entry_offset, &entries_base_address, sizeof(void*), sizeof(void*));
+        ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entry_offset, sizeof(void*));
 
         u64 cannonical_hash_index = inital_hash_index;
 
@@ -1998,7 +2008,7 @@
             u8* entry = entries_base_address + (cannonical_hash_index * meta->entry_size);
             u8* entry_key = NULLPTR;
             if (meta->key_is_ptr) {
-                ckg_memory_copy(entry + meta->entry_key_offset, &entry_key, sizeof(void*), sizeof(void*));
+                ckg_memory_copy(&entry_key, sizeof(void*), entry + meta->entry_key_offset, sizeof(void*));
             } else {
                 entry_key = entry + meta->entry_key_offset;
             }
@@ -2034,6 +2044,10 @@
         return hash;
     }
 
+    bool string_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
+        return ckg_str_equal(c1, c1_size - 1, c2, c2_size - 1);
+    }
+
     u64 ckg_string_view_hash(void* view, u64 str_length) {
         (void)str_length;
         CKG_StringView* str_view = (CKG_StringView*)view;
@@ -2046,6 +2060,16 @@
         }
 
         return hash;
+    }
+
+    bool string_view_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
+        (void)c1_size;
+        (void)c2_size;
+
+        CKG_StringView* s1 = (CKG_StringView*)c1;
+        CKG_StringView* s2 = (CKG_StringView*)c2;
+
+        return ckg_str_equal(s1->data, s1->length, s2->data, s2->length);
     }
 
     typedef struct HashMapContext {
@@ -2064,7 +2088,7 @@
         context.temp_key_address = NULLPTR;
 
         if (context.meta->key_is_ptr) {
-            ckg_memory_copy((u8*)map + context.meta->key_offset, &context.temp_key_address, sizeof(void*), sizeof(void*));
+            ckg_memory_copy(&context.temp_key_address, sizeof(void*), (u8*)map + context.meta->key_offset, sizeof(void*));
         } else {
             context.temp_key_address = (u8*)map + context.meta->key_offset;
         }
@@ -2074,7 +2098,7 @@
         context.real_index = ckit_hashmap_resolve_collision(map, context.temp_key_address, index);
 
         u8* entries = NULLPTR;
-        ckg_memory_copy((u8*)map + context.meta->entry_offset, &entries, sizeof(void*), sizeof(void*));
+        ckg_memory_copy(&entries, sizeof(void*), (u8*)map + context.meta->entry_offset,  sizeof(void*));
         context.entry = entries + (context.real_index * context.meta->entry_size);
         context.entry_key_address = (u8*)context.entry + context.meta->entry_key_offset;
         context.entry_value_address = (u8*)context.entry + context.meta->entry_value_offset;
@@ -2091,7 +2115,7 @@
     void ckg_hashmap_get_helper(void* map) {
         HashMapContext context = ckg_hashmap_find_entry(map);
         ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
-        ckg_memory_copy(context.entry_value_address, (u8*)map + context.meta->value_offset, context.meta->value_size, context.meta->value_size);
+        ckg_memory_copy((u8*)map + context.meta->value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
     }
 
     void ckg_hashmap_put_helper(void* map) {
@@ -2104,15 +2128,15 @@
         if (!filled) {
            context.meta->count++;
         }
-        ckg_memory_copy((u8*)map + context.meta->key_offset, context.entry_key_address, context.meta->key_size, context.meta->key_size);
-        ckg_memory_copy((u8*)map + context.meta->value_offset, context.entry_value_address, context.meta->value_size, context.meta->value_size);
+        ckg_memory_copy(context.entry_key_address, context.meta->key_size, (u8*)map + context.meta->key_offset, context.meta->key_size);
+        ckg_memory_copy(context.entry_value_address, context.meta->value_size, (u8*)map + context.meta->value_offset, context.meta->value_size);
         *context.entry_filled_address = 1;
     }
 
     void ckg_hashmap_pop_helper(void* map) {
         HashMapContext context = ckg_hashmap_find_entry(map);
         ckg_assert_msg(*context.entry_filled_address, "The key doesn't exist in the hashmap!\n");
-        ckg_memory_copy(context.entry_value_address, (u8*)map + context.meta->value_offset, context.meta->value_size, context.meta->value_size);
+        ckg_memory_copy((u8*)map + context.meta->value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
         *context.entry_filled_address = 0;
     }
 
@@ -2124,18 +2148,18 @@
 
         CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
         u8* entries_base_address = NULLPTR;
-        ckg_memory_copy((u8*)map + meta->entry_offset, &entries_base_address, sizeof(void*), sizeof(void*));
+        ckg_memory_copy( &entries_base_address, sizeof(void*), (u8*)map + meta->entry_offset, sizeof(void*));
         u64 old_capacity = meta->capacity;
         meta->capacity *= 2;
         void* new_entries = ckg_alloc(meta->capacity * meta->entry_size);
-        ckg_memory_copy(&new_entries, (u8*)map + meta->entry_offset, sizeof(void*), sizeof(void*));
+        ckg_memory_copy((u8*)map + meta->entry_offset, sizeof(void*), &new_entries, sizeof(void*));
 
         // rehash
         for (u64 i = 0; i < old_capacity; i++) {
             u8* entry = entries_base_address + (i * meta->entry_size);
             u8* entry_key = NULLPTR;
             if (meta->key_is_ptr) {
-                ckg_memory_copy(entry + meta->entry_key_offset, &entry_key, sizeof(void*), sizeof(void*));
+                ckg_memory_copy(&entry_key, sizeof(void*), entry + meta->entry_key_offset,  sizeof(void*));
             } else {
                 entry_key = entry + meta->entry_key_offset;
             }
@@ -2150,7 +2174,7 @@
             u64 real_index = ckit_hashmap_resolve_collision((u8*)map, entry_key, index);
 
             u8* new_entry = (u8*)new_entries + (real_index * meta->entry_size);
-            ckg_memory_copy(entry, new_entry, meta->entry_size, meta->entry_size);
+            ckg_memory_copy(new_entry, meta->entry_size, entry, meta->entry_size);
         }
 
         ckg_free(entries_base_address);
