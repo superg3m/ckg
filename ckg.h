@@ -298,11 +298,19 @@
         CKG_ARENA_FLAG_COUNT = 4,
     } CKG_ArenaFlag;
 
+    typedef struct CKG_ArenaFreeNode {
+        u8* base_address;
+        size_t capacity;
+    } CKG_ArenaFreeNode;
+
     typedef struct CKG_Arena {
         u8* base_address;
         size_t capacity;
         size_t used_save_point;
         size_t used;
+
+        CKG_LinkedList* free_list;
+
         u8 alignment;
         int flags;
     } CKG_Arena;
