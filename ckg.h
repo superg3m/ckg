@@ -1030,8 +1030,11 @@
 #endif
 
 #if defined(CKG_IMPL_ASSERT)
+    void* ckg_default_libc_malloc(CKG_Allocator* allocator, size_t allocation_size);
+    void ckg_default_libc_free(CKG_Allocator* allocator, void* data);
     void MACRO_ckg_assert(bool expression, const char* function, const char* file, int line) {
-        if (!expression) {                                      
+        if (!expression) {               
+            ckg_bind_custom_allocator(ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR);                       
             ckg_stack_trace_dump(function, file, line);                               
             char msg[] = "Func: %s, File: %s:%d\n";          
             CKG_LOG_FATAL(msg, function, file, line);
@@ -1043,7 +1046,8 @@
         va_list args;
         va_start(args, msg);
 
-        if (!(expression)) {                                      
+        if (!(expression)) {            
+            ckg_bind_custom_allocator(ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR);                                  
             ckg_stack_trace_dump(function, file, line);                               
             char ckg_msg[] = "Func: %s, File: %s:%d\n";          
             CKG_LOG_FATAL(ckg_msg, function, file, line);
@@ -1101,12 +1105,12 @@
 #endif 
 
 #if defined(CKG_IMPL_MEMORY)
-    internal void* ckg_default_libc_malloc(CKG_Allocator* allocator, size_t allocation_size) {
+    void* ckg_default_libc_malloc(CKG_Allocator* allocator, size_t allocation_size) {
         (void)allocator;
         return malloc(allocation_size);
     }
 
-    internal void ckg_default_libc_free(CKG_Allocator* allocator, void* data) {
+    void ckg_default_libc_free(CKG_Allocator* allocator, void* data) {
         (void)allocator;
         free(data);
     }
