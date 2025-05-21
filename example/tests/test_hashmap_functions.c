@@ -1,5 +1,20 @@
 #include "../../ckg.h"
 
+/*
+typedef struct DebugEntry {
+    char* key;
+    int value;
+    bool filled;
+} DebugEntry;
+
+typedef struct DebugMap {
+    CKG_HashMapMeta meta;
+    char* temp_key;
+    int temp_value;
+    DebugEntry* entries;
+} DebugMap;
+*/
+
 typedef struct Person {
     char* name;
     int age;
@@ -184,6 +199,9 @@ void test_trival_struct() {
 
 // Combine all tests here
 void ckg_hashmap_test() {
+    // DebugMap m = {0};
+    // (void)m;
+
     test_integer_keys();
     test_string_literal_keys();
     test_char_ptr_keys();

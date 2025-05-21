@@ -2062,7 +2062,10 @@
     }
 
     bool string_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
-        return ckg_str_equal(c1, c1_size - 1, c2, c2_size - 1);
+        (void)c1_size;
+        (void)c2_size;
+        
+        return ckg_str_equal(c1, ckg_cstr_length(c1), c2, ckg_cstr_length(c2));
     }
 
     u64 ckg_string_view_hash(void* view, u64 str_length) {
