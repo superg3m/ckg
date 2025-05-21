@@ -14,6 +14,19 @@ u64 person_hash(void* data, u64 size) {
     return h1 ^ h2;
 }
 
+bool person_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
+    (void)c1_size;
+    (void)c2_size;
+
+    Person* p1 = (Person*)c1;
+    Person* p2 = (Person*)c2;
+
+    return (
+        p1->age == p2->age &&
+        ckg_str_equal(p1->name, ckg_cstr_length(p1->name), p2->name, ckg_cstr_length(p2->name))
+    );
+}
+
 void test_integer_keys() {
     CKG_HashMap(int, int)* map = NULLPTR;
     ckg_hashmap_init_siphash(map, int, int);
@@ -101,7 +114,7 @@ void test_char_ptr_keys() {
 
 void test_struct_keys() {
     CKG_HashMap(Person, int)* map = NULLPTR;
-    ckg_hashmap_init_with_hash(map, Person, int, false, person_hash);
+    ckg_hashmap_init_with_hash(map, Person, int, false, person_hash, person_equality);
 
     Person p1 = { "Alice", 30 };
     Person p2 = { "Bob", 25 };
