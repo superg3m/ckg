@@ -988,7 +988,7 @@
 
     internal void __ckg_special_print_helper(char* message, u64 message_length, CKG_LogLevel log_level) {
         CKG_StringView middle_to_color = ckg_sv_between_delimiters(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
-        if (middle_to_color.length == 0) {
+        if (!middle_to_color.data) {
             bool found = message[message_length - 1] == '\n';
             printf("%.*s", (int)(message_length - found), message);
             return;
