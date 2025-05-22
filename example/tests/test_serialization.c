@@ -29,6 +29,11 @@ void test_serialization() {
         ckg_assert(ckg_str_equal(orig.data, orig.length, deser.data, deser.length));
     }
 
+    for (int i = 0; i < ckg_vector_count(deserialized_vec); i++) {
+        char* str = deserialized_vec[i].data;
+        ckg_free(str);
+    }
+
     ckg_vector_free(original_vec);
     ckg_vector_free(deserialized_vec);
     CKG_LOG_SUCCESS("test_serialization passed\n");

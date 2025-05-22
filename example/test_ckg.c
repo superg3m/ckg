@@ -8,32 +8,28 @@ void* custom_alloc_callback(CKG_Allocator* allocator, size_t allocation_size) {
 }
 
 void custom_free_callback(CKG_Allocator* allocator, void* data) {
-	(void)allocator; 
-	(void)data;
+	CKG_Arena* arena = (CKG_Arena*)allocator->ctx;
+	ckg_arena_pop_data(arena, data);
 	return;
 }
 
-#define TOTAL_MEMORY_SIZE KiloBytes(18)
+#define TOTAL_MEMORY_SIZE KiloBytes(40)
 
 int main() {
 	u8 program_stack_memory[TOTAL_MEMORY_SIZE] = {0};
 	CKG_Arena arena = ckg_arena_create_fixed(program_stack_memory, TOTAL_MEMORY_SIZE, true);
 	ckg_bind_custom_allocator(custom_alloc_callback, custom_free_callback, &arena);
 
-	ckg_arena_temp(&arena, {
-		test_ckg_memory_operations();
-		test_ckg_arena_operations();
-		test_ckg_str_operations();
-		test_ckg_vector_operations();
-		test_ckg_ring_buffer_overwrite_behavior();
-		ckg_hashmap_test();
-		test_serialization();
-	});
+	test_ckg_memory_operations();
+	test_ckg_arena_operations();
+	test_ckg_str_operations();
+	test_ckg_vector_operations();
+	test_ckg_ring_buffer_overwrite_behavior();
+	ckg_hashmap_test();
+	test_serialization();
 
-	ckg_arena_temp(&arena, {
-		test_ckg_stack_operations();
-		linked_list_operations();
-	});
+	test_ckg_stack_operations();
+	linked_list_operations();
 	
 	for (char i = 0; i < 26; i++) {
 		char c = i + 'a';
@@ -57,6 +53,7 @@ int main() {
 	CKG_LOG_DEBUG("String_Between: ${%.*s} | %d\n", str_between_test.length, str_between_test.data, (int)str_between_test.length);
 	CKG_LOG_WARN("================================ THIS WORKS ALL THE WAY I THINK! CKG END ================================\n");
 
+	CKG_LOG_SUCCESS("used/cap: %zu / %zu = %f\n", arena.used, arena.capacity, (float)arena.used / (float)arena.capacity);
 	ckg_arena_free(&arena);
 	return 0;
 }

@@ -287,129 +287,6 @@
     #define ckg_memory_insert_index(data, number_of_elements, data_capacity, element, index) MACRO_ckg_memory_insert_index(data, number_of_elements, data_capacity, sizeof(data[0]), index); data[index] = element;
 #endif
 
-#if defined(CKG_INCLUDE_ARENA)
-    #define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
-
-    typedef enum CKG_ArenaFlag {
-        CKG_ARENA_FLAG_INVALID = -1,
-        CKG_ARENA_FLAG_FIXED = 0x1,
-        CKG_ARENA_FLAG_CIRCULAR = 0x2,
-        CKG_ARENA_FLAG_STACK_MEMORY = 0x4,
-        CKG_ARENA_FLAG_COUNT = 4,
-    } CKG_ArenaFlag;
-
-    /*
-    typedef struct CKG_ArenaFreeNode {
-        u8* base_address;
-        size_t capacity;
-    } CKG_ArenaFreeNode;
-    CKG_LinkedList* free_list;
-    */
-
-    typedef struct CKG_Arena {
-        u8* base_address;
-        size_t capacity;
-        size_t used_save_point;
-        size_t used;
-        u8 alignment;
-        int flags;
-    } CKG_Arena;
-    
-    /**
-     * @brief if memory is stack memory make sure to set the CKG_ARENA_FLAG_STACK_MEMORY bit in the flags
-     * 
-     * @param memory 
-     * @param allocation_size 
-     * @param flag 
-     * @param alignment
-     * @return CKG_API* 
-     */
-    CKG_API CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, int flags, u8 alignment);
-    CKG_API void ckg_arena_free(CKG_Arena* arena);
-    CKG_API void* ckg_arena_push_custom(CKG_Arena* arena, size_t element_size);	
-    CKG_API void ckg_arena_begin_temp(CKG_Arena* arena);
-    CKG_API void ckg_arena_end_temp(CKG_Arena* arena);
-    CKG_API void ckg_arena_zero(CKG_Arena* arena);
-    CKG_API void ckg_arena_reset(CKG_Arena* arena);
-    CKG_API void MACRO_ckg_arena_pop(CKG_Arena* arena, size_t bytes_to_pop);
-    
-    #define ckg_arena_create_fixed(memory, allocation_size, is_stack_memory) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_FIXED|(is_stack_memory ? CKG_ARENA_FLAG_STACK_MEMORY : 0), 0)
-    #define ckg_arena_create_circular(memory, allocation_size, is_stack_memory) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_CIRCULAR|(is_stack_memory ? CKG_ARENA_FLAG_STACK_MEMORY : 0), 0)
-    #define ckg_arena_push(arena, type) ((type*)ckg_arena_push_custom(arena, sizeof(type)))
-    #define ckg_arena_push_array(arena, type, element_count) ((type*)ckg_arena_push_custom(arena, sizeof(type) * element_count))
-    #define ckg_arena_pop(arena, type) MACRO_ckg_arena_pop(arena, sizeof(type))
-    #define ckg_arena_pop_array(arena, type) MACRO_ckg_arena_pop(arena, sizeof(type) * element_count)
-    #define ckg_arena_temp(arena, code_block) ckg_arena_begin_temp(arena); code_block; ckg_arena_end_temp(arena);
-#endif
-
-#if defined(CKG_INCLUDE_STRING)
-    /**
-	 * @brief returns a string buffer with nullterm
-	 * in most cases free with ckg_free()
-	 * @param s1 
-	 * @return char* 
-	 */
-	CKG_API char* ckg_str_alloc(char* s1, u64 length);
-    CKG_API u64   ckg_cstr_length(char* c_string);
-    CKG_API void  ckg_str_clear(char* s1, u64 length);
-    CKG_API void  ckg_str_copy(char* dest, size_t dest_capacity, char* source, u64 source_length);
-	CKG_API void  ckg_str_append(char* str, u64 str_length, size_t str_capacity, char* to_append, u64 to_append_length);
-	CKG_API void  ckg_str_append_char(char* str, u64 str_length, size_t str_capacity, char to_append);
-	CKG_API void  ckg_str_insert(char* str, u64 str_length, size_t str_capacity, char* to_insert, u64 to_insert_length, u64 index);
-	CKG_API void  ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index);
-    CKG_API void  ckg_str_reverse(char* str, u64 str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
-    CKG_API char* ckg_str_va_sprint(u64* str_length, const char* fmt, va_list args);
-    CKG_API char* MACRO_ckg_str_sprint(u64* str_length_ptr_back, const char* fmt, ...);
-    #define ckg_str_sprint(str_length_ptr_back, fmt, ...) MACRO_ckg_str_sprint(str_length_ptr_back, fmt, ##__VA_ARGS__)
-
-    CKG_API bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length);
-    CKG_API bool ckg_str_contains(char* s1, u64 s1_length, char* contains, u64 contains_length);
-    
-    /**
-     * @brief Check the return value of -1 to know if there is not a substring in the string provided
-     * 
-     * @param str 
-     * @param str_length 
-     * @param substring 
-     * @param substring_length 
-     * @return s64 
-     */
-	CKG_API s64  ckg_str_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
-	CKG_API s64  ckg_str_last_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
-	CKG_API bool ckg_str_starts_with(char* str, u64 str_length, char* starts_with, u64 starts_with_length);
-	CKG_API bool ckg_str_ends_with(char* str, u64 str_length, char* ends_with, u64 ends_with_length);
-
-
-    typedef struct CKG_StringView {
-        char* data;
-        u64 length;
-    } CKG_StringView;
-    
-    CKG_StringView  ckg_sv_create(char* data, u64 length);
-    CKG_StringView  ckg_sv_between_delimiters(char* str, u64 str_length, char* start_delimitor, u64 start_delimitor_length, char* end_delimitor, u64 end_delimitor_length);
-    CKG_StringView* ckg_sv_split(char* data, u64 length, char* delimitor, u64 delimitor_length);
-    
-    #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
-    #define CKG_SV_EMPTY() (CKG_StringView){NULLPTR, 0}
-    #define CKG_LIT_ARG(literal) literal, sizeof(literal) - 1
-
-    #define ckg_sv_equal(sv1, sv2) ckg_str_equal(sv1.data, sv1.length, sv2.data, sv2.length)
-    #define ckg_sv_contains(sv1, sv2) ckg_str_contains(sv1.data, sv1.length, sv2.data, sv2.length)
-	#define ckg_sv_index_of(sv1, sv2) ckg_str_index_of(sv1.data, sv1.length, sv2.data, sv2.length)
-	#define ckg_sv_last_index_of(sv1, sv2) ckg_str_last_index_of(sv1.data, sv1.length, sv2.data, sv2.length)
-	#define ckg_sv_starts_with(sv1, sv2) ckg_str_starts_with(sv1.data, sv1.length, sv2.data, sv2.length)
-	#define ckg_sv_ends_with(sv1, sv2) ckg_str_ends_with(sv1.data, sv1.length, sv2.data, sv2.length)
-#endif
-
-#if defined(CKG_INCLUDE_CHAR)
-    #define ckg_char_is_digit(c) (c >= '0' && c <= '9')
-    #define ckg_char_is_upper(c) (c >= 'A' && c <= 'Z')
-    #define ckg_char_is_lower(c) (c >= 'a' && c <= 'z')
-
-    CKG_API bool ckg_char_is_alpha(char c);
-    CKG_API bool ckg_char_is_alpha_numeric(char c);
-#endif
-
 #if defined(CKG_INCLUDE_COLLECTIONS)
     //
     // ========== START CKG_VECTOR ==========
@@ -737,6 +614,123 @@
      * @return CKG_API* 
      */
     CKG_API void* ckg_deserialize_collection(FILE* file_handle, CKG_CollectionType collection_type, CKG_DataType data_type);
+#endif
+
+#if defined(CKG_INCLUDE_ARENA)
+    #define ARENA_DEFAULT_ALLOCATION_SIZE MegaBytes(1)
+
+    typedef enum CKG_ArenaFlag {
+        CKG_ARENA_FLAG_INVALID = -1,
+        CKG_ARENA_FLAG_FIXED = 0x1,
+        CKG_ARENA_FLAG_CIRCULAR = 0x2,
+        CKG_ARENA_FLAG_STACK_MEMORY = 0x4,
+        CKG_ARENA_FLAG_COUNT = 4,
+    } CKG_ArenaFlag;
+
+    typedef struct CKG_Arena {
+        u8* base_address;
+        size_t used;
+        size_t capacity;
+        size_t used_save_point;
+        size_t* size_stack;
+        u8 alignment;
+        int flags;
+    } CKG_Arena;
+    
+    /**
+     * @brief if memory is stack memory make sure to set the CKG_ARENA_FLAG_STACK_MEMORY bit in the flags
+     * 
+     * @param memory 
+     * @param allocation_size 
+     * @param flag 
+     * @param alignment
+     * @return CKG_API* 
+     */
+    CKG_API CKG_Arena ckg_arena_create_custom(void* memory, size_t allocation_size, int flags, u8 alignment);
+    CKG_API void ckg_arena_free(CKG_Arena* arena);
+    CKG_API void* ckg_arena_push_custom(CKG_Arena* arena, size_t element_size);	
+    CKG_API void ckg_arena_begin_temp(CKG_Arena* arena);
+    CKG_API void ckg_arena_end_temp(CKG_Arena* arena);
+    CKG_API void ckg_arena_zero(CKG_Arena* arena);
+    CKG_API void ckg_arena_reset(CKG_Arena* arena);
+    CKG_API void MACRO_ckg_arena_pop(CKG_Arena* arena, void* data, size_t bytes_to_pop);
+    
+    #define ckg_arena_create_fixed(memory, allocation_size, is_stack_memory) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_FIXED|(is_stack_memory ? CKG_ARENA_FLAG_STACK_MEMORY : 0), 0)
+    #define ckg_arena_create_circular(memory, allocation_size, is_stack_memory) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_CIRCULAR|(is_stack_memory ? CKG_ARENA_FLAG_STACK_MEMORY : 0), 0)
+    #define ckg_arena_push(arena, type) ((type*)ckg_arena_push_custom(arena, sizeof(type)))
+    #define ckg_arena_push_array(arena, type, element_count) ((type*)ckg_arena_push_custom(arena, sizeof(type) * element_count))
+    #define ckg_arena_pop(arena, type) MACRO_ckg_arena_pop(arena, NULLPTR, sizeof(type))
+    #define ckg_arena_pop_array(arena, type) MACRO_ckg_arena_pop(arena, NULLPTR, sizeof(type) * element_count)
+    #define ckg_arena_pop_data(arena, data) MACRO_ckg_arena_pop(arena, data, ckg_stack_pop(arena->size_stack))
+    #define ckg_arena_temp(arena, code_block) ckg_arena_begin_temp(arena); code_block; ckg_arena_end_temp(arena);
+#endif
+
+#if defined(CKG_INCLUDE_STRING)
+    /**
+     * @brief returns a string buffer with nullterm
+     * in most cases free with ckg_free()
+     * @param s1 
+     * @return char* 
+     */
+    CKG_API char* ckg_str_alloc(char* s1, u64 length);
+    CKG_API u64   ckg_cstr_length(char* c_string);
+    CKG_API void  ckg_str_clear(char* s1, u64 length);
+    CKG_API void  ckg_str_copy(char* dest, size_t dest_capacity, char* source, u64 source_length);
+    CKG_API void  ckg_str_append(char* str, u64 str_length, size_t str_capacity, char* to_append, u64 to_append_length);
+    CKG_API void  ckg_str_append_char(char* str, u64 str_length, size_t str_capacity, char to_append);
+    CKG_API void  ckg_str_insert(char* str, u64 str_length, size_t str_capacity, char* to_insert, u64 to_insert_length, u64 index);
+    CKG_API void  ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index);
+    CKG_API void  ckg_str_reverse(char* str, u64 str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
+    CKG_API char* ckg_str_va_sprint(u64* str_length, const char* fmt, va_list args);
+    CKG_API char* MACRO_ckg_str_sprint(u64* str_length_ptr_back, const char* fmt, ...);
+    #define ckg_str_sprint(str_length_ptr_back, fmt, ...) MACRO_ckg_str_sprint(str_length_ptr_back, fmt, ##__VA_ARGS__)
+
+    CKG_API bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length);
+    CKG_API bool ckg_str_contains(char* s1, u64 s1_length, char* contains, u64 contains_length);
+    
+    /**
+     * @brief Check the return value of -1 to know if there is not a substring in the string provided
+     * 
+     * @param str 
+     * @param str_length 
+     * @param substring 
+     * @param substring_length 
+     * @return s64 
+     */
+    CKG_API s64  ckg_str_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
+    CKG_API s64  ckg_str_last_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
+    CKG_API bool ckg_str_starts_with(char* str, u64 str_length, char* starts_with, u64 starts_with_length);
+    CKG_API bool ckg_str_ends_with(char* str, u64 str_length, char* ends_with, u64 ends_with_length);
+
+
+    typedef struct CKG_StringView {
+        char* data;
+        u64 length;
+    } CKG_StringView;
+    
+    CKG_StringView  ckg_sv_create(char* data, u64 length);
+    CKG_StringView  ckg_sv_between_delimiters(char* str, u64 str_length, char* start_delimitor, u64 start_delimitor_length, char* end_delimitor, u64 end_delimitor_length);
+    CKG_StringView* ckg_sv_split(char* data, u64 length, char* delimitor, u64 delimitor_length);
+
+    #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
+    #define CKG_SV_NULL() (CKG_StringView){NULLPTR, 0}
+    #define CKG_LIT_ARG(literal) literal, sizeof(literal) - 1
+
+    #define ckg_sv_equal(sv1, sv2) ckg_str_equal(sv1.data, sv1.length, sv2.data, sv2.length)
+    #define ckg_sv_contains(sv1, sv2) ckg_str_contains(sv1.data, sv1.length, sv2.data, sv2.length)
+    #define ckg_sv_index_of(sv1, sv2) ckg_str_index_of(sv1.data, sv1.length, sv2.data, sv2.length)
+    #define ckg_sv_last_index_of(sv1, sv2) ckg_str_last_index_of(sv1.data, sv1.length, sv2.data, sv2.length)
+    #define ckg_sv_starts_with(sv1, sv2) ckg_str_starts_with(sv1.data, sv1.length, sv2.data, sv2.length)
+    #define ckg_sv_ends_with(sv1, sv2) ckg_str_ends_with(sv1.data, sv1.length, sv2.data, sv2.length)
+#endif
+
+#if defined(CKG_INCLUDE_CHAR)
+    #define ckg_char_is_digit(c) (c >= '0' && c <= '9')
+    #define ckg_char_is_upper(c) (c >= 'A' && c <= 'Z')
+    #define ckg_char_is_lower(c) (c >= 'a' && c <= 'z')
+
+    CKG_API bool ckg_char_is_alpha(char c);
+    CKG_API bool ckg_char_is_alpha_numeric(char c);
 #endif
 
 #if defined(CKG_INCLUDE_IO)
@@ -1131,10 +1125,7 @@
         
         global_allocator.allocate = a;
         global_allocator.free = f;
-
-        if (ctx) {
-            global_allocator.ctx = ctx;
-        }
+        global_allocator.ctx = ctx;
     }
 
     void* ckg_alloc(size_t allocation_size) {
@@ -1245,10 +1236,11 @@
         ckg_assert_msg(allocation_size != 0, "Can't have a zero allocation size!\n");
         ckg_assert_msg(!((flags & CKG_ARENA_FLAG_CIRCULAR) && (flags & CKG_ARENA_FLAG_FIXED)), "Can't have both a fixed an circular arena!\n");
 
-        CKG_Arena arena;
+        CKG_Arena arena = {0};
         arena.used = 0;
         arena.capacity = allocation_size;
         arena.base_address = (u8*)memory;
+        arena.size_stack = NULLPTR;
         arena.alignment = alignment == 0 ? 8 : alignment;
         arena.flags = flags;
 
@@ -1258,9 +1250,17 @@
     void ckg_arena_free(CKG_Arena* arena) {
         ckg_assert_msg(arena->flags != CKG_ARENA_FLAG_INVALID, "Arena is invalid!\n");
 
+
         if (!(arena->flags & CKG_ARENA_FLAG_STACK_MEMORY)) {
             ckg_free(arena->base_address);
         }
+
+        CKG_Alloc_T* a = global_allocator.allocate;
+        CKG_Free_T* f  = global_allocator.free;
+        void* ctx  = global_allocator.ctx;
+        ckg_bind_custom_allocator(ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR);
+        ckg_vector_free(arena->size_stack);
+        ckg_bind_custom_allocator(a, f, ctx);
 
         arena->flags = CKG_ARENA_FLAG_INVALID;
     }
@@ -1275,6 +1275,10 @@
     void ckg_arena_reset(CKG_Arena* arena) {
         ckg_assert_msg(arena->flags != CKG_ARENA_FLAG_INVALID, "Arena is invalid!\n");
 
+        int initial_count = ckg_stack_count(arena->size_stack);
+        for (int i = 0; i < initial_count; i++) {
+            ckg_stack_pop(arena->size_stack);
+        }
         arena->used = 0;
     }
 
@@ -1292,18 +1296,33 @@
         }
 
         u8* ret = arena->base_address + arena->used;
+        size_t previous_used = arena->used;
         arena->used += element_size;
         if ((arena->used & (arena->alignment - 1)) != 0) { // if first bit is set then its not aligned
             arena->used += (arena->alignment - (arena->used & (arena->alignment - 1)));
         }
 
+        CKG_Alloc_T* a = global_allocator.allocate;
+        CKG_Free_T* f  = global_allocator.free;
+        void* ctx  = global_allocator.ctx;
+        ckg_bind_custom_allocator(ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR);
+        ckg_stack_push(arena->size_stack, arena->used - previous_used);
+        ckg_bind_custom_allocator(a, f, ctx);
+
         return ret;
     }
 
-    void MACRO_ckg_arena_pop(CKG_Arena* arena, size_t bytes_to_pop) {
+    void MACRO_ckg_arena_pop(CKG_Arena* arena, void* data, size_t bytes_to_pop) {
         ckg_assert_msg(arena->flags != CKG_ARENA_FLAG_INVALID, "Arena is invalid!\n");
 
-        arena->used -= bytes_to_pop;
+        if (data) {
+            // ckg_assert_msg(arena->base_address + (arena->used - bytes_to_pop) == data, "The address you are trying to pop is not the top most data\n");
+            if (arena->base_address + (arena->used - bytes_to_pop) == data) {
+                arena->used -= bytes_to_pop;
+            }
+        } else {
+            arena->used -= bytes_to_pop;
+        }
     }
 
     void ckg_arena_begin_temp(CKG_Arena* arena) {
@@ -1367,16 +1386,16 @@
         s64 start_delimitor_index = ckg_str_index_of(str, str_length, start_delimitor, start_delimitor_length); 
         s64 end_delimitor_index = ckg_str_index_of(str, str_length, end_delimitor, end_delimitor_length);
         if (start_delimitor_index == -1 || end_delimitor_index == -1) {
-            return CKG_SV_EMPTY();
+            return CKG_SV_NULL();
         }
 
         if (start_delimitor_index == -1 || end_delimitor_index == -1) {
-            return CKG_SV_EMPTY();
+            return CKG_SV_NULL();
         } else if (start_delimitor_index > end_delimitor_index) {
-            return CKG_SV_EMPTY(); // The start delimtor is after the end delimitor
+            return CKG_SV_NULL(); // The start delimtor is after the end delimitor
         }
 
-        CKG_StringView ret = CKG_SV_EMPTY();
+        CKG_StringView ret = CKG_SV_NULL();
         u64 start_str_index = (u64)((u64)start_delimitor_index + start_delimitor_length);
         ret.data = str + start_str_index;
         ret.length = (u64)end_delimitor_index - start_str_index;
@@ -1407,7 +1426,7 @@
             }
 
             if (found_index == 0) {
-                ckg_vector_push(ret_vector, CKG_SV_EMPTY());
+                ckg_vector_push(ret_vector, CKG_SV_NULL());
             } else {
                 CKG_StringView substring = ckg_sv_create(str_view.data, (u64)found_index);
                 ckg_vector_push(ret_vector, substring);

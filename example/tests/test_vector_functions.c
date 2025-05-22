@@ -31,10 +31,9 @@ void test_ckg_stack_operations() {
 		ckg_assert(value2 == (2040 - i));
 	}
 
-	if (ckg_stack_empty(int_stack)) {
-		ckg_stack_free(int_stack);
-	}
-
+	ckg_assert(ckg_stack_empty(int_stack));
+	
+	ckg_stack_free(int_stack);
 	CKG_LOG_SUCCESS("All vector tests passed!\n"); 
 }
 
