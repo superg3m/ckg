@@ -336,8 +336,8 @@
         size_t element_size;
     } CKG_RingBufferHeader;
 
-    void* ckg_ring_buffer_create(size_t element_size, int capacity);
-    void* MACRO_ckg_ring_buffer_free(void* buffer);
+    CKG_API void* ckg_ring_buffer_create(size_t element_size, int capacity);
+    CKG_API void* MACRO_ckg_ring_buffer_free(void* buffer);
     #define ckg_ring_buffer_header_base(buffer) ((CKG_RingBufferHeader*)(((char*)(buffer)) - sizeof(CKG_RingBufferHeader)))
 
     #define ckg_ring_buffer_free(buffer) buffer = MACRO_ckg_ring_buffer_free(buffer)
@@ -708,9 +708,9 @@
         u64 length;
     } CKG_StringView;
     
-    CKG_StringView  ckg_sv_create(const char* data, u64 length);
-    CKG_StringView  ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
-    CKG_StringView* ckg_sv_split(const char* data, u64 length, const char* delimitor, u64 delimitor_length);
+    CKG_API CKG_StringView  ckg_sv_create(const char* data, u64 length);
+    CKG_API CKG_StringView  ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
+    CKG_API CKG_StringView* ckg_sv_split(const char* data, u64 length, const char* delimitor, u64 delimitor_length);
 
     #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
     #define CKG_SV_NULL() (CKG_StringView){NULLPTR, 0}
