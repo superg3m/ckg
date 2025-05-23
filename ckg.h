@@ -655,8 +655,8 @@
     CKG_API void ckg_arena_reset(CKG_Arena* arena);
     CKG_API void MACRO_ckg_arena_pop(CKG_Arena* arena, void* data, size_t bytes_to_pop);
     
-    #define ckg_arena_create_fixed(memory, allocation_size, is_stack_memory) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_FIXED|(is_stack_memory ? CKG_ARENA_FLAG_STACK_MEMORY : 0), 0)
-    #define ckg_arena_create_circular(memory, allocation_size, is_stack_memory) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_CIRCULAR|(is_stack_memory ? CKG_ARENA_FLAG_STACK_MEMORY : 0), 0)
+    #define ckg_arena_create_fixed(memory, allocation_size, is_stack_memory) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_FIXED|(is_stack_memory ? CKG_ARENA_FLAG_STACK_MEMORY : 0), 8)
+    #define ckg_arena_create_circular(memory, allocation_size, is_stack_memory) ckg_arena_create_custom(memory, allocation_size, CKG_ARENA_FLAG_CIRCULAR|(is_stack_memory ? CKG_ARENA_FLAG_STACK_MEMORY : 0), 8)
     #define ckg_arena_push(arena, type) ((type*)ckg_arena_push_custom(arena, sizeof(type)))
     #define ckg_arena_push_array(arena, type, element_count) ((type*)ckg_arena_push_custom(arena, sizeof(type) * element_count))
     #define ckg_arena_pop(arena, type) MACRO_ckg_arena_pop(arena, NULLPTR, sizeof(type))
