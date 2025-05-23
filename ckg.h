@@ -1246,21 +1246,22 @@
 
         return arena;
     }
-
+    
     void ckg_arena_free(CKG_Arena* arena) {
         ckg_assert_msg(arena->flags != CKG_ARENA_FLAG_INVALID, "Arena is invalid!\n");
-
 
         if (!(arena->flags & CKG_ARENA_FLAG_STACK_MEMORY)) {
             ckg_free(arena->base_address);
         }
 
-        CKG_Alloc_T* a = global_allocator.allocate;
-        CKG_Free_T* f  = global_allocator.free;
-        void* ctx  = global_allocator.ctx;
-        ckg_bind_custom_allocator(ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR);
-        ckg_vector_free(arena->size_stack);
-        ckg_bind_custom_allocator(a, f, ctx);
+        if (arena->size_stack) {
+            CKG_Alloc_T* a = global_allocator.allocate;
+            CKG_Free_T* f  = global_allocator.free;
+            void* ctx  = global_allocator.ctx;
+            ckg_bind_custom_allocator(ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR);
+            ckg_stack_free(arena->size_stack);
+            ckg_bind_custom_allocator(a, f, ctx);
+        }
 
         arena->flags = CKG_ARENA_FLAG_INVALID;
     }
