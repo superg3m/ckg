@@ -734,7 +734,7 @@
 #endif
 
 #if defined(CKG_INCLUDE_IO)
-    bool ckg_io_path_exists(const char* path);
+    CKG_API bool ckg_io_path_exists(const char* path);
     /**
      * @brief returns null terminated file data 
      * 
