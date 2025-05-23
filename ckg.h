@@ -639,7 +639,7 @@
     
     /**
      * @brief if memory is stack memory make sure to set the CKG_ARENA_FLAG_STACK_MEMORY bit in the flags
-     * 
+     * also alignment has to be a power of two!
      * @param memory 
      * @param allocation_size 
      * @param flag 
@@ -1241,7 +1241,7 @@
         arena.capacity = allocation_size;
         arena.base_address = (u8*)memory;
         arena.size_stack = NULLPTR;
-        arena.alignment = alignment == 0 ? 8 : alignment;
+        arena.alignment = alignment;
         arena.flags = flags;
 
         return arena;
@@ -1291,7 +1291,7 @@
             ckg_assert_msg(arena->used + element_size <= arena->capacity, "Ran out of arena memory!\n");
         } else if (arena->flags & CKG_ARENA_FLAG_CIRCULAR) {
             if ((arena->used + element_size > arena->capacity)) {
-                arena->used = sizeof(CKG_Arena);
+                arena->used = 0;
                 ckg_assert_msg(arena->used + element_size <= arena->capacity, "Element size exceeds circular arena allocation capacity!\n");
             }
         }
