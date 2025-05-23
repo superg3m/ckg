@@ -30,7 +30,7 @@ void test_serialization() {
     }
 
     for (int i = 0; i < ckg_vector_count(deserialized_vec); i++) {
-        char* str = deserialized_vec[i].data;
+        char* str = (char*)deserialized_vec[i].data;
         ckg_free(str);
     }
 

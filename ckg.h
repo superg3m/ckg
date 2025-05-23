@@ -269,8 +269,8 @@
      * @param b2_allocation_size 
      * @return bool 
      */
-    CKG_API bool ckg_memory_compare(void* buffer_one, size_t b1_size, void* buffer_two, size_t b2_size);
-    CKG_API void ckg_memory_copy(void* destination, size_t destination_size, void* source, size_t source_size);
+    CKG_API bool ckg_memory_compare(const void* buffer_one, size_t b1_size, const void* buffer_two, size_t b2_size);
+    CKG_API void ckg_memory_copy(void* destination, size_t destination_size, const void* source, size_t source_size);
     CKG_API void ckg_memory_zero(void* data, size_t data_size_in_bytes);
 
     CKG_API void MACRO_ckg_memory_delete_index(void* data, int number_of_elements, int data_capacity, size_t element_size_in_bytes, int index);
@@ -666,28 +666,22 @@
 #endif
 
 #if defined(CKG_INCLUDE_STRING)
+
     /**
      * @brief returns a string buffer with nullterm
      * in most cases free with ckg_free()
      * @param s1 
      * @return char* 
      */
-    CKG_API char* ckg_str_alloc(char* s1, u64 length);
-    CKG_API u64   ckg_cstr_length(char* c_string);
-    CKG_API void  ckg_str_clear(char* s1, u64 length);
-    CKG_API void  ckg_str_copy(char* dest, size_t dest_capacity, char* source, u64 source_length);
-    CKG_API void  ckg_str_append(char* str, u64 str_length, size_t str_capacity, char* to_append, u64 to_append_length);
-    CKG_API void  ckg_str_append_char(char* str, u64 str_length, size_t str_capacity, char to_append);
-    CKG_API void  ckg_str_insert(char* str, u64 str_length, size_t str_capacity, char* to_insert, u64 to_insert_length, u64 index);
-    CKG_API void  ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index);
-    CKG_API void  ckg_str_reverse(char* str, u64 str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity);
+    CKG_API char* ckg_str_alloc(const char* s1, u64 length);
+    CKG_API u64   ckg_cstr_length(const char* c_string);
+    CKG_API bool ckg_str_equal(const char* s1, u64 s1_length, const char* s2, u64 s2_length);
+    CKG_API bool ckg_str_contains(const char* s1, u64 s1_length, const char* contains, u64 contains_length);
+    CKG_API char* ckg_str_reverse(const char* str, u64 str_length);
     CKG_API char* ckg_str_va_sprint(u64* str_length, const char* fmt, va_list args);
     CKG_API char* MACRO_ckg_str_sprint(u64* str_length_ptr_back, const char* fmt, ...);
     #define ckg_str_sprint(str_length_ptr_back, fmt, ...) MACRO_ckg_str_sprint(str_length_ptr_back, fmt, ##__VA_ARGS__)
 
-    CKG_API bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length);
-    CKG_API bool ckg_str_contains(char* s1, u64 s1_length, char* contains, u64 contains_length);
-    
     /**
      * @brief Check the return value of -1 to know if there is not a substring in the string provided
      * 
@@ -697,20 +691,26 @@
      * @param substring_length 
      * @return s64 
      */
-    CKG_API s64  ckg_str_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
-    CKG_API s64  ckg_str_last_index_of(char* str, u64 str_length, char* substring, u64 substring_length);
-    CKG_API bool ckg_str_starts_with(char* str, u64 str_length, char* starts_with, u64 starts_with_length);
-    CKG_API bool ckg_str_ends_with(char* str, u64 str_length, char* ends_with, u64 ends_with_length);
+    CKG_API s64  ckg_str_index_of(const char* str, u64 str_length, const char* substring, u64 substring_length);
+    CKG_API s64  ckg_str_last_index_of(const char* str, u64 str_length, const char* substring, u64 substring_length);
+    CKG_API bool ckg_str_starts_with(const char* str, u64 str_length, const char* starts_with, u64 starts_with_length);
+    CKG_API bool ckg_str_ends_with(const char* str, u64 str_length, const char* ends_with, u64 ends_with_length);
 
+    CKG_API void  ckg_str_clear(char* s1, u64 length);
+    CKG_API void  ckg_str_copy(char* s1, size_t s1_capacity, const char* s2, u64 s2_length);
+    CKG_API void  ckg_str_append(char* str, u64 str_length, size_t str_capacity, const char* to_append, u64 to_append_length);
+    CKG_API void  ckg_str_append_char(char* str, u64 str_length, size_t str_capacity, char to_append);
+    CKG_API void  ckg_str_insert(char* str, u64 str_length, size_t str_capacity, const char* to_insert, u64 to_insert_length, u64 index);
+    CKG_API void  ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index);
 
     typedef struct CKG_StringView {
-        char* data;
+        const char* data;
         u64 length;
     } CKG_StringView;
     
-    CKG_StringView  ckg_sv_create(char* data, u64 length);
-    CKG_StringView  ckg_sv_between_delimiters(char* str, u64 str_length, char* start_delimitor, u64 start_delimitor_length, char* end_delimitor, u64 end_delimitor_length);
-    CKG_StringView* ckg_sv_split(char* data, u64 length, char* delimitor, u64 delimitor_length);
+    CKG_StringView  ckg_sv_create(const char* data, u64 length);
+    CKG_StringView  ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length);
+    CKG_StringView* ckg_sv_split(const char* data, u64 length, const char* delimitor, u64 delimitor_length);
 
     #define CKG_SV_LIT(literal) (CKG_StringView){literal, sizeof(literal) - 1}
     #define CKG_SV_NULL() (CKG_StringView){NULLPTR, 0}
@@ -734,7 +734,7 @@
 #endif
 
 #if defined(CKG_INCLUDE_IO)
-    bool ckg_io_path_exists(char* path);
+    bool ckg_io_path_exists(const char* path);
     /**
      * @brief returns null terminated file data 
      * 
@@ -744,7 +744,7 @@
      * @param err [OPTIONAL]
      * @return u8* 
      */
-    CKG_API u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err);
+    CKG_API u8* ckg_io_read_entire_file(const char* file_name, size_t* returned_file_size, CKG_Error* err);
 #endif
 
 #if defined(CKG_INCLUDE_OS)
@@ -757,7 +757,7 @@
      * @param err [OPTIONAL]
      * @return CKG_DLL* 
      */
-    CKG_API CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err);
+    CKG_API CKG_DLL ckg_io_load_dll(const char* dll_name, CKG_Error* err);
 
     /**
      * @brief 
@@ -767,7 +767,7 @@
      * @param err [OPTIONAL]
      * @return void* 
      */
-    CKG_API void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err);
+    CKG_API void* ckg_os_get_proc_address(CKG_DLL dll, const char* proc_name, CKG_Error* err);
 
     /**
      * @brief 
@@ -979,14 +979,14 @@
         CKG_COLOR_RESET
     };
 
-    internal bool __ckg_message_has_special_delmitor(char* message, u64 message_length) {
+    internal bool __ckg_message_has_special_delmitor(const char* message, u64 message_length) {
         bool start_delimitor_index = ckg_str_contains(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1);
         bool end_delimitor_index = ckg_str_contains(message, message_length, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
 
         return start_delimitor_index && end_delimitor_index;
     }
 
-    internal void __ckg_special_print_helper(char* message, u64 message_length, CKG_LogLevel log_level) {
+    internal void __ckg_special_print_helper(const char* message, u64 message_length, CKG_LogLevel log_level) {
         CKG_StringView middle_to_color = ckg_sv_between_delimiters(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
         if (!middle_to_color.data) {
             bool found = message[message_length - 1] == '\n';
@@ -1153,7 +1153,7 @@
         return ret;
     }
 
-    bool ckg_memory_compare(void* buffer_one, size_t b1_size, void* buffer_two, size_t b2_size) {
+    bool ckg_memory_compare(const void* buffer_one, size_t b1_size, const void* buffer_two, size_t b2_size) {
         ckg_assert(buffer_one);
         ckg_assert(buffer_two);
 
@@ -1172,7 +1172,7 @@
         return true;
     }
 
-    void ckg_memory_copy(void* destination, size_t destination_size, void* source, size_t source_size) {
+    void ckg_memory_copy(void* destination, size_t destination_size, const void* source, size_t source_size) {
         ckg_assert(source);
         ckg_assert(destination);
         ckg_assert(source_size <= destination_size);
@@ -1342,13 +1342,13 @@
 #endif
 
 #if defined(CKG_IMPL_STRING)
-    char* ckg_str_alloc(char* s1, u64 length) {
+    char* ckg_str_alloc(const char* s1, u64 length) {
         char* ret = ckg_alloc(length + 1) ;
         ckg_memory_copy(ret, length, s1, length);
         return ret;
     }
 
-    u64 ckg_cstr_length(char* cstring) {
+    u64 ckg_cstr_length(const char* cstring) {
         ckg_assert(cstring);
 
         if (!cstring) {
@@ -1356,7 +1356,7 @@
         }
 
         u64 length = 0;
-        char* cursor = (char*)cstring;
+        const char* cursor = cstring;
         while(*cursor++ != '\0') {
             length++;
         }
@@ -1364,11 +1364,11 @@
         return length;
     }
 
-    void ckg_cstr_clear(char* s1, u64 length) {
+    void ckg_str_clear(char* s1, u64 length) {
         ckg_memory_zero(s1, length);
     }
 
-    CKG_StringView ckg_sv_create(char* data, u64 length) {
+    CKG_StringView ckg_sv_create(const char* data, u64 length) {
         ckg_assert(data);
 
         CKG_StringView ret;
@@ -1378,7 +1378,7 @@
         return ret;
     }
 
-    CKG_StringView ckg_sv_between_delimiters(char* str, u64 str_length, char* start_delimitor, u64 start_delimitor_length, char* end_delimitor, u64 end_delimitor_length) {
+    CKG_StringView ckg_sv_between_delimiters(const char* str, u64 str_length, const char* start_delimitor, u64 start_delimitor_length, const char* end_delimitor, u64 end_delimitor_length) {
         ckg_assert(str);
         ckg_assert(start_delimitor);
         ckg_assert(end_delimitor);
@@ -1404,7 +1404,7 @@
         return ret;
     }
 
-    CKG_StringView* ckg_sv_split(char* data, u64 length, char* delimitor, u64 delimitor_length) {
+    CKG_StringView* ckg_sv_split(const char* data, u64 length, const char* delimitor, u64 delimitor_length) {
         ckg_assert(data);
         ckg_assert(delimitor);
         ckg_assert_msg(delimitor_length > 0, "delimitor can not be a empty string!\n");
@@ -1440,16 +1440,16 @@
         return ret_vector;
     }
 
-    bool ckg_str_equal(char* s1, u64 s1_length, char* s2, u64 s2_length) {
+    bool ckg_str_equal(const char* s1, u64 s1_length, const char* s2, u64 s2_length) {
         return ckg_memory_compare(s1, s1_length, s2, s2_length);
     }
 
-    void ckg_str_copy(char* s1, size_t s1_capacity, char* s2, u64 s2_length) {
-        ckg_memory_zero((void*)s1, s1_capacity);
+    void ckg_str_copy(char* s1, size_t s1_capacity, const char* s2, u64 s2_length) {
+        ckg_memory_zero(s1, s1_capacity);
         ckg_memory_copy(s1, s1_capacity, s2, s2_length);
     }
 
-    void ckg_str_insert(char* str, u64 str_length, size_t str_capacity, char* to_insert, u64 to_insert_length, u64 index) {
+    void ckg_str_insert(char* str, u64 str_length, size_t str_capacity, const char* to_insert, u64 to_insert_length, u64 index) {
         ckg_assert(str);
         ckg_assert(to_insert);
 
@@ -1477,7 +1477,7 @@
         str[index] = to_insert;
     }
 
-    void ckg_str_append(char* str, u64 str_length, size_t str_capacity, char* to_append, u64 to_append_length) {
+    void ckg_str_append(char* str, u64 str_length, size_t str_capacity, const char* to_append, u64 to_append_length) {
         ckg_str_insert(str, str_length, str_capacity, to_append, to_append_length, str_length);
     }
 
@@ -1485,16 +1485,18 @@
         ckg_str_insert_char(str, str_length, str_capacity, to_append, str_length);
     }
 
-    void ckg_str_reverse(char* str, u64 str_length, char* returned_reversed_string_buffer, size_t reversed_buffer_capacity) {
+    char* ckg_str_reverse(const char* str, u64 str_length) {
         ckg_assert(str);
-        ckg_assert(reversed_buffer_capacity > str_length);
 
+        char* ret = ckg_alloc(str_length + 1);
         for (s64 i = (s64)str_length - 1; i >= 0; i--) {
-            ckg_str_append_char(returned_reversed_string_buffer, ((str_length - 1) - (u64)i), reversed_buffer_capacity, str[i]);
+            ckg_str_append_char(ret, ((str_length - 1) - (u64)i), str_length + 1, str[i]);
         }
+
+        return ret;
     }
 
-    s64 ckg_str_index_of(char* str, u64 str_length, char* substring, u64 substring_length) {
+    s64 ckg_str_index_of(const char* str, u64 str_length, const char* substring, u64 substring_length) {
         ckg_assert(str);
         ckg_assert(substring);
 
@@ -1530,14 +1532,14 @@
         return ret_index; // returns -1 if not found
     }
 
-    bool ckg_str_contains(char* str, u64 str_length, char* contains, u64 contains_length) {
+    bool ckg_str_contains(const char* str, u64 str_length, const char* contains, u64 contains_length) {
         ckg_assert(str);
         ckg_assert(contains);
 
         return ckg_str_index_of(str, str_length, contains, contains_length) != -1;
     }
 
-    s64 ckg_str_last_index_of(char* str, u64 str_length, char* substring, u64 substring_length) {
+    s64 ckg_str_last_index_of(const char* str, u64 str_length, const char* substring, u64 substring_length) {
         ckg_assert(str);
         ckg_assert(substring);
 
@@ -1568,7 +1570,7 @@
         return ret_index;
     }
 
-    bool ckg_str_starts_with(char* str, u64 str_length, char* starts_with, u64 starts_with_length) {
+    bool ckg_str_starts_with(const char* str, u64 str_length, const char* starts_with, u64 starts_with_length) {
         ckg_assert(str);
         ckg_assert(starts_with);
 
@@ -1585,7 +1587,7 @@
         return false;
     }
 
-    bool ckg_str_ends_with(char* str, u64 str_length, char* ends_with, u64 ends_with_length) {
+    bool ckg_str_ends_with(const char* str, u64 str_length, const char* ends_with, u64 ends_with_length) {
         ckg_assert(str);
         ckg_assert(ends_with);
 
@@ -2385,11 +2387,11 @@
 
 #if defined(CKG_IMPL_IO)
     #if defined(PLATFORM_WINDOWS)
-        bool ckg_io_path_exists(char* path) {
+        bool ckg_io_path_exists(const char* path) {
             return (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES);
         }
 
-        u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
+        u8* ckg_io_read_entire_file(const char* file_name, size_t* returned_file_size, CKG_Error* err) {
             HANDLE file_handle = CreateFileA(file_name, GENERIC_READ, 0, NULLPTR, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULLPTR);
             if (file_handle == INVALID_HANDLE_VALUE) {
                 CKG_LOG_ERROR("CreateFileA() returned an INVALID_HANDLE_VALUE, the file_name/path is likely wrong: ckg_io_read_entire_file(%s)\n", file_name);
@@ -2501,7 +2503,7 @@
 
 #if defined(CKG_IMPL_OS)
     #if defined(PLATFORM_WINDOWS)
-        CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
+        CKG_DLL ckg_io_load_dll(const char* dll_name, CKG_Error* err) {
             HMODULE library = LoadLibraryA(dll_name);
             if (!library) {
                 CKG_LOG_ERROR(false, "LoadLibraryA() failed: ckg_io_load_dll(%s)\n", dll_name);
@@ -2513,7 +2515,7 @@
             return library;
         }
 
-        void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err) {
+        void* ckg_os_get_proc_address(CKG_DLL dll, const char* proc_name, CKG_Error* err) {
             ckg_assert(dll);
 
             void* proc = (void*)GetProcAddress(dll, proc_name);

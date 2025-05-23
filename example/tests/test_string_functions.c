@@ -249,27 +249,19 @@ void test_ckg_cstr_reverse() {
 
     CKG_StringView substring_view = ckg_sv_create(t1, 2);
     u64 reversed_string_length = substring_view.length;
-    u64 reversed_string_capacity = reversed_string_length + 1;
-    char* reversed_string = (char*)ckg_alloc(reversed_string_capacity);
-    ckg_str_reverse(substring_view.data, substring_view.length, reversed_string, reversed_string_capacity);
+    char* reversed_string = ckg_str_reverse(substring_view.data, substring_view.length);
 
 	ckg_assert(ckg_str_equal(reversed_string, reversed_string_length, CKG_LIT_ARG("eh")));
 	ckg_free(reversed_string);
 
     u64 reversed_string2_length = sizeof("Chicken") - 1;
-    u64 reversed_string2_capacity = reversed_string2_length + 1;
-    char* reversed_string2 = (char*)ckg_alloc(reversed_string2_capacity);
-    ckg_str_reverse(CKG_LIT_ARG("Chicken"), reversed_string2, reversed_string2_capacity);
+    char* reversed_string2 = ckg_str_reverse(CKG_LIT_ARG("Chicken"));
 
     u64 reversed_string3_length = sizeof("Roast") - 1;
-    u64 reversed_string3_capacity = reversed_string3_length + 1;
-    char* reversed_string3 = (char*)ckg_alloc(reversed_string3_capacity);
-    ckg_str_reverse(CKG_LIT_ARG("Roast"), reversed_string3, reversed_string3_capacity);
+    char* reversed_string3 = ckg_str_reverse(CKG_LIT_ARG("Roast"));
 
     u64 reversed_string4_length = sizeof("Soup") - 1;
-    u64 reversed_string4_capacity = reversed_string4_length + 1;
-    char* reversed_string4 = (char*)ckg_alloc(reversed_string4_capacity);
-    ckg_str_reverse(CKG_LIT_ARG("Soup"), reversed_string4, reversed_string4_capacity);
+    char* reversed_string4 = ckg_str_reverse(CKG_LIT_ARG("Soup"));
 
 	ckg_assert_msg(ckg_str_equal(reversed_string2, reversed_string2_length, CKG_LIT_ARG("nekcihC")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "nekcihC", reversed_string2);
 	ckg_assert_msg(ckg_str_equal(reversed_string3, reversed_string3_length, CKG_LIT_ARG("tsaoR")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "tsaoR", reversed_string3);
@@ -281,17 +273,13 @@ void test_ckg_cstr_reverse() {
 
 	char* t2 = "";
     u64 reversed_t2_length = sizeof("") - 1;
-    u64 reversed_t2_capacity = reversed_t2_length + 1;
-    char* reversed_t2 = (char*)ckg_alloc(reversed_t2_capacity);
-    ckg_str_reverse(t2, reversed_t2_length, reversed_t2, reversed_t2_capacity);
+    char* reversed_t2 = ckg_str_reverse(t2, reversed_t2_length);
 	ckg_assert_msg(ckg_str_equal(reversed_t2, reversed_t2_length, CKG_LIT_ARG("")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "\"\"", reversed_t2);
     ckg_free(reversed_t2);
 
 	t2 = "f";
     reversed_t2_length = sizeof("f") - 1;
-    reversed_t2_capacity = reversed_t2_length + 1;
-    reversed_t2 = (char*)ckg_alloc(reversed_t2_capacity);
-    ckg_str_reverse(t2, reversed_t2_length, reversed_t2, reversed_t2_capacity);
+    reversed_t2 = ckg_str_reverse(t2, reversed_t2_length);
 	ckg_assert_msg(ckg_str_equal(reversed_t2, reversed_t2_length, CKG_LIT_ARG("f")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
 	ckg_assert_msg(!ckg_str_equal(reversed_t2, reversed_t2_length, CKG_LIT_ARG("g")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "f", reversed_t2);
     ckg_free(reversed_t2);
