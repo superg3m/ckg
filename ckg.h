@@ -41,6 +41,8 @@
 #if defined(CKG_INCLUDE_TYPES)
     #undef NULLPTR
     #undef PI
+    #undef DEGREES_TO_RAD
+    #undef RAD_TO_DEGREES
     #undef stringify
     #undef glue
     #undef KiloBytes
