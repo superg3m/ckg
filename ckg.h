@@ -51,6 +51,7 @@
     #undef MIN
     #undef MAX
     #undef CLAMP
+    #undef SQUARED
     #undef local_persist
     #undef internal
     #undef FIRST_DIGIT
@@ -59,6 +60,9 @@
     #undef UNSET_BIT
     #undef ArrayCount
     #undef PLATFORM_WINDOWS
+    #undef NOMINMAX
+    #undef WIN32_LEAN_AND_MEAN
+    #undef WIN32_LEAN_AND_MEAN
     #undef PLATFORM_APPLE
     #undef PLATFORM_LINUX
     #undef OS_DELIMITER
@@ -95,6 +99,7 @@
     #define MIN(a, b) (((a) < (b)) ? (a) : (b))
     #define MAX(a, b) (((a) > (b)) ? (a) : (b))
     #define CLAMP(value, min_value, max_value) (MIN(MAX(value, min_value), max_value))
+    #define SQUARED(a) ((a) * (a))
 
     #define local_persist static
     #define internal static
