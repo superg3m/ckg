@@ -62,7 +62,6 @@
     #undef PLATFORM_WINDOWS
     #undef NOMINMAX
     #undef WIN32_LEAN_AND_MEAN
-    #undef WIN32_LEAN_AND_MEAN
     #undef PLATFORM_APPLE
     #undef PLATFORM_LINUX
     #undef OS_DELIMITER
