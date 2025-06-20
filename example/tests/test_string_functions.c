@@ -197,7 +197,7 @@ void test_ckg_str_contains() {
 }
 
 void test_ckg_str_starts_with() {
-    char t1[] = "hello";
+    const char t1[] = "hello";
     u64 t1_length = sizeof("hello") - 1;
     CKG_StringView substring_view = ckg_sv_create(t1, 2);
 	ckg_assert(ckg_str_starts_with(substring_view.data, substring_view.length, CKG_LIT_ARG("he")));
@@ -208,7 +208,7 @@ void test_ckg_str_starts_with() {
 	ckg_assert(!ckg_str_starts_with(t1, t1_length, CKG_LIT_ARG("")));
 
 
-	char* t2 = "";
+	const char* t2 = "";
     u64 t2_length = 0;
 	ckg_assert(ckg_str_starts_with(t2, t2_length, CKG_LIT_ARG("")));
 
@@ -221,7 +221,7 @@ void test_ckg_str_starts_with() {
 }
 
 void test_ckg_str_ends_with() {
-    char t1[] = "hello";
+    const char t1[] = "hello";
     u64 t1_length = sizeof("hello") - 1;
     CKG_StringView substring_view = ckg_sv_create(t1, 2);
 	ckg_assert(ckg_str_ends_with(substring_view.data, substring_view.length, CKG_LIT_ARG("he")));
@@ -232,7 +232,7 @@ void test_ckg_str_ends_with() {
 	ckg_assert(ckg_str_ends_with(t1, t1_length, CKG_LIT_ARG("hello")));
 	ckg_assert(ckg_str_ends_with(t1, t1_length, CKG_LIT_ARG("ello")));
 
-	char* t2 = "";
+	const char* t2 = "";
     u64 t2_length = 0;
 	ckg_assert(ckg_str_ends_with(t2, t2_length, CKG_LIT_ARG("")));
 	
@@ -245,7 +245,7 @@ void test_ckg_str_ends_with() {
 }
 
 void test_ckg_cstr_reverse() {
-    char t1[] = "hello";
+    const char t1[] = "hello";
 
     CKG_StringView substring_view = ckg_sv_create(t1, 2);
     u64 reversed_string_length = substring_view.length;
@@ -271,7 +271,7 @@ void test_ckg_cstr_reverse() {
 	ckg_free(reversed_string3);
 	ckg_free(reversed_string4);
 
-	char* t2 = "";
+	const char* t2 = "";
     u64 reversed_t2_length = sizeof("") - 1;
     char* reversed_t2 = ckg_str_reverse(t2, reversed_t2_length);
 	ckg_assert_msg(ckg_str_equal(reversed_t2, reversed_t2_length, CKG_LIT_ARG("")), "test_ckg_cstr_reverse failed expected: %s | got: %s", "\"\"", reversed_t2);
@@ -288,7 +288,7 @@ void test_ckg_cstr_reverse() {
 }
 
 void test_ckg_str_index_of() {
-    char t1[] = "hello ";
+    const char t1[] = "hello ";
     u64 t1_length = sizeof("hello ") - 1;
     CKG_StringView substring_view = ckg_sv_create(t1, 2);
 
@@ -300,7 +300,7 @@ void test_ckg_str_index_of() {
 
 	ckg_assert(ckg_str_index_of(t1, t1_length, CKG_LIT_ARG(" ")) == 5);
 
-	char* t2 = "";
+	const char* t2 = "";
     u64 t2_length = 0;
 	ckg_assert(ckg_str_index_of(t2, t2_length, CKG_LIT_ARG("")) == 0);
 
@@ -324,7 +324,7 @@ void test_ckg_str_last_index_of() {
 	ckg_assert(ckg_str_last_index_of(t1, t1_length, CKG_LIT_ARG("r")) == -1);
 	ckg_assert(ckg_str_last_index_of(t1, t1_length, CKG_LIT_ARG("h")) == 0);
 
-	char* t2 = "";
+	const char* t2 = "";
     u64 t2_length = 0;
 	ckg_assert(ckg_str_last_index_of(t2, t2_length, CKG_LIT_ARG("")) == 0);
 

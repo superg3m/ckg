@@ -313,16 +313,18 @@
 
     #define ckg_stack_count(stack) (ckg_assert(stack), (*ckg_vector_header_base(stack)).count)
 
-    #ifdef __cplusplus
+    #if defined(__cplusplus)
         #define ckg_vector_push(vector, element) vector = (decltype(vector))ckg_vector_grow(vector, sizeof(vector[0]), 0); vector[ckg_vector_header_base(vector)->count++] = element
         #define ckg_stack_push(stack, element) stack = (decltype(stack))ckg_vector_grow(stack, sizeof(stack[0]), 0); stack[ckg_vector_header_base(stack)->count++] = element
+        #define ckg_vector_free(vector) vector = (decltype(vector))MACRO_ckg_vector_free(vector)
+        #define ckg_stack_free(stack) stack = (decltype(stack))MACRO_ckg_vector_free(stack)
     #else
         #define ckg_vector_push(vector, element) vector = ckg_vector_grow(vector, sizeof(vector[0]), 0); vector[ckg_vector_header_base(vector)->count++] = element
         #define ckg_stack_push(stack, element) stack = ckg_vector_grow(stack, sizeof(stack[0]), 0); stack[ckg_vector_header_base(stack)->count++] = element
+        #define ckg_vector_free(vector) vector = MACRO_ckg_vector_free(vector)
+        #define ckg_stack_free(stack) stack = MACRO_ckg_vector_free(stack)
     #endif
     
-    #define ckg_vector_free(vector) vector = MACRO_ckg_vector_free(vector)
-    #define ckg_stack_free(stack) stack = MACRO_ckg_vector_free(stack)
     #define ckg_stack_pop(stack) (ckg_assert(stack), stack[--ckg_vector_header_base(stack)->count])
     #define ckg_stack_peek(stack) (ckg_assert(stack), stack[ckg_stack_count(stack) - 1])
     #define ckg_stack_empty(stack) (ckg_assert(stack), (ckg_stack_count(stack) == 0))
@@ -346,7 +348,12 @@
     CKG_API void* MACRO_ckg_ring_buffer_free(void* buffer);
     #define ckg_ring_buffer_header_base(buffer) ((CKG_RingBufferHeader*)(((char*)(buffer)) - sizeof(CKG_RingBufferHeader)))
 
-    #define ckg_ring_buffer_free(buffer) buffer = MACRO_ckg_ring_buffer_free(buffer)
+    #if defined(__cplusplus)
+        #define ckg_ring_buffer_free(buffer) buffer = (decltype(buffer))MACRO_ckg_ring_buffer_free(buffer)
+    #else
+        #define ckg_ring_buffer_free(buffer) buffer = MACRO_ckg_ring_buffer_free(buffer)
+    #endif
+    
     #define ckg_ring_buffer_read(buffer)         (ckg_ring_buffer_header_base(buffer)->read)
     #define ckg_ring_buffer_write(buffer)        (ckg_ring_buffer_header_base(buffer)->write)
     #define ckg_ring_buffer_count(buffer)        (ckg_assert(buffer != NULLPTR), ckg_ring_buffer_header_base(buffer)->count)
@@ -634,13 +641,13 @@
     } CKG_ArenaFlag;
 
     typedef struct CKG_Arena {
-        u8* base_address;
-        size_t used;
-        size_t capacity;
-        size_t used_save_point;
-        size_t* size_stack;
-        u8 alignment;
         int flags;
+        size_t used;
+        size_t used_save_point;
+        size_t capacity;
+        u8 alignment;
+        u8* base_address;
+        size_t* size_stack;
     } CKG_Arena;
     
     /**
@@ -1242,13 +1249,14 @@
         ckg_assert_msg(allocation_size != 0, "Can't have a zero allocation size!\n");
         ckg_assert_msg(!((flags & CKG_ARENA_FLAG_CIRCULAR) && (flags & CKG_ARENA_FLAG_FIXED)), "Can't have both a fixed an circular arena!\n");
 
-        CKG_Arena arena = {0};
+        CKG_Arena arena;
+        arena.flags = flags;
         arena.used = 0;
+        arena.used_save_point = 0;
         arena.capacity = allocation_size;
+        arena.alignment = alignment;
         arena.base_address = (u8*)memory;
         arena.size_stack = NULLPTR;
-        arena.alignment = alignment;
-        arena.flags = flags;
 
         return arena;
     }
@@ -2405,7 +2413,8 @@
                 return NULLPTR;
             }
 
-            LARGE_INTEGER large_int = {0};
+            LARGE_INTEGER large_int;
+            ckg_memory_zero(&large_int, sizeof(LARGE_INTEGER));
             BOOL success = GetFileSizeEx(file_handle, &large_int);
             if (!success) {
                 CKG_LOG_ERROR("GetFileSizeEx() Failed to get size from file_handle: ckg_io_read_entire_file(%s)\n", file_name);
@@ -2512,7 +2521,7 @@
         CKG_DLL ckg_io_load_dll(const char* dll_name, CKG_Error* err) {
             HMODULE library = LoadLibraryA(dll_name);
             if (!library) {
-                CKG_LOG_ERROR(false, "LoadLibraryA() failed: ckg_io_load_dll(%s)\n", dll_name);
+                CKG_LOG_ERROR("LoadLibraryA() failed: ckg_io_load_dll(%s)\n", dll_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
 
                 return NULLPTR;
@@ -2524,9 +2533,9 @@
         void* ckg_os_get_proc_address(CKG_DLL dll, const char* proc_name, CKG_Error* err) {
             ckg_assert(dll);
 
-            void* proc = (void*)GetProcAddress(dll, proc_name);
+            void* proc = (void*)GetProcAddress((HMODULE)dll, proc_name);
             if (!proc) {
-                CKG_LOG_ERROR(false, "GetProcAddress() failed: ckg_os_get_proc_address(%s)\n", proc_name);
+                CKG_LOG_ERROR("GetProcAddress() failed: ckg_os_get_proc_address(%s)\n", proc_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
@@ -2536,7 +2545,7 @@
 
         CKG_DLL MACRO_ckg_os_free_dll(CKG_DLL dll) {
             ckg_assert(dll);
-            FreeLibrary(dll);
+            FreeLibrary((HMODULE)dll);
 
             return NULLPTR;
         }
@@ -2544,7 +2553,7 @@
         CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
             void* library = dlopen(dll_name, RTLD_LAZY);
             if (!library) {
-                CKG_LOG_ERROR(false, "dlopen() failed: ckg_io_load_dll(%s)\n", dll_name);
+                CKG_LOG_ERROR("dlopen() failed: ckg_io_load_dll(%s)\n", dll_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
@@ -2555,7 +2564,7 @@
         void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err) {
             void* proc = dlsym(dll, proc_name);
             if (!proc) {
-                CKG_LOG_ERROR(false, "dlsym() failed: ckg_os_get_proc_address(%s)\n", proc_name);
+                CKG_LOG_ERROR("dlsym() failed: ckg_os_get_proc_address(%s)\n", proc_name);
                 ckg_error_safe_set(err, CKG_ERROR_IO_RESOURCE_NOT_FOUND);
                 return NULLPTR;
             }
