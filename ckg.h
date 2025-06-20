@@ -60,8 +60,6 @@
     #undef UNSET_BIT
     #undef ArrayCount
     #undef PLATFORM_WINDOWS
-    #undef NOMINMAX
-    #undef WIN32_LEAN_AND_MEAN
     #undef PLATFORM_APPLE
     #undef PLATFORM_LINUX
     #undef OS_DELIMITER
@@ -111,6 +109,8 @@
     #define ArrayCount(array) (int)(sizeof(array) / sizeof(array[0]))
 
     #if defined(_WIN32)
+        #undef NOMINMAX
+        #undef WIN32_LEAN_AND_MEAN
         #define NOMINMAX
         #define WIN32_LEAN_AND_MEAN
         #include <windows.h>
