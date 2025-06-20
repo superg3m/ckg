@@ -261,7 +261,7 @@
     CKG_API void* MACRO_ckg_free(void* data);
     CKG_API void* ckg_realloc(void* data, size_t old_allocation_size, size_t new_allocation_size);
     #ifdef __cplusplus
-        #define ckg_free(data) data = static_cast<decltype(data)>(MACRO_ckg_free(const_cast<void*>(reinterpret_cast<const void*>(data))))
+        #define ckg_free(data) data = (decltype(data))(MACRO_ckg_free(const_cast<void*>(reinterpret_cast<const void*>(data))))
     #else 
         #define ckg_free(data) data = MACRO_ckg_free(data)
     #endif
