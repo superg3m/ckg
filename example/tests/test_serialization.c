@@ -16,7 +16,7 @@ void test_serialization() {
 
     FILE* in = fopen(filename, "rb");
     ckg_assert(in);
-    CKG_StringView* deserialized_vec = ckg_deserialize_collection(in, CKG_COLLECTION_VECTOR, CKG_DATA_TYPE_STRING_VIEW);
+    CKG_StringView* deserialized_vec = (CKG_StringView*)ckg_deserialize_collection(in, CKG_COLLECTION_VECTOR, CKG_DATA_TYPE_STRING_VIEW);
     fclose(in);
 
     size_t original_size = ckg_vector_count(original_vec);

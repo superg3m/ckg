@@ -25,7 +25,9 @@ int main() {
 	test_ckg_str_operations();
 	test_ckg_vector_operations();
 	test_ckg_ring_buffer_overwrite_behavior();
-	ckg_hashmap_test();
+	#if !defined(__cplusplus)
+		ckg_hashmap_test();
+	#endif
 	test_serialization();
 
 	test_ckg_stack_operations();

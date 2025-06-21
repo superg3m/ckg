@@ -27,7 +27,7 @@ cc: CompilerConfig = CompilerConfig(
 )
 
 if IS_WINDOWS() and not C_BUILD_IS_DEPENDENCY():
-    cc.compiler_name = "cl"
+    cc.compiler_name = "g++"
 elif IS_DARWIN() and not C_BUILD_IS_DEPENDENCY():
     cc.compiler_name = "clang"
 elif IS_LINUX() and not C_BUILD_IS_DEPENDENCY():
@@ -48,9 +48,9 @@ if cc.compiler_name == "cl":
     ]
 else:
     cc.compiler_warning_level = "all"
-    compiler_inject = ["-Wextra"]
+    compiler_inject = ["-Wextra", "-fpermissive"]
     cc.compiler_disable_specific_warnings = [
-        "implicit-fallthrough"
+        "implicit-fallthrough",
     ]
 
 executable_procedure_libs = []

@@ -39,7 +39,7 @@ void test_ckg_stack_operations() {
 
 void test_ckg_ring_buffer_overwrite_behavior() {
     const int cap = 8;
-    int* ring = ckg_ring_buffer_create(sizeof(int), cap);
+    int* ring = (int*)ckg_ring_buffer_create(sizeof(int), cap);
 
     // Fill buffer with initial values 1..8
     for (int i = 0; i < cap; i++) {

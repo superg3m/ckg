@@ -423,168 +423,170 @@
     //
     // ========== START CKG_HashMap ==========
     //
-    typedef u64 (*CKG_HashFunction)(void* data, u64 size);
-    typedef bool (*CKG_EqualityFunction)(void* c1, size_t c1_size, void* c2, size_t c2_size);
+    #if !defined(__cplusplus)
+        typedef u64 (*CKG_HashFunction)(void* data, u64 size);
+        typedef bool (*CKG_EqualityFunction)(void* c1, size_t c1_size, void* c2, size_t c2_size);
 
-    typedef struct CKG_HashMapMeta {
-        int key_offset;
-        int value_offset;
-        int entry_offset;
-        int entry_key_offset;
-        int entry_value_offset;
-        int entry_filled_offset;
+        typedef struct CKG_HashMapMeta {
+            int key_offset;
+            int value_offset;
+            int entry_offset;
+            int entry_key_offset;
+            int entry_value_offset;
+            int entry_filled_offset;
 
-        int key_size;
-        int value_size;
-        int entry_size;
+            int key_size;
+            int value_size;
+            int entry_size;
 
-        u64 capacity;
-        u64 count;
+            u64 capacity;
+            u64 count;
+            
+            bool key_is_ptr;
+            CKG_HashFunction hash_fn;
+            CKG_EqualityFunction equal_fn;
+        } CKG_HashMapMeta;
+
+
+        #define CKG_HashMapEntry(KeyType, ValueType) \
+        struct {                                     \
+            KeyType key;                             \
+            ValueType value;                         \
+            bool filled;                             \
+        }                                            \
+
+        // Date: May 15, 2025
+        // NOTE(Jovanni): Its important to note that temp_key and temp_value are used on:
+        // insert to act as a stack object for the value or key literal
+        // THIS MIGHT HAVE TO BE PACKED!
+        #define CKG_HashMap(KeyType, ValueType)            \
+        struct {                                           \
+            CKG_HashMapMeta meta;                          \
+            KeyType temp_key;                              \
+            ValueType temp_value;                          \
+            CKG_HashMapEntry(KeyType, ValueType)* entries; \
+        }                                                  \
+
+        #define CKG_HASHMAP_DEFAULT_CAPACITY 4
+        #define CKG_HASHMAP_DEFAULT_LOAD_FACTOR 0.70f
+
+        /**
+         * @brief only works with trival structs
+         * 
+         * @param source 
+         * @param source_size 
+         * @return u64 
+         */
+        u64 siphash24(void* source, u64 source_size);
+
+        /**
+         * @brief only works with trival structs
+         * 
+         * @param c1 
+         * @param c1_size 
+         * @param c2 
+         * @param c2_size 
+         * @return bool 
+         */
+        bool byte_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
+
+        u64 ckg_string_hash(void* str, u64 str_length);
+        bool string_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
+
+        u64 ckg_string_view_hash(void* view, u64 str_length);
+        bool string_view_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
+
+        float ckg_hashmap_load_factor(void* map);
+        void ckg_hashmap_grow(void* map);
+        float ckg_hashmap_load_factor(void* map);
         
-        bool key_is_ptr;
-        CKG_HashFunction hash_fn;
-        CKG_EqualityFunction equal_fn;
-    } CKG_HashMapMeta;
+        bool ckg_hashmap_has_helper(void* map);
+        void ckg_hashmap_get_helper(void* map);
+        void ckg_hashmap_put_helper(void* map);
+        void ckg_hashmap_pop_helper(void* map);
+
+        /**
+         * @brief Inserts a key-value pair into a generic hashmap.
+         *
+         * Supports value-type keys (e.g., integers, structs without pointers) via `ckg_hashmap_put`,
+         * and pointer-type keys via `ckg_hashmap_put_key_ptr`.
+         *
+         * A **trivially hashable struct**:
+         * - Contains only value types (e.g., int, float, char).
+         * - Does **not** contain any pointers.
+         * - Can be safely hashed via byte-wise hashing.
+         *
+         * If your key is a pointer (e.g., `char *`, `void *`), use `ckg_hashmap_put_key_ptr`.
+         * For non-trivial structs (e.g., structs with pointers), you may also define a custom hash function
+         * and assign it to the hashmap's `meta.hash_fn` field.
+         *
+         * @example
+         *     typedef struct { int x, y; } Point; // Trivially hashable
+         *     ckg_hashmap_put(map, (Point){1, 2}, 42);
+         *
+         *     const char *name = "Alice";
+         *     ckg_hashmap_put_key_ptr(map, name, 100); // Required for pointer keys
+         */
+    #define ckg_hashmap_init_with_hash(map, KeyType, ValueType, __key_is_ptr, __hash_function, __eq_function) \
+        do {                                                                                                     \
+            map = ckg_alloc(sizeof(CKG_HashMap(KeyType, ValueType)));                                            \
+            map->meta.key_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_key);                          \
+            map->meta.value_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_value);                      \
+            map->meta.entry_offset = offsetof(CKG_HashMap(KeyType, ValueType), entries);                         \
+            map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);                    \
+            map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);                \
+            map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled);              \
+            map->meta.key_size = sizeof(KeyType);                                                                \
+            map->meta.value_size = sizeof(ValueType);                                                            \
+            map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                                 \
+            map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                                                   \
+            map->meta.count = 0;                                                                                 \
+            map->meta.hash_fn = __hash_function;                                                                 \
+            map->meta.equal_fn = __eq_function;                                                                 \
+            map->meta.key_is_ptr = __key_is_ptr;                                                                 \
+            map->entries = ckg_alloc(map->meta.entry_size * map->meta.capacity);                                 \
+        } while(0)                                                                                               \
 
 
-    #define CKG_HashMapEntry(KeyType, ValueType) \
-    struct {                                     \
-        KeyType key;                             \
-        ValueType value;                         \
-        bool filled;                             \
-    }                                            \
+        #define ckg_hashmap_init_siphash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, siphash24, byte_equality)
+        #define ckg_hashmap_init_string_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, true, ckg_string_hash, string_equality)
+        #define ckg_hashmap_init_string_view_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, ckg_string_view_hash, string_view_equality)
 
-    // Date: May 15, 2025
-    // NOTE(Jovanni): Its important to note that temp_key and temp_value are used on:
-    // insert to act as a stack object for the value or key literal
-    // THIS MIGHT HAVE TO BE PACKED!
-    #define CKG_HashMap(KeyType, ValueType)            \
-    struct {                                           \
-        CKG_HashMapMeta meta;                          \
-        KeyType temp_key;                              \
-        ValueType temp_value;                          \
-        CKG_HashMapEntry(KeyType, ValueType)* entries; \
-    }                                                  \
+        #define ckg_hashmap_put(map, __key, __value) \
+        do {                                         \
+            (map)->temp_key = (__key);               \
+            (map)->temp_value = (__value);           \
+            ckg_hashmap_put_helper((u8*)(map));      \
+        } while(0)                                   \
 
-    #define CKG_HASHMAP_DEFAULT_CAPACITY 4
-    #define CKG_HASHMAP_DEFAULT_LOAD_FACTOR 0.70f
-
-    /**
-     * @brief only works with trival structs
-     * 
-     * @param source 
-     * @param source_size 
-     * @return u64 
-     */
-    u64 siphash24(void* source, u64 source_size);
-
-    /**
-     * @brief only works with trival structs
-     * 
-     * @param c1 
-     * @param c1_size 
-     * @param c2 
-     * @param c2_size 
-     * @return bool 
-     */
-    bool byte_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
-
-    u64 ckg_string_hash(void* str, u64 str_length);
-    bool string_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
-
-    u64 ckg_string_view_hash(void* view, u64 str_length);
-    bool string_view_equality(void* c1, size_t c1_size, void* c2, size_t c2_size);
-
-    float ckg_hashmap_load_factor(void* map);
-    void ckg_hashmap_grow(void* map);
-    float ckg_hashmap_load_factor(void* map);
-    
-    bool ckg_hashmap_has_helper(void* map);
-    void ckg_hashmap_get_helper(void* map);
-    void ckg_hashmap_put_helper(void* map);
-    void ckg_hashmap_pop_helper(void* map);
-
-    /**
-     * @brief Inserts a key-value pair into a generic hashmap.
-     *
-     * Supports value-type keys (e.g., integers, structs without pointers) via `ckg_hashmap_put`,
-     * and pointer-type keys via `ckg_hashmap_put_key_ptr`.
-     *
-     * A **trivially hashable struct**:
-     * - Contains only value types (e.g., int, float, char).
-     * - Does **not** contain any pointers.
-     * - Can be safely hashed via byte-wise hashing.
-     *
-     * If your key is a pointer (e.g., `char *`, `void *`), use `ckg_hashmap_put_key_ptr`.
-     * For non-trivial structs (e.g., structs with pointers), you may also define a custom hash function
-     * and assign it to the hashmap's `meta.hash_fn` field.
-     *
-     * @example
-     *     typedef struct { int x, y; } Point; // Trivially hashable
-     *     ckg_hashmap_put(map, (Point){1, 2}, 42);
-     *
-     *     const char *name = "Alice";
-     *     ckg_hashmap_put_key_ptr(map, name, 100); // Required for pointer keys
-     */
-   #define ckg_hashmap_init_with_hash(map, KeyType, ValueType, __key_is_ptr, __hash_function, __eq_function) \
-    do {                                                                                                     \
-        map = ckg_alloc(sizeof(CKG_HashMap(KeyType, ValueType)));                                            \
-        map->meta.key_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_key);                          \
-        map->meta.value_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_value);                      \
-        map->meta.entry_offset = offsetof(CKG_HashMap(KeyType, ValueType), entries);                         \
-        map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);                    \
-        map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);                \
-        map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled);              \
-        map->meta.key_size = sizeof(KeyType);                                                                \
-        map->meta.value_size = sizeof(ValueType);                                                            \
-        map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                                 \
-        map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                                                   \
-        map->meta.count = 0;                                                                                 \
-        map->meta.hash_fn = __hash_function;                                                                 \
-        map->meta.equal_fn = __eq_function;                                                                 \
-        map->meta.key_is_ptr = __key_is_ptr;                                                                 \
-        map->entries = ckg_alloc(map->meta.entry_size * map->meta.capacity);                                 \
-    } while(0)                                                                                               \
+        #define ckg_hashmap_has(map, key)       \
+        (                                       \
+            (map)->temp_key = (key),            \
+            ckg_hashmap_has_helper((u8*)(map))  \
+        )                                       \
 
 
-    #define ckg_hashmap_init_siphash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, siphash24, byte_equality)
-    #define ckg_hashmap_init_string_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, true, ckg_string_hash, string_equality)
-    #define ckg_hashmap_init_string_view_hash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, ckg_string_view_hash, string_view_equality)
+        #define ckg_hashmap_get(map, key)       \
+        (                                       \
+            (map)->temp_key = (key),            \
+            ckg_hashmap_get_helper((u8*)(map)), \
+            (map)->temp_value                   \
+        )                                       \
 
-    #define ckg_hashmap_put(map, __key, __value) \
-    do {                                         \
-        (map)->temp_key = (__key);               \
-        (map)->temp_value = (__value);           \
-        ckg_hashmap_put_helper((u8*)(map));      \
-    } while(0)                                   \
+        #define ckg_hashmap_pop(map, key)       \
+        (                                       \
+            (map)->temp_key = (key),            \
+            ckg_hashmap_pop_helper((u8*)(map)), \
+            (map)->temp_value                   \
+        )                                       \
 
-    #define ckg_hashmap_has(map, key)       \
-    (                                       \
-        (map)->temp_key = (key),            \
-        ckg_hashmap_has_helper((u8*)(map))  \
-    )                                       \
+        #define ckg_hashmap_free(map)                                 \
+        do {                                                          \
+            ckg_free(map->entries);                                   \
+            ckg_free(map);                                            \
+        } while(0)                                                    \
 
-
-    #define ckg_hashmap_get(map, key)       \
-    (                                       \
-        (map)->temp_key = (key),            \
-        ckg_hashmap_get_helper((u8*)(map)), \
-        (map)->temp_value                   \
-    )                                       \
-
-    #define ckg_hashmap_pop(map, key)       \
-    (                                       \
-        (map)->temp_key = (key),            \
-        ckg_hashmap_pop_helper((u8*)(map)), \
-        (map)->temp_value                   \
-    )         
-
-    #define ckg_hashmap_free(map)                                 \
-    do {                                                          \
-        ckg_free(map->entries);                                   \
-        ckg_free(map);                                            \
-    } while(0)                                                    \
-
+    #endif
     //
     // ========== END CKG_HashMap ==========
     //
@@ -1357,7 +1359,7 @@
 
 #if defined(CKG_IMPL_STRING)
     char* ckg_str_alloc(const char* s1, u64 length) {
-        char* ret = ckg_alloc(length + 1) ;
+        char* ret = (char*)ckg_alloc(length + 1) ;
         ckg_memory_copy(ret, length, s1, length);
         return ret;
     }
@@ -1502,7 +1504,7 @@
     char* ckg_str_reverse(const char* str, u64 str_length) {
         ckg_assert(str);
 
-        char* ret = ckg_alloc(str_length + 1);
+        char* ret = (char*)ckg_alloc(str_length + 1);
         for (s64 i = (s64)str_length - 1; i >= 0; i--) {
             ckg_str_append_char(ret, ((str_length - 1) - (u64)i), str_length + 1, str[i]);
         }
@@ -1629,7 +1631,7 @@
         u64 allocation_ret = (u64)vsnprintf(NULLPTR, 0, fmt, args_copy) + 1; // +1 for null terminator
         va_end(args_copy);
 
-        char* buffer = ckg_alloc(allocation_ret);
+        char* buffer = (char*)ckg_alloc(allocation_ret);
 
         va_copy(args_copy, args);
         vsnprintf(buffer, allocation_ret, fmt, args_copy);
@@ -1717,7 +1719,7 @@
         ckg_assert(capacity > 0);
 
         size_t allocation_size = sizeof(CKG_RingBufferHeader) + (capacity * element_size);
-        CKG_RingBufferHeader* header = ckg_alloc(allocation_size);
+        CKG_RingBufferHeader* header = (CKG_RingBufferHeader*)ckg_alloc(allocation_size);
         header->element_size = element_size;
         header->capacity = capacity;
 
@@ -1964,289 +1966,291 @@
     //
     // ========== Start CKG_HashMap ==========
     //
-    // Original location:
-    // https://github.com/majek/csiphash/1
+    
+    #if !defined(__cplusplus)
+        // Original location:
+        // https://github.com/majek/csiphash/1
 
-    #if defined(_WIN32)
-        #define _le64toh(x) ((uint64_t)(x))
-    #elif defined(__APPLE__)
-        #include <libkern/OSByteOrder.h>
-        #define _le64toh(x) OSSwapLittleToHostInt64(x)
-    #else
-        #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
-            #include <sys/endian.h>
-        #else
-            #include <endian.h>
-        #endif
-
-        #if defined(__BYTE_ORDER) && defined(__LITTLE_ENDIAN) && __BYTE_ORDER == __LITTLE_ENDIAN   
+        #if defined(_WIN32)
             #define _le64toh(x) ((uint64_t)(x))
+        #elif defined(__APPLE__)
+            #include <libkern/OSByteOrder.h>
+            #define _le64toh(x) OSSwapLittleToHostInt64(x)
         #else
-            #define _le64toh(x) le64toh(x)
+            #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
+                #include <sys/endian.h>
+            #else
+                #include <endian.h>
+            #endif
+
+            #if defined(__BYTE_ORDER) && defined(__LITTLE_ENDIAN) && __BYTE_ORDER == __LITTLE_ENDIAN   
+                #define _le64toh(x) ((uint64_t)(x))
+            #else
+                #define _le64toh(x) le64toh(x)
+            #endif
         #endif
-    #endif
 
-    #define ROTATE(x, b) (uint64_t)( ((x) << (b)) | ( (x) >> (64 - (b))) )
+        #define ROTATE(x, b) (uint64_t)( ((x) << (b)) | ( (x) >> (64 - (b))) )
 
-    #define HALF_ROUND(a,b,c,d,s,t)	\
-        a += b; c += d;			    \
-        b = ROTATE(b, s) ^ a;		\
-        d = ROTATE(d, t) ^ c;		\
-        a = ROTATE(a, 32);          \
+        #define HALF_ROUND(a,b,c,d,s,t)	\
+            a += b; c += d;			    \
+            b = ROTATE(b, s) ^ a;		\
+            d = ROTATE(d, t) ^ c;		\
+            a = ROTATE(a, 32);          \
 
-    #define DOUBLE_ROUND(v0,v1,v2,v3)  \
-        HALF_ROUND(v0,v1,v2,v3,13,16); \
-        HALF_ROUND(v2,v1,v0,v3,17,21); \
-        HALF_ROUND(v0,v1,v2,v3,13,16); \
-        HALF_ROUND(v2,v1,v0,v3,17,21)
+        #define DOUBLE_ROUND(v0,v1,v2,v3)  \
+            HALF_ROUND(v0,v1,v2,v3,13,16); \
+            HALF_ROUND(v2,v1,v0,v3,17,21); \
+            HALF_ROUND(v0,v1,v2,v3,13,16); \
+            HALF_ROUND(v2,v1,v0,v3,17,21)
 
-    uint64_t siphash24(void* source, u64 source_size) {
-        const char key[16] = {
-            0x00, 0x01, 0x02, 0x03,
-            0x04, 0x05, 0x06, 0x07,
-            0x08, 0x09, 0x0A, 0x0B,
-            0x0C, 0x0D, 0x0E, 0x0F
-        };
+        uint64_t siphash24(void* source, u64 source_size) {
+            const char key[16] = {
+                0x00, 0x01, 0x02, 0x03,
+                0x04, 0x05, 0x06, 0x07,
+                0x08, 0x09, 0x0A, 0x0B,
+                0x0C, 0x0D, 0x0E, 0x0F
+            };
 
-        const uint64_t *_key = (const uint64_t*)key;
-        uint64_t k0 = _le64toh(_key[0]);
-        uint64_t k1 = _le64toh(_key[1]);
-        uint64_t b = (uint64_t)source_size << 56;
-        const uint64_t* in = (const uint64_t*)source;
+            const uint64_t *_key = (const uint64_t*)key;
+            uint64_t k0 = _le64toh(_key[0]);
+            uint64_t k1 = _le64toh(_key[1]);
+            uint64_t b = (uint64_t)source_size << 56;
+            const uint64_t* in = (const uint64_t*)source;
 
-        uint64_t v0 = k0 ^ 0x736f6d6570736575ULL;
-        uint64_t v1 = k1 ^ 0x646f72616e646f6dULL;
-        uint64_t v2 = k0 ^ 0x6c7967656e657261ULL;
-        uint64_t v3 = k1 ^ 0x7465646279746573ULL;
+            uint64_t v0 = k0 ^ 0x736f6d6570736575ULL;
+            uint64_t v1 = k1 ^ 0x646f72616e646f6dULL;
+            uint64_t v2 = k0 ^ 0x6c7967656e657261ULL;
+            uint64_t v3 = k1 ^ 0x7465646279746573ULL;
 
-        while (source_size >= 8) {
-            uint64_t mi = _le64toh(*in);
-            in += 1; source_size -= 8;
-            v3 ^= mi;
+            while (source_size >= 8) {
+                uint64_t mi = _le64toh(*in);
+                in += 1; source_size -= 8;
+                v3 ^= mi;
+                DOUBLE_ROUND(v0,v1,v2,v3);
+                v0 ^= mi;
+            }
+
+            uint64_t t = 0; 
+            uint8_t* pt = (uint8_t*)&t; 
+            const uint8_t* m = (const uint8_t*)in;
+            switch (source_size) {
+                case 7: pt[6] = m[6];
+                case 6: pt[5] = m[5];
+                case 5: pt[4] = m[4];
+                case 4: *((uint32_t*)&pt[0]) = *((uint32_t*)&m[0]); break;
+                case 3: pt[2] = m[2];
+                case 2: pt[1] = m[1];
+                case 1: pt[0] = m[0];
+            }
+            b |= _le64toh(t);
+
+            v3 ^= b;
             DOUBLE_ROUND(v0,v1,v2,v3);
-            v0 ^= mi;
+            v0 ^= b; v2 ^= 0xff;
+            DOUBLE_ROUND(v0,v1,v2,v3);
+            DOUBLE_ROUND(v0,v1,v2,v3);
+
+            u64 ret = (v0 ^ v1) ^ (v2 ^ v3);
+            return ret;
         }
 
-        uint64_t t = 0; 
-        uint8_t* pt = (uint8_t*)&t; 
-        const uint8_t* m = (const uint8_t*)in;
-        switch (source_size) {
-            case 7: pt[6] = m[6];
-            case 6: pt[5] = m[5];
-            case 5: pt[4] = m[4];
-            case 4: *((uint32_t*)&pt[0]) = *((uint32_t*)&m[0]); break;
-            case 3: pt[2] = m[2];
-            case 2: pt[1] = m[1];
-            case 1: pt[0] = m[0];
+        bool byte_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
+            return ckg_memory_compare(c1, c1_size, c2, c2_size);
         }
-        b |= _le64toh(t);
 
-        v3 ^= b;
-        DOUBLE_ROUND(v0,v1,v2,v3);
-        v0 ^= b; v2 ^= 0xff;
-        DOUBLE_ROUND(v0,v1,v2,v3);
-        DOUBLE_ROUND(v0,v1,v2,v3);
+        float ckg_hashmap_load_factor(void* map) {
+            CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
+            return (float)meta->count / (float)meta->capacity;
+        }
 
-        u64 ret = (v0 ^ v1) ^ (v2 ^ v3);
-        return ret;
-    }
+        u64 ckit_hashmap_resolve_collision(void* map, void* key, u64 inital_hash_index) {
+            CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
+            u8* entries_base_address = NULLPTR;
+            ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entry_offset, sizeof(void*));
 
-    bool byte_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
-        return ckg_memory_compare(c1, c1_size, c2, c2_size);
-    }
+            u64 cannonical_hash_index = inital_hash_index;
 
-    float ckg_hashmap_load_factor(void* map) {
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
-        return (float)meta->count / (float)meta->capacity;
-    }
+            // Date: May 16, 2025
+            // TODO(Jovanni): This probably needs to have a comparision function to actually be correct
+            while (true) {
+                u8* entry = entries_base_address + (cannonical_hash_index * meta->entry_size);
+                u8* entry_key = NULLPTR;
+                if (meta->key_is_ptr) {
+                    ckg_memory_copy(&entry_key, sizeof(void*), entry + meta->entry_key_offset, sizeof(void*));
+                } else {
+                    entry_key = entry + meta->entry_key_offset;
+                }
 
-    u64 ckit_hashmap_resolve_collision(void* map, void* key, u64 inital_hash_index) {
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
-        u8* entries_base_address = NULLPTR;
-        ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entry_offset, sizeof(void*));
+                bool entry_filled = *(entry + meta->entry_filled_offset);
+                if (!entry_filled) {
+                    break;
+                }
 
-        u64 cannonical_hash_index = inital_hash_index;
+                bool equality_match = meta->equal_fn(entry_key, meta->key_size, key, meta->key_size);
+                if (equality_match) {
+                    break;
+                }
 
-        // Date: May 16, 2025
-        // TODO(Jovanni): This probably needs to have a comparision function to actually be correct
-        while (true) {
-            u8* entry = entries_base_address + (cannonical_hash_index * meta->entry_size);
-            u8* entry_key = NULLPTR;
-            if (meta->key_is_ptr) {
-                ckg_memory_copy(&entry_key, sizeof(void*), entry + meta->entry_key_offset, sizeof(void*));
+                cannonical_hash_index++;
+                cannonical_hash_index = cannonical_hash_index % meta->capacity;
+            }
+
+            return cannonical_hash_index;
+        }
+
+        u64 ckg_string_hash(void* str, u64 str_length) {
+            (void)str_length;
+
+            u64 hash = 5381;
+            u8* str_ptr = str;
+            int c;
+
+            while ((c = *str_ptr++)) {
+                hash = ((hash << 5) + hash) + c;
+            }
+
+            return hash;
+        }
+
+        bool string_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
+            (void)c1_size;
+            (void)c2_size;
+            
+            return ckg_str_equal(c1, ckg_cstr_length(c1), c2, ckg_cstr_length(c2));
+        }
+
+        u64 ckg_string_view_hash(void* view, u64 str_length) {
+            (void)str_length;
+            CKG_StringView* str_view = (CKG_StringView*)view;
+            u64 hash = 5381;
+            int c;
+
+            for (u64 i = 0; i < str_view->length; i++) {
+                c = str_view->data[i];
+                hash = ((hash << 5) + hash) + c;
+            }
+
+            return hash;
+        }
+
+        bool string_view_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
+            (void)c1_size;
+            (void)c2_size;
+
+            CKG_StringView* s1 = (CKG_StringView*)c1;
+            CKG_StringView* s2 = (CKG_StringView*)c2;
+
+            return ckg_str_equal(s1->data, s1->length, s2->data, s2->length);
+        }
+
+        typedef struct HashMapContext {
+            CKG_HashMapMeta* meta;
+            void* temp_key_address;
+            void* entry;
+            void* entry_key_address;
+            void* entry_value_address;
+            bool* entry_filled_address;
+            u64 real_index;
+        } HashMapContext;
+
+        static HashMapContext ckg_hashmap_find_entry(void* map) {
+            HashMapContext context;
+            context.meta = (CKG_HashMapMeta*)map;
+            context.temp_key_address = NULLPTR;
+
+            if (context.meta->key_is_ptr) {
+                ckg_memory_copy(&context.temp_key_address, sizeof(void*), (u8*)map + context.meta->key_offset, sizeof(void*));
             } else {
-                entry_key = entry + meta->entry_key_offset;
+                context.temp_key_address = (u8*)map + context.meta->key_offset;
             }
 
-            bool entry_filled = *(entry + meta->entry_filled_offset);
-            if (!entry_filled) {
-                break;
+            u64 hash = context.meta->hash_fn(context.temp_key_address, context.meta->key_size);
+            u64 index = hash % context.meta->capacity;
+            context.real_index = ckit_hashmap_resolve_collision(map, context.temp_key_address, index);
+
+            u8* entries = NULLPTR;
+            ckg_memory_copy(&entries, sizeof(void*), (u8*)map + context.meta->entry_offset,  sizeof(void*));
+            context.entry = entries + (context.real_index * context.meta->entry_size);
+            context.entry_key_address = (u8*)context.entry + context.meta->entry_key_offset;
+            context.entry_value_address = (u8*)context.entry + context.meta->entry_value_offset;
+            context.entry_filled_address = (bool*)((u8*)context.entry + context.meta->entry_filled_offset);
+
+            return context;
+        }
+
+        bool ckg_hashmap_has_helper(void* map) {
+            HashMapContext context = ckg_hashmap_find_entry(map);
+            return *(bool*)(context.entry_filled_address);
+        }
+
+        void ckg_hashmap_get_helper(void* map) {
+            HashMapContext context = ckg_hashmap_find_entry(map);
+            ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
+            ckg_memory_copy((u8*)map + context.meta->value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
+        }
+
+        void ckg_hashmap_put_helper(void* map) {
+            if (ckg_hashmap_load_factor(map) >= CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
+                ckg_hashmap_grow(map);
             }
 
-            bool equality_match = meta->equal_fn(entry_key, meta->key_size, key, meta->key_size);
-            if (equality_match) {
-                break;
+            HashMapContext context = ckg_hashmap_find_entry(map);
+            bool filled = *context.entry_filled_address;
+            if (!filled) {
+            context.meta->count++;
+            }
+            ckg_memory_copy(context.entry_key_address, context.meta->key_size, (u8*)map + context.meta->key_offset, context.meta->key_size);
+            ckg_memory_copy(context.entry_value_address, context.meta->value_size, (u8*)map + context.meta->value_offset, context.meta->value_size);
+            *context.entry_filled_address = 1;
+        }
+
+        void ckg_hashmap_pop_helper(void* map) {
+            HashMapContext context = ckg_hashmap_find_entry(map);
+            ckg_assert_msg(*context.entry_filled_address, "The key doesn't exist in the hashmap!\n");
+            ckg_memory_copy((u8*)map + context.meta->value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
+            *context.entry_filled_address = 0;
+        }
+
+        void ckg_hashmap_grow(void* map) {
+            if (ckg_hashmap_load_factor(map) < CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
+                return;
             }
 
-            cannonical_hash_index++;
-            cannonical_hash_index = cannonical_hash_index % meta->capacity;
-        }
+            CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
+            u8* entries_base_address = NULLPTR;
+            ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entry_offset, sizeof(void*));
+            u64 old_capacity = meta->capacity;
+            meta->capacity *= 2;
+            void* new_entries = ckg_alloc(meta->capacity * meta->entry_size);
+            ckg_memory_copy((u8*)map + meta->entry_offset, sizeof(void*), &new_entries, sizeof(void*));
 
-        return cannonical_hash_index;
-    }
+            // rehash
+            for (u64 i = 0; i < old_capacity; i++) {
+                u8* entry = entries_base_address + (i * meta->entry_size);
+                u8* entry_key = NULLPTR;
+                if (meta->key_is_ptr) {
+                    ckg_memory_copy(&entry_key, sizeof(void*), entry + meta->entry_key_offset,  sizeof(void*));
+                } else {
+                    entry_key = entry + meta->entry_key_offset;
+                }
 
-    u64 ckg_string_hash(void* str, u64 str_length) {
-        (void)str_length;
+                bool entry_filled = *(bool*)(entry + meta->entry_filled_offset);
+                if (!entry_filled) {
+                    continue;
+                }
 
-        u64 hash = 5381;
-        u8* str_ptr = str;
-        int c;
+                u64 hash = meta->hash_fn(entry_key, meta->key_size);
+                u64 index = hash % meta->capacity;
+                u64 real_index = ckit_hashmap_resolve_collision((u8*)map, entry_key, index);
 
-        while ((c = *str_ptr++)) {
-            hash = ((hash << 5) + hash) + c;
-        }
-
-        return hash;
-    }
-
-    bool string_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
-        (void)c1_size;
-        (void)c2_size;
-        
-        return ckg_str_equal(c1, ckg_cstr_length(c1), c2, ckg_cstr_length(c2));
-    }
-
-    u64 ckg_string_view_hash(void* view, u64 str_length) {
-        (void)str_length;
-        CKG_StringView* str_view = (CKG_StringView*)view;
-        u64 hash = 5381;
-        int c;
-
-        for (u64 i = 0; i < str_view->length; i++) {
-            c = str_view->data[i];
-            hash = ((hash << 5) + hash) + c;
-        }
-
-        return hash;
-    }
-
-    bool string_view_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
-        (void)c1_size;
-        (void)c2_size;
-
-        CKG_StringView* s1 = (CKG_StringView*)c1;
-        CKG_StringView* s2 = (CKG_StringView*)c2;
-
-        return ckg_str_equal(s1->data, s1->length, s2->data, s2->length);
-    }
-
-    typedef struct HashMapContext {
-        CKG_HashMapMeta* meta;
-        void* temp_key_address;
-        void* entry;
-        void* entry_key_address;
-        void* entry_value_address;
-        bool* entry_filled_address;
-        u64 real_index;
-    } HashMapContext;
-
-    static HashMapContext ckg_hashmap_find_entry(void* map) {
-        HashMapContext context;
-        context.meta = (CKG_HashMapMeta*)map;
-        context.temp_key_address = NULLPTR;
-
-        if (context.meta->key_is_ptr) {
-            ckg_memory_copy(&context.temp_key_address, sizeof(void*), (u8*)map + context.meta->key_offset, sizeof(void*));
-        } else {
-            context.temp_key_address = (u8*)map + context.meta->key_offset;
-        }
-
-        u64 hash = context.meta->hash_fn(context.temp_key_address, context.meta->key_size);
-        u64 index = hash % context.meta->capacity;
-        context.real_index = ckit_hashmap_resolve_collision(map, context.temp_key_address, index);
-
-        u8* entries = NULLPTR;
-        ckg_memory_copy(&entries, sizeof(void*), (u8*)map + context.meta->entry_offset,  sizeof(void*));
-        context.entry = entries + (context.real_index * context.meta->entry_size);
-        context.entry_key_address = (u8*)context.entry + context.meta->entry_key_offset;
-        context.entry_value_address = (u8*)context.entry + context.meta->entry_value_offset;
-        context.entry_filled_address = (bool*)((u8*)context.entry + context.meta->entry_filled_offset);
-
-        return context;
-    }
-
-    bool ckg_hashmap_has_helper(void* map) {
-        HashMapContext context = ckg_hashmap_find_entry(map);
-        return *(bool*)(context.entry_filled_address);
-    }
-
-    void ckg_hashmap_get_helper(void* map) {
-        HashMapContext context = ckg_hashmap_find_entry(map);
-        ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
-        ckg_memory_copy((u8*)map + context.meta->value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
-    }
-
-    void ckg_hashmap_put_helper(void* map) {
-        if (ckg_hashmap_load_factor(map) >= CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
-            ckg_hashmap_grow(map);
-        }
-
-        HashMapContext context = ckg_hashmap_find_entry(map);
-        bool filled = *context.entry_filled_address;
-        if (!filled) {
-           context.meta->count++;
-        }
-        ckg_memory_copy(context.entry_key_address, context.meta->key_size, (u8*)map + context.meta->key_offset, context.meta->key_size);
-        ckg_memory_copy(context.entry_value_address, context.meta->value_size, (u8*)map + context.meta->value_offset, context.meta->value_size);
-        *context.entry_filled_address = 1;
-    }
-
-    void ckg_hashmap_pop_helper(void* map) {
-        HashMapContext context = ckg_hashmap_find_entry(map);
-        ckg_assert_msg(*context.entry_filled_address, "The key doesn't exist in the hashmap!\n");
-        ckg_memory_copy((u8*)map + context.meta->value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
-        *context.entry_filled_address = 0;
-    }
-
-    void ckg_hashmap_grow(void* map) {
-        if (ckg_hashmap_load_factor(map) < CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
-            return;
-        }
-
-        CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
-        u8* entries_base_address = NULLPTR;
-        ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entry_offset, sizeof(void*));
-        u64 old_capacity = meta->capacity;
-        meta->capacity *= 2;
-        void* new_entries = ckg_alloc(meta->capacity * meta->entry_size);
-        ckg_memory_copy((u8*)map + meta->entry_offset, sizeof(void*), &new_entries, sizeof(void*));
-
-        // rehash
-        for (u64 i = 0; i < old_capacity; i++) {
-            u8* entry = entries_base_address + (i * meta->entry_size);
-            u8* entry_key = NULLPTR;
-            if (meta->key_is_ptr) {
-                ckg_memory_copy(&entry_key, sizeof(void*), entry + meta->entry_key_offset,  sizeof(void*));
-            } else {
-                entry_key = entry + meta->entry_key_offset;
+                u8* new_entry = (u8*)new_entries + (real_index * meta->entry_size);
+                ckg_memory_copy(new_entry, meta->entry_size, entry, meta->entry_size);
             }
 
-            bool entry_filled = *(bool*)(entry + meta->entry_filled_offset);
-            if (!entry_filled) {
-                continue;
-            }
-
-            u64 hash = meta->hash_fn(entry_key, meta->key_size);
-            u64 index = hash % meta->capacity;
-            u64 real_index = ckit_hashmap_resolve_collision((u8*)map, entry_key, index);
-
-            u8* new_entry = (u8*)new_entries + (real_index * meta->entry_size);
-            ckg_memory_copy(new_entry, meta->entry_size, entry, meta->entry_size);
+            ckg_free(entries_base_address);
         }
-
-        ckg_free(entries_base_address);
-    }
-
+    #endif
     //
     // ========== END CKG_HashMap ==========
     //
@@ -2320,17 +2324,17 @@
                 fread(&header, sizeof(CKG_VectorHeader), 1, file_handle);
 
                 if (data_type == CKG_DATA_TYPE_BITS) {
-                    u8* vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
+                    u8* vector = (u8*)ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
                     fread(vector, header.element_size, header.count, file_handle);
                     return vector;
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
-                    CKG_StringView* sv_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
+                    CKG_StringView* sv_vector = (CKG_StringView*)ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
 
                     for (int i = 0; i < header.count; i++) {
                         CKG_StringView sv;
                         fread(&sv.length, sizeof(size_t), 1, file_handle);
 
-                        sv.data = ckg_alloc(sv.length + 1);
+                        sv.data = (const char*)ckg_alloc(sv.length + 1);
                         fread((char*)sv.data, sv.length, 1, file_handle);
                        
                         ckg_vector_push(sv_vector, sv);
@@ -2338,12 +2342,12 @@
 
                     return sv_vector;
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
-                    char** string_vector = ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
+                    char** string_vector = (char**)ckg_vector_grow(NULLPTR, header.element_size, header.capacity);
 
                     for (int i = 0; i < header.count; i++) {
                         size_t char_count = 0;
                         fread(&char_count, sizeof(size_t), 1, file_handle);
-                        char* current_string = ckg_alloc(char_count + 1); // prob want a way to specify if you should allocate or not
+                        char* current_string = (char*)ckg_alloc(char_count + 1); // prob want a way to specify if you should allocate or not
                         fread(current_string, char_count, 1, file_handle);
 
                         ckg_vector_push(string_vector, current_string);
@@ -2358,16 +2362,16 @@
                 fread(&header, sizeof(CKG_RingBufferHeader), 1, file_handle);
 
                 if (data_type == CKG_DATA_TYPE_BITS) {
-                    u8* ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
+                    u8* ring_buffer = (u8*)ckg_ring_buffer_create(header.element_size, header.capacity);
                     fread(ring_buffer, header.element_size, header.count, file_handle);
                     return ring_buffer;
                 } else if (data_type == CKG_DATA_TYPE_STRING_VIEW) {
-                    CKG_StringView* sv_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
+                    CKG_StringView* sv_ring_buffer = (CKG_StringView*)ckg_ring_buffer_create(header.element_size, header.capacity);
 
                     for (int i = 0; i < header.count; i++) {
                         CKG_StringView sv;
                         fread(&sv.length, sizeof(size_t), 1, file_handle);
-                        sv.data = ckg_alloc(sv.length + 1);
+                        sv.data = (const char*)ckg_alloc(sv.length + 1);
                         fread((char*)sv.data, sv.length, 1, file_handle);
 
                         ckg_ring_buffer_enqueue(sv_ring_buffer, sv);
@@ -2375,12 +2379,12 @@
 
                     return sv_ring_buffer;
                 } else if (data_type == CKG_DATA_TYPE_CSTRING) {
-                    char** string_ring_buffer = ckg_ring_buffer_create(header.element_size, header.capacity);
+                    char** string_ring_buffer = (char**)ckg_ring_buffer_create(header.element_size, header.capacity);
 
                     for (int i = 0; i < header.count; i++) {
                         size_t char_count = 0;
                         fread(&char_count, sizeof(size_t), 1, file_handle);
-                        char* current_string = ckg_alloc(char_count + 1);
+                        char* current_string = (char*)(char_count + 1);
                         fread(current_string, char_count, 1, file_handle);
 
                         ckg_ring_buffer_enqueue(string_ring_buffer, current_string);
