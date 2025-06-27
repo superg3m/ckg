@@ -113,7 +113,9 @@
         #undef WIN32_LEAN_AND_MEAN
         #define NOMINMAX
         #define WIN32_LEAN_AND_MEAN
-        #include <windows.h>
+        #if defined(CKG_OS_INCLUDE)
+            #include <windows.h>
+        #endif
         #define PLATFORM_WINDOWS
         #define OS_DELIMITER '\\'
         #define CRASH __debugbreak()
@@ -122,7 +124,7 @@
         #define PLATFORM_APPLE
         #define OS_DELIMITER '/'
         #define CRASH __builtin_trap()
-    #elif defined(__linux__) || defined(__unix__) || defined(__POSIX__)
+    #elif (defined(__linux__) || defined(__unix__) || defined(__POSIX__))
         #include <dlfcn.h>
         #define PLATFORM_LINUX
         #define OS_DELIMITER '/'

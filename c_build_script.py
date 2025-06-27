@@ -27,7 +27,7 @@ cc: CompilerConfig = CompilerConfig(
 )
 
 if IS_WINDOWS() and not C_BUILD_IS_DEPENDENCY():
-    cc.compiler_name = "g++"
+    cc.compiler_name = "cl"
 elif IS_DARWIN() and not C_BUILD_IS_DEPENDENCY():
     cc.compiler_name = "clang"
 elif IS_LINUX() and not C_BUILD_IS_DEPENDENCY():
