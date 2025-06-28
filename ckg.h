@@ -1031,8 +1031,6 @@
         
         va_end(args_list);
         
-        printf("%s%s", ckg_log_level_format[log_level], CKG_COLOR_RESET);
-        
         if (__ckg_message_has_special_delmitor(out_message, out_message_length)) {
             __ckg_special_print_helper(out_message, out_message_length, log_level);
         } else {
