@@ -42,7 +42,7 @@ if cc.compiler_name == "cl":
     ]
 else:
     cc.compiler_warning_level = "all"
-    compiler_inject = ["-Wextra", "-fpermissive"]
+    compiler_inject = ["-Wextra"]
     cc.compiler_disable_specific_warnings = [
         "implicit-fallthrough",
     ]
