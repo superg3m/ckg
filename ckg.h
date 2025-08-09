@@ -203,7 +203,6 @@
 #endif
 
 #if defined(CKG_INCLUDE_ERRORS)
-
     /*
     +------------+----------------------------+
     | Error Type |        Error Code          |
