@@ -52,8 +52,6 @@
     #undef MAX
     #undef CLAMP
     #undef SQUARED
-    #undef local_persist
-    #undef internal
     #undef FIRST_DIGIT
     #undef GET_BIT
     #undef SET_BIT
@@ -97,9 +95,6 @@
     #define MAX(a, b) (((a) > (b)) ? (a) : (b))
     #define CLAMP(value, min_value, max_value) (MIN(MAX(value, min_value), max_value))
     #define SQUARED(a) ((a) * (a))
-
-    #define local_persist static
-    #define internal static
 
     #define FIRST_DIGIT(number) ((int)number % 10);
     #define GET_BIT(number, bit_to_check) ((number & (1 << bit_to_check)) >> bit_to_check)
@@ -986,7 +981,7 @@
     char LOGGER_START_DELIM[] = "${";
     char LOGGER_END_DELIM[] = "}";
 
-    internal const char* ckg_log_level_format[LOG_LEVEL_COUNT] = {
+    static const char* ckg_log_level_format[LOG_LEVEL_COUNT] = {
         CKG_RED_BACKGROUND,
         CKG_RED,
         CKG_PURPLE,
@@ -995,14 +990,14 @@
         CKG_COLOR_RESET
     };
 
-    internal bool __ckg_message_has_special_delmitor(const char* message, u64 message_length) {
+    static bool __ckg_message_has_special_delmitor(const char* message, u64 message_length) {
         bool start_delimitor_index = ckg_str_contains(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1);
         bool end_delimitor_index = ckg_str_contains(message, message_length, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
 
         return start_delimitor_index && end_delimitor_index;
     }
 
-    internal void __ckg_special_print_helper(const char* message, u64 message_length, CKG_LogLevel log_level) {
+    static void __ckg_special_print_helper(const char* message, u64 message_length, CKG_LogLevel log_level) {
         CKG_StringView middle_to_color = ckg_sv_between_delimiters(message, message_length, LOGGER_START_DELIM, sizeof(LOGGER_START_DELIM) - 1, LOGGER_END_DELIM, sizeof(LOGGER_END_DELIM) - 1);
         if (!middle_to_color.data) {
             bool found = message[message_length - 1] == '\n';
@@ -1076,12 +1071,12 @@
 #endif
 
 #if defined(CKG_IMPL_ERRORS)
-    internal const char* CKG_ERROR_IO_STRINGS[CKG_ERROR_IO_COUNT] = {
+    static const char* CKG_ERROR_IO_STRINGS[CKG_ERROR_IO_COUNT] = {
         stringify(CKG_ERROR_IO_RESOURCE_NOT_FOUND),
         stringify(CKG_ERROR_IO_RESOURCE_TOO_BIG)
     };
 
-    internal const char* CKG_ERROR_ARGS_STRINGS[CKG_ERROR_ARGS_COUNT] = {
+    static const char* CKG_ERROR_ARGS_STRINGS[CKG_ERROR_ARGS_COUNT] = {
         stringify(CKG_ERROR_ARG_ONE_INVALID),
         stringify(CKG_ERROR_ARG_ONE_NULLPTR),
         stringify(CKG_ERROR_ARG_ONE_ZERO),
@@ -1113,7 +1108,7 @@
         return NULLPTR; // SHOULD NEVER GET HERE!
     }
 
-    internal void ckg_error_safe_set(CKG_Error* error, CKG_Error error_code) {
+    static void ckg_error_safe_set(CKG_Error* error, CKG_Error error_code) {
         if (error) {
             *error = error_code;
         }
@@ -1131,7 +1126,7 @@
         free(data);
     }
 
-    internal CKG_Allocator global_allocator = {ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR};
+    static CKG_Allocator global_allocator = {ckg_default_libc_malloc, ckg_default_libc_free, NULLPTR};
 
     void ckg_bind_custom_allocator(CKG_Alloc_T* a, CKG_Free_T* f, void* ctx) {
         ckg_assert_msg(a, "Alloc function is NULLPTR\n");
@@ -1775,7 +1770,7 @@
      * @param node 
      * @return CKG_Node* 
      */
-    internal CKG_Node* MACRO_ckg_node_free(CKG_LinkedList* linked_list, CKG_Node* node) {
+    static CKG_Node* MACRO_ckg_node_free(CKG_LinkedList* linked_list, CKG_Node* node) {
         ckg_assert(linked_list);
         ckg_assert(node);
         node->element_size_in_bytes = 0;
@@ -1794,7 +1789,7 @@
      * @param node 
      * @return CKG_Node* 
      */
-    internal CKG_Node* MACRO_ckg_node_data_free(CKG_LinkedList* linked_list, CKG_Node* node) {
+    static CKG_Node* MACRO_ckg_node_data_free(CKG_LinkedList* linked_list, CKG_Node* node) {
         ckg_assert(linked_list);
         ckg_assert(node);
         ckg_assert(node->data);
