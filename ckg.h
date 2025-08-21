@@ -2454,7 +2454,7 @@
             return file_data;
         }
     #else
-        bool ckg_io_path_exists(char* path) {
+        bool ckg_io_path_exists(const char* path) {
             FILE *fptr = fopen(path, "r");
 
             if (fptr == NULLPTR) {
@@ -2466,7 +2466,7 @@
             return true;
         }
 
-        u8* ckg_io_read_entire_file(char* file_name, size_t* returned_file_size, CKG_Error* err) {
+        u8* ckg_io_read_entire_file(const char* file_name, size_t* returned_file_size, CKG_Error* err) {
             FILE* file_handle = fopen(file_name, "rb");
             if (file_handle == NULLPTR) {
                 CKG_LOG_ERROR("Invalid file_handle, the file_name/path is likely wrong: ckg_io_read_entire_file(%s)\n", file_name);
@@ -2553,7 +2553,7 @@
             return NULLPTR;
         }
     #else
-        CKG_DLL ckg_io_load_dll(char* dll_name, CKG_Error* err) {
+        CKG_DLL ckg_io_load_dll(const char* dll_name, CKG_Error* err) {
             void* library = dlopen(dll_name, RTLD_LAZY);
             if (!library) {
                 CKG_LOG_ERROR("dlopen() failed: ckg_io_load_dll(%s)\n", dll_name);
@@ -2564,7 +2564,7 @@
             return library;
         }
 
-        void* ckg_os_get_proc_address(CKG_DLL dll, char* proc_name, CKG_Error* err) {
+        void* ckg_os_get_proc_address(CKG_DLL dll, const char* proc_name, CKG_Error* err) {
             void* proc = dlsym(dll, proc_name);
             if (!proc) {
                 CKG_LOG_ERROR("dlsym() failed: ckg_os_get_proc_address(%s)\n", proc_name);
