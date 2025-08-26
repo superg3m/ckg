@@ -196,6 +196,7 @@ void test_trival_struct() {
   CKG_LOG_SUCCESS("TrivialStruct key test passed!\n");
 }
 
+// nothing
 
 // Combine all tests here
 void ckg_hashmap_test() {
