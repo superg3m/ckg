@@ -423,10 +423,24 @@
         typedef u64 (*CKG_HashFunction)(void* data, u64 size);
         typedef bool (*CKG_EqualityFunction)(void* c1, size_t c1_size, void* c2, size_t c2_size);
 
+        #define CKG_HashMapEntry(KeyType, ValueType) \
+        struct {                                     \
+            KeyType key;                             \
+            ValueType value;                         \
+            bool filled;                             \
+        }                                            \
+
+        // Date: Aug 27, 2025
+        // NOTE(Jovanni): Its important to note that temp_key and temp_value are used on
+        // insert to act as a stack object for the value or key literal.
         typedef struct CKG_HashMapMeta {
-            int key_offset;
-            int value_offset;
-            int entry_offset;
+            int temp_key_offset;
+            int temp_value_offset;
+            
+            int entries_offset; // bytes to the entries from the map
+
+            // These are all relative to the entries[i] address
+            // I thought about storing these in CKG_HashMapEntry but that seems wasteful since you only need it once
             int entry_key_offset;
             int entry_value_offset;
             int entry_filled_offset;
@@ -443,18 +457,12 @@
             CKG_EqualityFunction equal_fn;
         } CKG_HashMapMeta;
 
-
-        #define CKG_HashMapEntry(KeyType, ValueType) \
-        struct {                                     \
-            KeyType key;                             \
-            ValueType value;                         \
-            bool filled;                             \
-        }                                            \
-
         // Date: May 15, 2025
-        // NOTE(Jovanni): Its important to note that temp_key and temp_value are used on:
-        // insert to act as a stack object for the value or key literal
-        // THIS MIGHT HAVE TO BE PACKED!
+        // NOTE(Jovanni): 
+        // One very interesting detail that makes this all possible is that 
+        // CKG_HashMapMeta is the first member of this struct
+        // and CKG_HashMapMeta is known at compile time so I know if I have a map
+        // I can always cast it to (CKG_HashMapMeta*) and get the offsets needed to get to temp_key, ect
         #define CKG_HashMap(KeyType, ValueType)            \
         struct {                                           \
             CKG_HashMapMeta meta;                          \
@@ -524,24 +532,24 @@
          *     ckg_hashmap_put_key_ptr(map, name, 100); // Required for pointer keys
          */
     #define ckg_hashmap_init_with_hash(map, KeyType, ValueType, __key_is_ptr, __hash_function, __eq_function) \
-        do {                                                                                                     \
-            map = ckg_alloc(sizeof(CKG_HashMap(KeyType, ValueType)));                                            \
-            map->meta.key_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_key);                          \
-            map->meta.value_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_value);                      \
-            map->meta.entry_offset = offsetof(CKG_HashMap(KeyType, ValueType), entries);                         \
-            map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);                    \
-            map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);                \
-            map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled);              \
-            map->meta.key_size = sizeof(KeyType);                                                                \
-            map->meta.value_size = sizeof(ValueType);                                                            \
-            map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                                 \
-            map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                                                   \
-            map->meta.count = 0;                                                                                 \
-            map->meta.hash_fn = __hash_function;                                                                 \
-            map->meta.equal_fn = __eq_function;                                                                 \
-            map->meta.key_is_ptr = __key_is_ptr;                                                                 \
-            map->entries = ckg_alloc(map->meta.entry_size * map->meta.capacity);                                 \
-        } while(0)                                                                                               \
+        do {                                                                                                  \
+            map = ckg_alloc(sizeof(CKG_HashMap(KeyType, ValueType)));                                         \
+            map->meta.temp_key_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_key);                  \
+            map->meta.temp_value_offset = offsetof(CKG_HashMap(KeyType, ValueType), temp_value);              \
+            map->meta.entries_offset = offsetof(CKG_HashMap(KeyType, ValueType), entries);                    \
+            map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);                 \
+            map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);             \
+            map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled);           \
+            map->meta.key_size = sizeof(KeyType);                                                             \
+            map->meta.value_size = sizeof(ValueType);                                                         \
+            map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                              \
+            map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                                                \
+            map->meta.count = 0;                                                                              \
+            map->meta.hash_fn = __hash_function;                                                              \
+            map->meta.equal_fn = __eq_function;                                                               \
+            map->meta.key_is_ptr = __key_is_ptr;                                                              \
+            map->entries = ckg_alloc(map->meta.entry_size * map->meta.capacity);                              \
+        } while(0)                                                                                            \
 
 
         #define ckg_hashmap_init_siphash(map, KeyType, ValueType) ckg_hashmap_init_with_hash(map, KeyType, ValueType, false, siphash24, byte_equality)
@@ -1960,7 +1968,6 @@
     //
     // ========== Start CKG_HashMap ==========
     //
-    
     #if !defined(__cplusplus)
         // Original location:
         // https://github.com/majek/csiphash/1
@@ -2061,7 +2068,7 @@
         u64 ckit_hashmap_resolve_collision(void* map, void* key, u64 inital_hash_index) {
             CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
             u8* entries_base_address = NULLPTR;
-            ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entry_offset, sizeof(void*));
+            ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entries_offset, sizeof(void*));
 
             u64 cannonical_hash_index = inital_hash_index;
 
@@ -2138,25 +2145,27 @@
             return ckg_str_equal(s1->data, s1->length, s2->data, s2->length);
         }
 
+        // Date: Aug 27th, 2025
+        // TODO(Jovanni): This context is just weird it really shouldn't be this complex?
         typedef struct HashMapContext {
             CKG_HashMapMeta* meta;
             void* temp_key_address;
-            void* entry;
+            void* entry; // This is the actual entry im talking about
             void* entry_key_address;
             void* entry_value_address;
             bool* entry_filled_address;
             u64 real_index;
         } HashMapContext;
 
-        static HashMapContext ckg_hashmap_find_entry(void* map) {
+        static HashMapContext ckg_hashmap_get_context(void* map) {
             HashMapContext context;
             context.meta = (CKG_HashMapMeta*)map;
             context.temp_key_address = NULLPTR;
 
             if (context.meta->key_is_ptr) {
-                ckg_memory_copy(&context.temp_key_address, sizeof(void*), (u8*)map + context.meta->key_offset, sizeof(void*));
+                ckg_memory_copy(&context.temp_key_address, sizeof(void*), (u8*)map + context.meta->temp_key_offset, sizeof(void*));
             } else {
-                context.temp_key_address = (u8*)map + context.meta->key_offset;
+                context.temp_key_address = (u8*)map + context.meta->temp_key_offset;
             }
 
             u64 hash = context.meta->hash_fn(context.temp_key_address, context.meta->key_size);
@@ -2164,7 +2173,7 @@
             context.real_index = ckit_hashmap_resolve_collision(map, context.temp_key_address, index);
 
             u8* entries = NULLPTR;
-            ckg_memory_copy(&entries, sizeof(void*), (u8*)map + context.meta->entry_offset,  sizeof(void*));
+            ckg_memory_copy(&entries, sizeof(void*), (u8*)map + context.meta->entries_offset,  sizeof(void*));
             context.entry = entries + (context.real_index * context.meta->entry_size);
             context.entry_key_address = (u8*)context.entry + context.meta->entry_key_offset;
             context.entry_value_address = (u8*)context.entry + context.meta->entry_value_offset;
@@ -2174,14 +2183,14 @@
         }
 
         bool ckg_hashmap_has_helper(void* map) {
-            HashMapContext context = ckg_hashmap_find_entry(map);
+            HashMapContext context = ckg_hashmap_get_context(map);
             return *(bool*)(context.entry_filled_address);
         }
 
         void ckg_hashmap_get_helper(void* map) {
-            HashMapContext context = ckg_hashmap_find_entry(map);
+            HashMapContext context = ckg_hashmap_get_context(map);
             ckg_assert_msg(*(bool*)(context.entry_filled_address), "The key doesn't exist in the hashmap!\n");
-            ckg_memory_copy((u8*)map + context.meta->value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
+            ckg_memory_copy((u8*)map + context.meta->temp_value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
         }
 
         void ckg_hashmap_put_helper(void* map) {
@@ -2189,20 +2198,20 @@
                 ckg_hashmap_grow(map);
             }
 
-            HashMapContext context = ckg_hashmap_find_entry(map);
+            HashMapContext context = ckg_hashmap_get_context(map);
             bool filled = *context.entry_filled_address;
             if (!filled) {
-            context.meta->count++;
+                context.meta->count++;
             }
-            ckg_memory_copy(context.entry_key_address, context.meta->key_size, (u8*)map + context.meta->key_offset, context.meta->key_size);
-            ckg_memory_copy(context.entry_value_address, context.meta->value_size, (u8*)map + context.meta->value_offset, context.meta->value_size);
+            ckg_memory_copy(context.entry_key_address, context.meta->key_size, (u8*)map + context.meta->temp_key_offset, context.meta->key_size);
+            ckg_memory_copy(context.entry_value_address, context.meta->value_size, (u8*)map + context.meta->temp_value_offset, context.meta->value_size);
             *context.entry_filled_address = 1;
         }
 
         void ckg_hashmap_pop_helper(void* map) {
-            HashMapContext context = ckg_hashmap_find_entry(map);
+            HashMapContext context = ckg_hashmap_get_context(map);
             ckg_assert_msg(*context.entry_filled_address, "The key doesn't exist in the hashmap!\n");
-            ckg_memory_copy((u8*)map + context.meta->value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
+            ckg_memory_copy((u8*)map + context.meta->temp_value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
             *context.entry_filled_address = 0;
         }
 
@@ -2213,11 +2222,11 @@
 
             CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
             u8* entries_base_address = NULLPTR;
-            ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entry_offset, sizeof(void*));
+            ckg_memory_copy(&entries_base_address, sizeof(void*), (u8*)map + meta->entries_offset, sizeof(void*));
             u64 old_capacity = meta->capacity;
             meta->capacity *= 2;
             void* new_entries = ckg_alloc(meta->capacity * meta->entry_size);
-            ckg_memory_copy((u8*)map + meta->entry_offset, sizeof(void*), &new_entries, sizeof(void*));
+            ckg_memory_copy((u8*)map + meta->entries_offset, sizeof(void*), &new_entries, sizeof(void*));
 
             // rehash
             for (u64 i = 0; i < old_capacity; i++) {
