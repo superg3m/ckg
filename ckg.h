@@ -2193,6 +2193,11 @@
             ckg_memory_copy((u8*)map + context.meta->temp_value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
         }
 
+        // Date: Aug 27th, 2025
+        // TODO(Jovanni): If you remove/pop the chain won't be able to find the correct element
+        // 1 2 3 4 5 
+        // 1 2 - 4 5 (pop)
+        // 1 2 4 4 5 (put 4) (BADDDDD!)
         void ckg_hashmap_put_helper(void* map) {
             if (ckg_hashmap_load_factor(map) >= CKG_HASHMAP_DEFAULT_LOAD_FACTOR) {
                 ckg_hashmap_grow(map);
