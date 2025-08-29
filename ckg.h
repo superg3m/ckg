@@ -428,6 +428,7 @@
             KeyType key;                             \
             ValueType value;                         \
             bool filled;                             \
+            bool dead;                               \
         }                                            \
 
         // Date: Aug 27, 2025
@@ -444,6 +445,7 @@
             int entry_key_offset;
             int entry_value_offset;
             int entry_filled_offset;
+            int entry_dead_offset;
 
             int key_size;
             int value_size;
@@ -451,6 +453,7 @@
 
             u64 capacity;
             u64 count;
+            u64 dead_count;
             
             bool key_is_ptr;
             CKG_HashFunction hash_fn;
@@ -540,11 +543,13 @@
             map->meta.entry_key_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), key);                 \
             map->meta.entry_value_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), value);             \
             map->meta.entry_filled_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), filled);           \
+            map->meta.entry_dead_offset = offsetof(CKG_HashMapEntry(KeyType, ValueType), dead);               \
             map->meta.key_size = sizeof(KeyType);                                                             \
             map->meta.value_size = sizeof(ValueType);                                                         \
             map->meta.entry_size = sizeof(CKG_HashMapEntry(KeyType, ValueType));                              \
             map->meta.capacity = CKG_HASHMAP_DEFAULT_CAPACITY;                                                \
             map->meta.count = 0;                                                                              \
+            map->meta.dead_count = 0;                                                                         \
             map->meta.hash_fn = __hash_function;                                                              \
             map->meta.equal_fn = __eq_function;                                                               \
             map->meta.key_is_ptr = __key_is_ptr;                                                              \
@@ -2062,7 +2067,7 @@
 
         float ckg_hashmap_load_factor(void* map) {
             CKG_HashMapMeta* meta = (CKG_HashMapMeta*)map;
-            return (float)meta->count / (float)meta->capacity;
+            return ((float)meta->count + (float)meta->dead_count) / (float)meta->capacity;
         }
 
         u64 ckit_hashmap_resolve_collision(void* map, void* key, u64 inital_hash_index) {
@@ -2154,6 +2159,7 @@
             void* entry_key_address;
             void* entry_value_address;
             bool* entry_filled_address;
+            bool* entry_dead_address;
             u64 real_index;
         } HashMapContext;
 
@@ -2178,6 +2184,7 @@
             context.entry_key_address = (u8*)context.entry + context.meta->entry_key_offset;
             context.entry_value_address = (u8*)context.entry + context.meta->entry_value_offset;
             context.entry_filled_address = (bool*)((u8*)context.entry + context.meta->entry_filled_offset);
+            context.entry_dead_address = (bool*)((u8*)context.entry + context.meta->entry_dead_offset);
 
             return context;
         }
@@ -2217,7 +2224,7 @@
             HashMapContext context = ckg_hashmap_get_context(map);
             ckg_assert_msg(*context.entry_filled_address, "The key doesn't exist in the hashmap!\n");
             ckg_memory_copy((u8*)map + context.meta->temp_value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
-            *context.entry_filled_address = 0;
+            *context.entry_dead_address = 0;
         }
 
         void ckg_hashmap_grow(void* map) {

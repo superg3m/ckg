@@ -159,41 +159,78 @@ void test_struct_keys() {
 }
 
 typedef struct TrivialStruct {
-  int a;
-  bool b;
-  char c;
-  double d;
+    int a;
+    bool b;
+    char c;
+    double d;
 } TrivialStruct;
 
 void test_trival_struct() {
-  CKG_HashMap(TrivialStruct, double)* map = NULLPTR;
-  ckg_hashmap_init_siphash(map, TrivialStruct, double);
+    CKG_HashMap(TrivialStruct, double)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, TrivialStruct, double);
 
-  TrivialStruct p1 = {1, true, 'a', 1.0};
-  TrivialStruct p2 = {2, false, 'b', 2.0};
-  TrivialStruct p3 = {3, true, 'c', 3.0};
-  TrivialStruct p4 = {1, true, 'a', 1.0}; // Duplicate of p1
+    TrivialStruct p1 = {1, true, 'a', 1.0};
+    TrivialStruct p2 = {2, false, 'b', 2.0};
+    TrivialStruct p3 = {3, true, 'c', 3.0};
+    TrivialStruct p4 = {1, true, 'a', 1.0}; // Duplicate of p1
 
-  ckg_hashmap_put(map, p1, 100.0);
-  ckg_hashmap_put(map, p2, 200.0);
-  ckg_hashmap_put(map, p3, 300.0);
+    ckg_hashmap_put(map, p1, 100.0);
+    ckg_hashmap_put(map, p2, 200.0);
+    ckg_hashmap_put(map, p3, 300.0);
 
-  ckg_assert(ckg_hashmap_get(map, p1) == 100.0);
-  ckg_assert(ckg_hashmap_get(map, p2) == 200.0);
-  ckg_assert(ckg_hashmap_get(map, p3) == 300.0);
-  ckg_assert(ckg_hashmap_get(map, p4) == 100.0); // Should match p1
+    ckg_assert(ckg_hashmap_get(map, p1) == 100.0);
+    ckg_assert(ckg_hashmap_get(map, p2) == 200.0);
+    ckg_assert(ckg_hashmap_get(map, p3) == 300.0);
+    ckg_assert(ckg_hashmap_get(map, p4) == 100.0); // Should match p1
 
-  ckg_hashmap_put(map, p4, 999.0); // Overwrite p1
+    ckg_hashmap_put(map, p4, 999.0); // Overwrite p1
 
-  ckg_assert(ckg_hashmap_get(map, p1) == 999.0);
-  ckg_assert(ckg_hashmap_get(map, p4) == 999.0);
+    ckg_assert(ckg_hashmap_get(map, p1) == 999.0);
+    ckg_assert(ckg_hashmap_get(map, p4) == 999.0);
 
-  double v = ckg_hashmap_pop(map, p4);
-  ckg_assert(v == 999.0);
+    double v = ckg_hashmap_pop(map, p4);
+    ckg_assert(v == 999.0);
 
-  ckg_hashmap_free(map);
+    ckg_hashmap_free(map);
 
-  CKG_LOG_SUCCESS("TrivialStruct key test passed!\n");
+    CKG_LOG_SUCCESS("TrivialStruct key test passed!\n");
+}
+
+void test_linear_probing() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, int, int);
+
+    ckg_hashmap_put(map, 0, 0);
+    ckg_hashmap_put(map, 1, 1);
+    ckg_hashmap_put(map, 2, 2);
+    ckg_hashmap_put(map, 3, 3);
+    ckg_hashmap_put(map, 4, 4);
+    ckg_hashmap_put(map, 5, 5);
+    ckg_hashmap_put(map, 6, 6);
+    ckg_hashmap_put(map, 7, 7);
+
+    ckg_assert(ckg_hashmap_get(map, 0) == 0);
+    ckg_assert(ckg_hashmap_get(map, 1) == 1);
+    ckg_assert(ckg_hashmap_get(map, 2) == 2);
+    ckg_assert(ckg_hashmap_get(map, 3) == 3);
+    ckg_assert(ckg_hashmap_get(map, 4) == 4);
+    ckg_assert(ckg_hashmap_get(map, 5) == 5);
+    ckg_assert(ckg_hashmap_get(map, 6) == 6);
+    ckg_assert(ckg_hashmap_get(map, 7) == 7);
+
+    int v = ckg_hashmap_pop(map, 2);
+    ckg_assert(v == 2);
+
+    for (int i = 0; i < (int)map->meta.count; i++) {
+        if (i == 2) {
+            continue;
+        }
+
+        ckg_assert_msg(ckg_hashmap_has(map, i), "EXPECTING TO FIND %d but couldn't linear probing is broken!\n", i);
+    }
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Linear probing test!\n");
 }
 
 // nothing
@@ -208,4 +245,5 @@ void ckg_hashmap_test() {
     test_char_ptr_keys();
     test_struct_keys();
     test_trival_struct();
+    test_linear_probing();
 }

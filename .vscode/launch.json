@@ -8,7 +8,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
-            "program": "${workspaceFolder}/example/clang/test_ckg.exe",
+            "program": "${workspaceFolder}/example/build_clang/debug/test_ckg.exe",
             "args": [],
             "cwd": "${workspaceFolder}"
         }
