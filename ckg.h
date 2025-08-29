@@ -2189,7 +2189,10 @@
 
         bool ckg_hashmap_has_helper(void* map) {
             HashMapContext context = ckg_hashmap_get_context(map);
-            return *(bool*)(context.entry_filled_address);
+            bool filled = *context.entry_filled_address;
+            bool dead = *context.entry_dead_address;
+
+            return filled && !dead;
         }
 
         void ckg_hashmap_get_helper(void* map) {
@@ -2211,16 +2214,17 @@
             }
             ckg_memory_copy(context.entry_key_address, context.meta->key_size, (u8*)map + context.meta->temp_key_offset, context.meta->key_size);
             ckg_memory_copy(context.entry_value_address, context.meta->value_size, (u8*)map + context.meta->temp_value_offset, context.meta->value_size);
-            *context.entry_filled_address = 1;
+            *context.entry_filled_address = true;
         }
 
         void ckg_hashmap_pop_helper(void* map) {
             HashMapContext context = ckg_hashmap_get_context(map);
             ckg_assert_msg(*context.entry_filled_address, "The key doesn't exist in the hashmap!\n");
-            ckg_memory_copy((u8*)map + context.meta->temp_value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
+
             context.meta->count -= 1;
             context.meta->dead_count += 1;
-            *context.entry_dead_address = 0;
+            *context.entry_dead_address = true;
+            ckg_memory_copy((u8*)map + context.meta->temp_value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
         }
 
         void ckg_hashmap_grow(void* map) {
