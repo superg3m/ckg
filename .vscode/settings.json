@@ -80,6 +80,7 @@
         "xlocinfo": "c",
         "xstddef": "c",
         "*.rh": "c",
-        "stddef.h": "c"
+        "stddef.h": "c",
+        "__bit_reference": "c"
     }
 }

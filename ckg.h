@@ -2205,7 +2205,8 @@
 
             HashMapContext context = ckg_hashmap_get_context(map);
             bool filled = *context.entry_filled_address;
-            if (!filled) {
+            bool dead = *context.entry_dead_address;
+            if (!filled || dead) {
                 context.meta->count++;
             }
             ckg_memory_copy(context.entry_key_address, context.meta->key_size, (u8*)map + context.meta->temp_key_offset, context.meta->key_size);
@@ -2217,6 +2218,8 @@
             HashMapContext context = ckg_hashmap_get_context(map);
             ckg_assert_msg(*context.entry_filled_address, "The key doesn't exist in the hashmap!\n");
             ckg_memory_copy((u8*)map + context.meta->temp_value_offset, context.meta->value_size, context.entry_value_address, context.meta->value_size);
+            context.meta->count -= 1;
+            context.meta->dead_count += 1;
             *context.entry_dead_address = 0;
         }
 
