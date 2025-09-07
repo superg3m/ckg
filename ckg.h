@@ -2281,7 +2281,8 @@
                 }
 
                 bool entry_filled = *(bool*)(entry + meta->entry_filled_offset);
-                if (!entry_filled) {
+                bool entry_dead = *(bool*)(entry + meta->entry_dead_offset);
+                if (!entry_filled || entry_dead) {
                     continue;
                 }
 
