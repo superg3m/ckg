@@ -728,10 +728,10 @@
 
     CKG_API void  ckg_str_clear(char* s1, u64 length);
     CKG_API void  ckg_str_copy(char* s1, size_t s1_capacity, const char* s2, u64 s2_length);
-    CKG_API void  ckg_str_append(char* str, u64 str_length, size_t str_capacity, const char* to_append, u64 to_append_length);
-    CKG_API void  ckg_str_append_char(char* str, u64 str_length, size_t str_capacity, char to_append);
-    CKG_API void  ckg_str_insert(char* str, u64 str_length, size_t str_capacity, const char* to_insert, u64 to_insert_length, u64 index);
-    CKG_API void  ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index);
+    CKG_API void  ckg_str_append(char* str, u64* str_length_out, size_t str_capacity, const char* to_append, u64 to_append_length);
+    CKG_API void  ckg_str_append_char(char* str, u64* str_length_out, size_t str_capacity, char to_append);
+    CKG_API void  ckg_str_insert(char* str, u64* str_length_out, size_t str_capacity, const char* to_insert, u64 to_insert_length, u64 index);
+    CKG_API void  ckg_str_insert_char(char* str, u64* str_length_out, size_t str_capacity, char to_insert, u64 index);
 
     typedef struct CKG_StringView {
         const char* data;
@@ -1504,48 +1504,56 @@
         ckg_memory_copy(s1, s1_capacity, s2, s2_length);
     }
 
-    void ckg_str_insert(char* str, u64 str_length, size_t str_capacity, const char* to_insert, u64 to_insert_length, u64 index) {
+    void ckg_str_insert(char* str, u64* str_length_out, size_t str_capacity, const char* to_insert, u64 to_insert_length, u64 index) {
         ckg_assert(str);
         ckg_assert(to_insert);
+        ckg_assert(str_length_out);
 
-        u64 new_length = str_length + to_insert_length;
-        ckg_assert_msg(new_length < str_capacity, "ckg_str_insert: str_capacity is %lld but new valid cstring length is %d + %d + 1(null_term)= %d\n", str_capacity, str_length, to_insert_length, new_length + 1);
+        u64 new_length = *str_length_out + to_insert_length;
+        ckg_assert_msg(*str_length_out < str_capacity, "ckg_str_insert: str_capacity is %lld but new valid cstring length is %d + %d + 1(null_term) = %d\n", str_capacity, *str_length_out, to_insert_length, new_length + 1);
         
         u8* move_source_ptr = (u8*)(str + index);
         u8* move_dest_ptr = (u8*)(move_source_ptr + to_insert_length);
 
-        ckg_memory_copy(move_dest_ptr, str_capacity - (index + to_insert_length), move_source_ptr, str_length - index);
+        ckg_memory_copy(move_dest_ptr, str_capacity - (index + to_insert_length), move_source_ptr, *str_length_out - index);
         u8* copy_dest_ptr = (u8*)(str + index);
         ckg_memory_copy(copy_dest_ptr, str_capacity, to_insert, to_insert_length);
+
+        *str_length_out += to_insert_length;
     }
 
-    void ckg_str_insert_char(char* str, u64 str_length, size_t str_capacity, char to_insert, u64 index) {
+    void ckg_str_insert_char(char* str, u64* str_length_out, size_t str_capacity, char to_insert, u64 index) {
         ckg_assert(str);
         ckg_assert(to_insert);
+        ckg_assert(str_length_out);
 
         u64 to_insert_length = 1;
-        bool expression = (str_length + to_insert_length) < str_capacity;
-        ckg_assert_msg(expression, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  str_length + to_insert_length, str_capacity);
+        u64 new_length = *str_length_out + to_insert_length;
+
+        ckg_assert_msg(*str_length_out < str_capacity, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  new_length, str_capacity);
 
         char* source_ptr = str + index;
-        ckg_memory_copy(source_ptr + 1, str_capacity - (index + 1), source_ptr, str_length - index);
+        ckg_memory_copy(source_ptr + 1, str_capacity - (index + 1), source_ptr, *str_length_out - index);
         str[index] = to_insert;
+
+        *str_length_out += to_insert_length;
     }
 
-    void ckg_str_append(char* str, u64 str_length, size_t str_capacity, const char* to_append, u64 to_append_length) {
-        ckg_str_insert(str, str_length, str_capacity, to_append, to_append_length, str_length);
+    void ckg_str_append(char* str, u64* str_length_out, size_t str_capacity, const char* to_append, u64 to_append_length) {
+        ckg_str_insert(str, str_length_out, str_capacity, to_append, to_append_length, *str_length_out);
     }
 
-    void ckg_str_append_char(char* str, u64 str_length, size_t str_capacity, char to_append) {
-        ckg_str_insert_char(str, str_length, str_capacity, to_append, str_length);
+    void ckg_str_append_char(char* str, u64* str_length_out, size_t str_capacity, char to_append) {
+        ckg_str_insert_char(str, str_length_out, str_capacity, to_append, *str_length_out);
     }
 
     char* ckg_str_reverse(const char* str, u64 str_length) {
         ckg_assert(str);
 
         char* ret = (char*)ckg_alloc(str_length + 1);
+        u64 length = 0;
         for (s64 i = (s64)str_length - 1; i >= 0; i--) {
-            ckg_str_append_char(ret, ((str_length - 1) - (u64)i), str_length + 1, str[i]);
+            ckg_str_append_char(ret, &length, str_length + 1, str[i]);
         }
 
         return ret;
