@@ -81,6 +81,8 @@
         "xstddef": "c",
         "*.rh": "c",
         "stddef.h": "c",
-        "__bit_reference": "c"
+        "__bit_reference": "c",
+        "ratio": "c",
+        "variant": "c"
     }
 }

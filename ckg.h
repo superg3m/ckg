@@ -303,6 +303,8 @@
         size_t element_size;
     } CKG_VectorHeader;
 
+    #define CKG_Vector(type) type*
+
     CKG_API void* ckg_vector_grow(void* vector, size_t element_size, int capacity);
     CKG_API void* MACRO_ckg_vector_free(void* vector);
 
