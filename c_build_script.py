@@ -24,7 +24,7 @@ pc: ProjectConfig = ProjectConfig(
 
 cc: CompilerConfig = CompilerConfig(
     compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "INVALID_COMPILER",
-    compiler_enable_sanitizer = True
+    compiler_enable_sanitizer = False
 )
 
 if IS_WINDOWS() and not C_BUILD_IS_DEPENDENCY():
