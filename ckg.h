@@ -1239,15 +1239,47 @@
         u8* src = (u8*)source;
         u8* dst = (u8*)destination;
 
-        bool overlap = dst < src || dst >= src + source_size;
-        if (overlap) {
+        // left overlap
+        // dest[**src[**]] (overlap trival: dst < src)
+        // this should be dst[i] = src[i]
+
+        // exactly overlapping
+        // src[dest[****]] ()
+        // this can copy anyway actually not even an issue
+
+        // right overlap
+        // src[**dest[**]]
+        // this should copy right to left
+        // dest[(source_size - 1) - i] = src[(source_size - 1) - i];
+
+        // The only concern you have here is whether you are overlapping in an usafe way.
+        // Therefore if you have no overlap you are safe to forward copy, if you have an overlap but the
+        // dest pointer is the the left of the src pointer (i.e dest < src) then this is is hence refered to as
+        // a left overlap copy this is safe to do the forward copy becuase you would only overwrite data in the dest end
+        // so the src data is perfectly perserved.
+
+        // HOWEVER, if the dest is to the right of src and is overlapping this is refered to as a right overlap
+        // this is not good because if you do a traditonal forward copy you will overwrite the data in parts of src.
+
+
+        // bool should_backward_copy = dst >= src && dst < src + source_size;
+        bool should_forward_copy = dst < src || dst >= src + source_size;
+        if (should_forward_copy) {
             for (size_t i = 0; i < source_size; i++) {
                 dst[i] = src[i];
             }
         } else {
+            // this is a bit unintuitive it might just be better to do the one below
             for (size_t i = source_size; i-- > 0;) {
                 dst[i] = src[i];
             }
+
+            /*
+            for (size_t index = source_size; index > 0; index--) {
+                const int i = index - 1;
+                dst[i] = src[i];
+            }
+            */
         }
     }
 

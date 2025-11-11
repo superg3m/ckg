@@ -37,4 +37,4 @@
 c_build/
 build_*/
 example/build_*/
-.vscode/[=]
+.vscode/
