@@ -1563,7 +1563,7 @@
 
         u64 to_insert_length = 1;
         u64 new_length = *str_length_out + to_insert_length;
-        ckg_assert_msg(new_length < str_capacity, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  new_length, str_capacity);
+        ckg_assert_msg(new_length < str_capacity, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n", new_length, str_capacity);
 
         char* source_ptr = str + index;
         ckg_memory_copy(source_ptr + 1, str_capacity - (index + 1), source_ptr, *str_length_out - index);
