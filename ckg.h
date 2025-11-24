@@ -1544,7 +1544,7 @@
         ckg_assert(str_length_out);
 
         u64 new_length = *str_length_out + to_insert_length;
-        ckg_assert_msg(*str_length_out < str_capacity, "ckg_str_insert: str_capacity is %lld but new valid cstring length is %d + %d + 1(null_term) = %d\n", str_capacity, *str_length_out, to_insert_length, new_length + 1);
+        ckg_assert_msg(new_length < str_capacity, "ckg_str_insert: str_capacity is %lld but new valid cstring length is %d + %d + 1(null_term) = %d\n", str_capacity, *str_length_out, to_insert_length, new_length + 1);
         
         u8* move_source_ptr = (u8*)(str + index);
         u8* move_dest_ptr = (u8*)(move_source_ptr + to_insert_length);
@@ -1563,8 +1563,7 @@
 
         u64 to_insert_length = 1;
         u64 new_length = *str_length_out + to_insert_length;
-
-        ckg_assert_msg(*str_length_out < str_capacity, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  new_length, str_capacity);
+        ckg_assert_msg(new_length < str_capacity, "ckg_str_insert_char: str overflow new_capacity_required: %d >= current_capacity: %lld\n",  new_length, str_capacity);
 
         char* source_ptr = str + index;
         ckg_memory_copy(source_ptr + 1, str_capacity - (index + 1), source_ptr, *str_length_out - index);
