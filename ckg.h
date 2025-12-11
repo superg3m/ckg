@@ -100,8 +100,8 @@
 
     #define FIRST_DIGIT(number) ((int)number % 10);
     #define GET_BIT(number, bit_to_check) ((number & (1 << bit_to_check)) >> bit_to_check)
-    #define SET_BIT(number, bit_to_set) number |= (1 << bit_to_set);
-    #define UNSET_BIT(number, bit_to_unset) number &= (~(1 << bit_to_unset));
+    #define SET_BIT(number, bit_to_set) number |= (1 << bit_to_set)
+    #define UNSET_BIT(number, bit_to_unset) number &= (~(1 << bit_to_unset))
 
     #define ArrayCount(array) (int)(sizeof(array) / sizeof(array[0]))
 
