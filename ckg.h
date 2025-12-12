@@ -560,8 +560,6 @@
             map->meta.equal_fn = __eq_function;                                                               \
             map->meta.key_is_ptr = __key_is_ptr;                                                              \
             map->entries = ckg_alloc(map->meta.entry_size * map->meta.capacity);                              \
-            (KeyType)map->entries[0].key;                                                                     \
-            (ValueType)map->entries[0].value;                                                                 \
         } while(0)                                                                                            \
 
 

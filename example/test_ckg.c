@@ -26,9 +26,7 @@ int main() {
 	test_ckg_vector_operations();
 	test_ckg_ring_buffer_overwrite_behavior();
 	ckg_arena_temp(&arena, {
-		#if !defined(__cplusplus)
-			ckg_hashmap_test();
-		#endif
+		ckg_hashmap_test();
 	});
 
 	test_serialization();
