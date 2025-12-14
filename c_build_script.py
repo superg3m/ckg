@@ -24,6 +24,7 @@ pc: ProjectConfig = ProjectConfig(
 
 cc: CompilerConfig = CompilerConfig(
     compiler_name = C_BUILD_COMPILER_NAME() if C_BUILD_IS_DEPENDENCY() else "INVALID_COMPILER",
+    compiler_enable_sanitizer = False
 )
 
 if IS_WINDOWS() and not C_BUILD_IS_DEPENDENCY():
@@ -34,12 +35,18 @@ elif IS_LINUX() and not C_BUILD_IS_DEPENDENCY():
     cc.compiler_name = "gcc"
 
 # Do different things depending on the platform
+compiler_inject = []
 if cc.compiler_name == "cl":
-    cc.compiler_warning_level = "3"
-    cc.compiler_disable_specific_warnings = ["5105", "4668", "4820", "4996"]
+    cc.compiler_warning_level = "4"
+    cc.compiler_disable_specific_warnings = [
+        "4116"
+    ]
 else:
     cc.compiler_warning_level = "all"
-    cc.compiler_disable_specific_warnings = ["deprecated", "parentheses", "missing-braces"]
+    compiler_inject = ["-Wextra"]
+    cc.compiler_disable_specific_warnings = [
+        "implicit-fallthrough",
+    ]
 
 executable_procedure_libs = []
 if IS_WINDOWS():
@@ -51,14 +58,16 @@ procedures: Dict[str, ProcedureConfig] = {
     "ckg_lib": ProcedureConfig(
         build_directory = f"./{build_postfix}",
         output_name = GET_LIB_NAME(cc, 'ckg'),
-        source_files = ["../../ckg.c"]
+        source_files = ["../../ckg.c"],
+        compiler_inject_into_args=compiler_inject
     ),
 
     "test_ckg": ProcedureConfig(
         build_directory = f"./example/{build_postfix}",
         output_name = "test_ckg.exe",
         source_files = ["../../*.c"],
-        additional_libs = [f"../../../{build_postfix}/{GET_LIB_NAME(cc, 'ckg')}"]
+        additional_libs = [f"../../../{build_postfix}/{GET_LIB_NAME(cc, 'ckg')}"],
+        compiler_inject_into_args=compiler_inject
     ),
 }
 

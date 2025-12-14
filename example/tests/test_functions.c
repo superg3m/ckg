@@ -1,7 +1,10 @@
-#include "../../ckg.h"
-
 #include "./test_memory_functions.c"
 #include "./test_arena_functions.c"
 #include "./test_vector_functions.c"
 #include "./test_string_functions.c"
 #include "./test_linked_list.c"
+#include "./test_serialization.c"
+
+#if !defined(__cplusplus)
+    #include "./test_hashmap_functions.c"
+#endif

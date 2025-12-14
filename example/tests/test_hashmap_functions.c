@@ -1,0 +1,394 @@
+#include "../../ckg.h"
+
+/*
+typedef struct DebugEntry {
+    char* key;
+    int value;
+    bool filled;
+} DebugEntry;
+
+typedef struct DebugMap {
+    CKG_HashMapMeta meta;
+    char* temp_key;
+    int temp_value;
+    DebugEntry* entries;
+} DebugMap;
+*/
+
+typedef struct Person {
+    char* name;
+    int age;
+} Person;
+
+u64 person_hash(void* data, u64 size) {
+    (void)size;
+
+    Person* person = (Person*)data;
+    u64 h1 = ckg_string_hash(person->name, 0);
+    u64 h2 = siphash24(&person->age, sizeof(person->age));
+    return h1 ^ h2;
+}
+
+bool person_equality(void* c1, size_t c1_size, void* c2, size_t c2_size) {
+    (void)c1_size;
+    (void)c2_size;
+
+    Person* p1 = (Person*)c1;
+    Person* p2 = (Person*)c2;
+
+    return (
+        p1->age == p2->age &&
+        ckg_str_equal(p1->name, ckg_cstr_length(p1->name), p2->name, ckg_cstr_length(p2->name))
+    );
+}
+
+void test_integer_keys() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, int, int);
+
+    for (int i = 0; i < 100; i++) {
+        ckg_hashmap_put(map, i, i * 10);
+    }
+
+    for (int i = 0; i < 100; i++) {
+        int value = ckg_hashmap_get(map, i);
+        ckg_assert(value == i * 10);
+    }
+
+    for (int i = 0; i < 50; i++) {
+        ckg_hashmap_put(map, i, i * 20);
+    }
+
+    for (int i = 0; i < 50; i++) {
+        int value = ckg_hashmap_get(map, i);
+        ckg_assert(value == i * 20);
+    }
+
+    ckg_free(map->entries);
+    ckg_free(map);
+
+    CKG_LOG_SUCCESS("Integer key test passed!\n");
+}
+
+void test_string_literal_keys() {
+    CKG_HashMap(char*, int)* str_map = NULLPTR;
+    ckg_hashmap_init_string_hash(str_map, char*, int);
+
+    ckg_hashmap_put(str_map, "one", 1);
+    ckg_hashmap_put(str_map, "two", 2);
+    ckg_hashmap_put(str_map, "three", 3);
+    ckg_hashmap_put(str_map, "four", 4);
+    ckg_hashmap_put(str_map, "five", 5);
+
+    ckg_assert(ckg_hashmap_get(str_map, "one") == 1);
+    ckg_assert(ckg_hashmap_get(str_map, "two") == 2);
+    ckg_assert(ckg_hashmap_get(str_map, "three") == 3);
+    ckg_assert(ckg_hashmap_get(str_map, "four") == 4);
+    ckg_assert(ckg_hashmap_get(str_map, "five") == 5);
+
+    char buffer[10];
+    ckg_str_copy(buffer, sizeof(buffer), CKG_LIT_ARG("three"));
+    ckg_assert(ckg_hashmap_get(str_map, buffer) == 3);
+
+    ckg_hashmap_free(str_map);
+
+    CKG_LOG_SUCCESS("String literal test passed!\n");
+}
+
+void test_char_ptr_keys() {
+    CKG_HashMap(char*, double)* map = NULLPTR;
+    ckg_hashmap_init_string_hash(map, char*, double);
+
+    char* key1 = ckg_str_alloc(CKG_LIT_ARG("apple"));
+    char* key2 = ckg_str_alloc(CKG_LIT_ARG("banana"));
+    char* key3 = ckg_str_alloc(CKG_LIT_ARG("cherry"));
+    char* key4 = ckg_str_alloc(CKG_LIT_ARG("apple"));
+
+    ckg_hashmap_put(map, key1, 1.5);
+    ckg_hashmap_put(map, key2, 2.7);
+    ckg_hashmap_put(map, key3, 3.14);
+
+    ckg_assert(ckg_hashmap_get(map, key1) == 1.5);
+    ckg_assert(ckg_hashmap_get(map, key2) == 2.7);
+    ckg_assert(ckg_hashmap_get(map, key3) == 3.14);
+    ckg_assert(ckg_hashmap_get(map, key4) == 1.5);
+
+    ckg_hashmap_put(map, key1, 5.5);
+    ckg_assert(ckg_hashmap_get(map, key1) == 5.5);
+    ckg_assert(ckg_hashmap_get(map, key4) == 5.5);
+
+    ckg_free(key1);
+    ckg_free(key2);
+    ckg_free(key3);
+    ckg_free(key4);
+
+    ckg_hashmap_free(map);
+
+    CKG_LOG_SUCCESS("Char pointer test passed!\n");
+}
+
+void test_struct_keys() {
+    CKG_HashMap(Person, int)* map = NULLPTR;
+    ckg_hashmap_init_with_hash(map, Person, int, false, person_hash, person_equality);
+
+    Person p1 = { "Alice", 30 };
+    Person p2 = { "Bob", 25 };
+    Person p3 = { "Charlie", 40 };
+    Person p4 = { "Alice", 30 }; // Duplicate of p1
+
+    ckg_hashmap_put(map, p1, 100);
+    ckg_hashmap_put(map, p2, 200);
+    ckg_hashmap_put(map, p3, 300);
+
+    ckg_assert(ckg_hashmap_get(map, p1) == 100);
+    ckg_assert(ckg_hashmap_get(map, p2) == 200);
+    ckg_assert(ckg_hashmap_get(map, p3) == 300);
+    ckg_assert(ckg_hashmap_get(map, p4) == 100); // Should match p1
+
+    ckg_hashmap_put(map, p4, 999); // Overwrite p1
+
+    ckg_assert(ckg_hashmap_get(map, p1) == 999);
+    ckg_assert(ckg_hashmap_get(map, p4) == 999);
+
+    int v = ckg_hashmap_pop(map, p4);
+    ckg_assert(v == 999);
+
+    ckg_hashmap_free(map);
+
+    CKG_LOG_SUCCESS("Struct key test passed!\n");
+}
+
+typedef struct TrivialStruct {
+    int a;
+    bool b;
+    char c;
+    double d;
+} TrivialStruct;
+
+void test_trival_struct() {
+    CKG_HashMap(TrivialStruct, double)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, TrivialStruct, double);
+
+    TrivialStruct p1 = {1, true, 'a', 1.0};
+    TrivialStruct p2 = {2, false, 'b', 2.0};
+    TrivialStruct p3 = {3, true, 'c', 3.0};
+    TrivialStruct p4 = {1, true, 'a', 1.0}; // Duplicate of p1
+
+    ckg_hashmap_put(map, p1, 100.0);
+    ckg_hashmap_put(map, p2, 200.0);
+    ckg_hashmap_put(map, p3, 300.0);
+
+    ckg_assert(ckg_hashmap_get(map, p1) == 100.0);
+    ckg_assert(ckg_hashmap_get(map, p2) == 200.0);
+    ckg_assert(ckg_hashmap_get(map, p3) == 300.0);
+    ckg_assert(ckg_hashmap_get(map, p4) == 100.0); // Should match p1
+
+    ckg_hashmap_put(map, p4, 999.0); // Overwrite p1
+
+    ckg_assert(ckg_hashmap_get(map, p1) == 999.0);
+    ckg_assert(ckg_hashmap_get(map, p4) == 999.0);
+
+    double v = ckg_hashmap_pop(map, p4);
+    ckg_assert(v == 999.0);
+
+    ckg_hashmap_free(map);
+
+    CKG_LOG_SUCCESS("TrivialStruct key test passed!\n");
+}
+
+void test_empty_map() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, int, int);
+
+    ckg_assert(!ckg_hashmap_has(map, 123));
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Empty map test passed!\n");
+}
+
+void test_linear_probing() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, int, int);
+
+    ckg_hashmap_put(map, 0, 0);
+    ckg_hashmap_put(map, 1, 1);
+    ckg_hashmap_put(map, 2, 2);
+    ckg_hashmap_put(map, 3, 3);
+    ckg_hashmap_put(map, 4, 4);
+    ckg_hashmap_put(map, 5, 5);
+    ckg_hashmap_put(map, 6, 6);
+    ckg_hashmap_put(map, 7, 7);
+
+    ckg_assert(ckg_hashmap_get(map, 0) == 0);
+    ckg_assert(ckg_hashmap_get(map, 1) == 1);
+    ckg_assert(ckg_hashmap_get(map, 2) == 2);
+    ckg_assert(ckg_hashmap_get(map, 3) == 3);
+    ckg_assert(ckg_hashmap_get(map, 4) == 4);
+    ckg_assert(ckg_hashmap_get(map, 5) == 5);
+    ckg_assert(ckg_hashmap_get(map, 6) == 6);
+    ckg_assert(ckg_hashmap_get(map, 7) == 7);
+
+    int v = ckg_hashmap_pop(map, 2);
+    ckg_assert(v == 2);
+
+    for (int i = 0; i < (int)map->meta.count; i++) {
+        if (i == 2) {
+            continue;
+        }
+
+        ckg_assert_msg(ckg_hashmap_has(map, i), "EXPECTING TO FIND %d but couldn't linear probing is broken!\n", i);
+    }
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Linear probing test!\n");
+}
+
+void test_single_entry() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, int, int);
+
+    ckg_hashmap_put(map, 42, 9001);
+    ckg_assert(ckg_hashmap_get(map, 42) == 9001);
+
+    ckg_hashmap_put(map, 42, 1337);
+    ckg_assert(ckg_hashmap_get(map, 42) == 1337);
+
+    int v = ckg_hashmap_pop(map, 42);
+    ckg_assert(v == 1337);
+
+    ckg_assert(!ckg_hashmap_has(map, 42));
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Single entry test passed!\n");
+}
+
+u64 small_hash(void* key, u64 size) {
+    (void)size;
+    int k = *(int*)key;
+    return (u64)(k % 4); // force collisions
+}
+
+bool int_equal(void* a, size_t a_size, void* b, size_t b_size) {
+    (void)a_size; (void)b_size;
+    return *(int*)a == *(int*)b;
+}
+
+void test_collisions() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_with_hash(map, int, int, false, small_hash, int_equal);
+
+    for (int i = 0; i < 20; i++) {
+        ckg_hashmap_put(map, i, i * 100);
+    }
+
+    for (int i = 0; i < 20; i++) {
+        ckg_assert(ckg_hashmap_get(map, i) == i * 100);
+    }
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Collision test passed!\n");
+}
+
+void test_large_insertions() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, int, int);
+
+    for (int i = 0; i < 5000; i++) {
+        ckg_hashmap_put(map, i, i+1);
+    }
+
+    for (int i = 0; i < 5000; i++) {
+        ckg_assert(ckg_hashmap_get(map, i) == i+1);
+    }
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Large insertions test passed!\n");
+}
+
+void test_delete_reinsert() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, int, int);
+
+    ckg_hashmap_put(map, 77, 123);
+    ckg_assert(ckg_hashmap_pop(map, 77) == 123);
+
+    ckg_hashmap_put(map, 77, 456);
+    ckg_assert(ckg_hashmap_get(map, 77) == 456);
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Delete & reinsert test passed!\n");
+}
+
+void test_overwrite_same_key() {
+    CKG_HashMap(int, int)* map = NULLPTR;
+    ckg_hashmap_init_siphash(map, int, int);
+
+    for (int i = 0; i < 1000; i++) {
+        ckg_hashmap_put(map, 5, i);
+    }
+
+    ckg_assert(ckg_hashmap_get(map, 5) == 999);
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Overwrite same key test passed!\n");
+}
+
+void test_string_edge_cases() {
+    CKG_HashMap(char*, int)* map = NULLPTR;
+    ckg_hashmap_init_string_hash(map, char*, int);
+
+    // Empty string key
+    ckg_hashmap_put(map, "", 123);
+    ckg_assert(ckg_hashmap_get(map, "") == 123);
+
+    // Very long key
+    size_t len = 1024;
+    char* big = (char*)ckg_alloc(len+1);
+    for (size_t i = 0; i < len; i++) big[i] = 'x';
+    big[len] = '\0';
+
+    ckg_hashmap_put(map, big, 456);
+    ckg_assert(ckg_hashmap_get(map, big) == 456);
+
+    ckg_free(big);
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("String edge case test passed!\n");
+}
+
+void test_struct_mutation() {
+    CKG_HashMap(Person, int)* map = NULLPTR;
+    ckg_hashmap_init_with_hash(map, Person, int, false, person_hash, person_equality);
+
+    Person p = { "Mutant", 50 };
+    ckg_hashmap_put(map, p, 111);
+
+    // Mutate local copy AFTER insertion
+    p.age = 99;
+
+    Person lookup = { "Mutant", 50 };
+    ckg_assert(ckg_hashmap_get(map, lookup) == 111);
+
+    ckg_hashmap_free(map);
+    CKG_LOG_SUCCESS("Struct mutation test passed!\n");
+}
+
+// Combine all tests here
+void ckg_hashmap_test() {
+    // DebugMap m = {0};
+    // (void)m;
+
+    test_integer_keys();
+    test_string_literal_keys();
+    test_char_ptr_keys();
+    test_struct_keys();
+    test_trival_struct();
+    test_empty_map();
+    test_linear_probing();
+    test_single_entry();
+    test_collisions();
+    test_large_insertions();
+    test_delete_reinsert();
+    test_overwrite_same_key();
+    test_string_edge_cases();
+    test_struct_mutation();
+}
